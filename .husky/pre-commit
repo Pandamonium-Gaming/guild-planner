@@ -10,5 +10,8 @@ npx cspell "**/*.md" || { echo "❌ Spelling errors detected (en-GB). Add words 
 # Run markdownlint on changed markdown files  
 npx markdownlint-cli2 "**/*.md" || { echo "❌ Markdown linting errors detected. Fix and retry."; exit 1; }
 
-echo "✅ Spelling and markdown checks passed! (Tests run in CI)"
+echo "🌍 Checking translation sync..."
+node scripts/check-translations.js || { echo "❌ Translation files are out of sync. Run 'npm run check:translations' for details."; exit 1; }
+
+echo "✅ All pre-commit checks passed! (Tests run in CI)"
 

@@ -30,6 +30,9 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+      - name: Check translation sync
+        run: npm run check:translations
+
       - name: Run tests
         run: npm run test:coverage
 
