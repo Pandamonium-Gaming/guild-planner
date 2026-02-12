@@ -12,6 +12,11 @@
     "test:coverage": "jest --coverage",
     "update-ships": "node scripts/fetch-ships.js",
     "check:translations": "node scripts/check-translations.js",
+    "check:changelog": "node scripts/check-changelog.js",
+    "version:bump": "node scripts/version-bump.js",
+    "version:patch": "node scripts/version-bump.js patch",
+    "version:minor": "node scripts/version-bump.js minor",
+    "version:major": "node scripts/version-bump.js major",
     "prepare": "husky"
   },
   "dependencies": {
