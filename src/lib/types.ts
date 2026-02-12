@@ -63,6 +63,15 @@ export interface Clan {
   group_icon_url?: string;
   aoc_welcome_enabled?: boolean;
   sc_welcome_enabled?: boolean;
+  aoc_recruitment_open?: boolean;
+  sc_recruitment_open?: boolean;
+  ror_recruitment_open?: boolean;
+  aoc_recruitment_message?: string | null;
+  sc_recruitment_message?: string | null;
+  ror_recruitment_message?: string | null;
+  aoc_public_description?: string | null;
+  sc_public_description?: string | null;
+  ror_public_description?: string | null;
 }
 
 // Race and Archetype types (match database ENUMs)
@@ -227,6 +236,7 @@ export interface RecruitmentApplication {
   id: string;
   group_id: string;
   user_id?: string;
+  game_slug?: string;
   discord_username: string;
   character_name?: string;
   primary_class?: string;

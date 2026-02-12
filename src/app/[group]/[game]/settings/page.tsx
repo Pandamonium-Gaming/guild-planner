@@ -7,6 +7,7 @@ import { useGameLayoutContext } from '@/contexts/GameLayoutContext';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { RankManagement } from '@/components/settings/RankManagement';
 import { ClanSettings } from '@/components/settings/ClanSettings';
+import { GameRecruitmentSettings } from '@/components/settings/GameRecruitmentSettings';
 import { getGroupBySlug } from '@/lib/auth';
 import type { GroupRole } from '@/lib/permissions';
 import { ArrowLeft } from 'lucide-react';
@@ -94,6 +95,11 @@ export default function SettingsPage() {
           rorAnnouncementRoleId={group.ror_announcement_role_id || ''}
           rorEventsRoleId={group.ror_events_role_id || ''}
         />
+      )}
+
+      {/* Game-Specific Recruitment Settings */}
+      {canEditSettings && group && (
+        <GameRecruitmentSettings groupId={group.id} gameSlug={gameSlug} />
       )}
     </div>
   );
