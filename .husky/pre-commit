@@ -11,3 +11,4 @@ npx cspell "**/*.md" || { echo "❌ Spelling errors detected (en-GB). Add words 
 npx markdownlint-cli2 "**/*.md" || { echo "❌ Markdown linting errors detected. Fix and retry."; exit 1; }
 
 echo "✅ Spelling and markdown checks passed! (Tests run in CI)"
+

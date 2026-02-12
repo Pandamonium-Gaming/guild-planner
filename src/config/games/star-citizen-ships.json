@@ -1,7 +1,7 @@
 {
-  "lastUpdated": "2026-02-02T22:39:55.960Z",
+  "lastUpdated": "2026-02-12T14:10:00.290Z",
   "source": "https://robertsspaceindustries.com/ship-matrix/index",
-  "totalShips": 246,
+  "totalShips": 247,
   "ships": [
     {
       "id": "avenger-stalker",
@@ -1952,6 +1952,31 @@
       "description": "ARGO’s pragmatic no-nonsense approach to ship design is celebrated in the unmistakable silhouette of the MOLE. Just one look at this machine and you know it means business. Tap into your full potential with the combined force of ARGO’s patented trilateral mining system. The MOLE has a total of 24 mineral pods, each holding 12 SCU. Eight pods are usable at one time – when they’re full, either head home or jettison them for collection by another vessel and carry on mining. Three independently controlled articulated extraction stations allow for maximum power and near-limitless versatility. The MOLE lives by the adage ’many hands make for light work’.",
       "url": "https://robertsspaceindustries.com/pledge/ships/argo-mole/MOLE",
       "image": "https://media.robertsspaceindustries.com/wgai60tvwa3vs/store_large.jpg"
+    },
+    {
+      "id": "moth",
+      "name": "MOTH",
+      "manufacturer": "Argo Astronautics",
+      "manufacturerCode": "ARGO",
+      "role": "Medium Salvage",
+      "size": "medium",
+      "length": 45,
+      "beam": 25,
+      "height": 15,
+      "mass": 1169686,
+      "cargo": 224,
+      "crew": {
+        "min": 1,
+        "max": 4
+      },
+      "speed": {
+        "scm": 140,
+        "afterburner": null
+      },
+      "productionStatus": "flight-ready",
+      "description": "A medium salvager built to bridge the gap between light salvage and full industrial undertakings. With Argo’s industrial heritage leading the design, the MOTH is the natural next step for those looking for team-driven, larger-scale operations.",
+      "url": "https://robertsspaceindustries.com/pledge/ships/moth/MOTH",
+      "image": "https://media.robertsspaceindustries.com/e6qe6d6cyguo3/store_large.jpg"
     },
     {
       "id": "mpuv-cargo",
