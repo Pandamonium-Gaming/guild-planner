@@ -3,7 +3,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { GAME_DISCORD_COLUMNS, GameId } from '@/lib/discordConfig';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Webhook, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { testDiscordWebhook } from '@/lib/discord';
@@ -87,6 +87,49 @@ export function ClanSettings({
   const [error, setError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string; game?: string } | null>(null);
   const { t } = useLanguage();
+
+  // Sync state when props change (when group data loads)
+  useEffect(() => {
+    setGameConfig({
+      aoc: {
+        webhookUrl: currentAocWebhookUrl,
+        eventsWebhookUrl: currentAocEventsWebhookUrl,
+        announcementRoleId: aocAnnouncementRoleId,
+        eventsRoleId: aocEventsRoleId,
+      },
+      sc: {
+        webhookUrl: currentScWebhookUrl,
+        eventsWebhookUrl: currentScEventsWebhookUrl,
+        announcementRoleId: scAnnouncementRoleId,
+        eventsRoleId: scEventsRoleId,
+      },
+      ror: {
+        webhookUrl: currentRorWebhookUrl,
+        eventsWebhookUrl: currentRorEventsWebhookUrl,
+        announcementRoleId: rorAnnouncementRoleId,
+        eventsRoleId: rorEventsRoleId,
+      },
+      cc: {
+        webhookUrl: '',
+        eventsWebhookUrl: '',
+        announcementRoleId: '',
+        eventsRoleId: '',
+      },
+    });
+  }, [
+    currentAocWebhookUrl,
+    currentAocEventsWebhookUrl,
+    currentScWebhookUrl,
+    currentScEventsWebhookUrl,
+    currentRorWebhookUrl,
+    currentRorEventsWebhookUrl,
+    aocAnnouncementRoleId,
+    aocEventsRoleId,
+    scAnnouncementRoleId,
+    scEventsRoleId,
+    rorAnnouncementRoleId,
+    rorEventsRoleId,
+  ]);
 
   const normalizeGameId = (id: string): GameId => {
     if (id === 'starcitizen' || id === 'star-citizen') return 'sc';

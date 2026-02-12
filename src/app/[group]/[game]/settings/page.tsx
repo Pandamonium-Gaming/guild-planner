@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGameLayoutContext } from '@/contexts/GameLayoutContext';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
@@ -9,6 +10,7 @@ import { ClanSettings } from '@/components/settings/ClanSettings';
 import { RecruitmentSettings } from '@/components/settings/RecruitmentSettings';
 import { getGroupBySlug } from '@/lib/auth';
 import type { GroupRole } from '@/lib/permissions';
+import { ArrowLeft } from 'lucide-react';
 
 export default function SettingsPage() {
   const { group, groupSlug, gameSlug, userId, hasPermission, membership } = useGameLayoutContext();
@@ -52,9 +54,16 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-6">
         <h2 className="text-xl font-bold text-white mb-2">{t('settings.gameSettingsTitle') || `${gameSlug.toUpperCase()} Settings`}</h2>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-slate-400 mb-3">
           Configure game-specific settings for {gameSlug === 'aoc' ? 'Ashes of Creation' : gameSlug === 'sc' || gameSlug === 'starcitizen' ? 'Star Citizen' : gameSlug === 'ror' ? 'Return of Reckoning' : gameSlug.toUpperCase()}.
         </p>
+        <Link 
+          href={`/${groupSlug}/settings`}
+          className="inline-flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          View Guild-wide Settings
+        </Link>
       </div>
 
       {/* Rank Management - Only for games with member ranks (Star Citizen) */}

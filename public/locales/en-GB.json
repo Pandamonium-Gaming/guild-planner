@@ -264,6 +264,7 @@
   },
   "settings": {
     "title": "Settings",
+    "gameSettingsTitle": "Game Settings",
     "profile": "Profile",
     "displayName": "Display Name",
     "displayNameHint": "This is how your name appears to other clan members.",

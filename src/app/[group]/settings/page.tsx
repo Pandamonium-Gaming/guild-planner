@@ -156,13 +156,42 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ group:
 
           {/* Discord Integration */}
           {canEditSettings && group && (
-            <GroupDiscordSettings
-              groupId={group.id}
-              currentWebhookUrl={group.group_webhook_url || ''}
-              currentWelcomeWebhookUrl={group.group_welcome_webhook_url || ''}
-              notifyOnEvents={group.notify_on_events ?? true}
-              notifyOnAnnouncements={group.notify_on_announcements ?? true}
-            />
+            <>
+              <GroupDiscordSettings
+                groupId={group.id}
+                currentWebhookUrl={group.group_webhook_url || ''}
+                currentWelcomeWebhookUrl={group.group_welcome_webhook_url || ''}
+                notifyOnEvents={group.notify_on_events ?? true}
+                notifyOnAnnouncements={group.notify_on_announcements ?? true}
+              />
+              
+              {/* Links to game-specific Discord settings */}
+              <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-4">
+                <p className="text-sm text-slate-300 mb-3">
+                  Configure game-specific Discord webhooks and role mentions:
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href={`/${groupSlug}/aoc/settings`}
+                    className="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 hover:text-purple-300 rounded-lg transition-colors text-sm border border-slate-600"
+                  >
+                    Ashes of Creation Discord Settings
+                  </Link>
+                  <Link
+                    href={`/${groupSlug}/sc/settings`}
+                    className="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 hover:text-purple-300 rounded-lg transition-colors text-sm border border-slate-600"
+                  >
+                    Star Citizen Discord Settings
+                  </Link>
+                  <Link
+                    href={`/${groupSlug}/ror/settings`}
+                    className="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 hover:text-purple-300 rounded-lg transition-colors text-sm border border-slate-600"
+                  >
+                    Return of Reckoning Discord Settings
+                  </Link>
+                </div>
+              </div>
+            </>
           )}
 
           {/* Recruitment Settings */}
