@@ -103,8 +103,14 @@
     "creator": "oprichter"
   },
   "group": {
+    "joinClan": "Lid worden van groep",
+    "applyToJoin": "Aanmelden om lid te worden",
+    "applyDescription": "Meld je aan om lid te worden van {{name}}. Een beheerder zal je aanmelding beoordelen.",
     "applicationPending": "Aanmelding in afwachting",
     "pendingApproval": "Je aanmelding om lid te worden van {{name}} wordt beoordeeld door een beheerder of officier.",
+    "accessAfterApproval": "Je krijgt toegang tot groepsgegevens zodra je bent goedgekeurd.",
+    "loginRequired": "Login vereist",
+    "signInToAccess": "Log in met Discord om toegang te krijgen tot {{name}}",
     "notFound": "Groep niet gevonden",
     "doesNotExist": "De groep '{{name}}' bestaat niet.",
     "errorLoading": "Fout bij laden van groep",
@@ -258,6 +264,8 @@
   },
   "settings": {
     "title": "Instellingen",
+    "groupSettingsTitle": "Groepsinstellingen",
+    "gameSettingsTitle": "Spelinstellingen",
     "profile": "Profiel",
     "displayName": "Weergavenaam",
     "displayNameHint": "Dit is hoe je naam verschijnt voor andere clanleden.",
@@ -454,6 +462,7 @@
     "hasMayor": "Heeft groep burgemeester",
     "noCitizenships": "Geen burgerschap ingesteld",
     "noCitizenshipsDesc": "Voeg burgerschap informatie toe aan personages om de node verdeling van de groep te zien.",
+    "distribution": "Verdeling",
     "unassignedMembers": "{{count}} leden hebben geen burgerschap toegewezen",
     "totalNodes": "{{count}} nodes",
     "membersAssigned": "leden toegewezen",

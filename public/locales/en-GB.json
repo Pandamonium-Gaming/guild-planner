@@ -462,6 +462,7 @@
     "hasMayor": "Has group mayor",
     "noCitizenships": "No Citizenships Set",
     "noCitizenshipsDesc": "Add citizenship information to characters to see the group's node distribution.",
+    "distribution": "Distribution",
     "unassignedMembers": "{{count}} members don't have citizenship assigned",
     "totalNodes": "{{count}} nodes",
     "membersAssigned": "members assigned",
