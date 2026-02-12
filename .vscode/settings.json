@@ -44,7 +44,8 @@
         "/^node test2\\.js$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "git tag": true
     },
     "codeQL.githubDatabase.download": "never"
 }
