@@ -4,12 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGameLayoutContext } from '@/contexts/GameLayoutContext';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
-import { ManageTab } from '../tabs/ManageTab';
-import { GuildIconUploaderWrapper } from '../GuildIconUploaderWrapper';
-import { PermissionsSettings } from '@/components/settings/PermissionsSettings';
+import { RankManagement } from '@/components/settings/RankManagement';
 import { ClanSettings } from '@/components/settings/ClanSettings';
 import { RecruitmentSettings } from '@/components/settings/RecruitmentSettings';
-import { GameManagement } from '@/components/settings/GameManagement';
 import { getGroupBySlug } from '@/lib/auth';
 import type { GroupRole } from '@/lib/permissions';
 
@@ -20,20 +17,13 @@ export default function SettingsPage() {
   // Settings page needs full membership management functions
   const {
     members,
-    pendingMembers,
     canManageMembers,
-    canManageRoles,
     updateRank,
-    updateRole,
-    removeMember,
-    acceptMember,
-    rejectMember,
   } = useGroupMembership(group?.id || null, userId, gameSlug);
 
-  const canEditPermissions = hasPermission('settings_edit_permissions');
   const canEditSettings = hasPermission('settings_edit');
 
-  const [guildIconUrl, setGuildIconUrl] = useState(group?.group_icon_url || '');
+  const [_guildIconUrl, _setGuildIconUrl] = useState(group?.group_icon_url || '');
   const prevIconUrlRef = useRef<string | undefined>(group?.group_icon_url);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -41,83 +31,66 @@ export default function SettingsPage() {
     const newUrl = group?.group_icon_url || '';
     if (prevIconUrlRef.current !== newUrl) {
       prevIconUrlRef.current = newUrl;
-      setGuildIconUrl(newUrl);
+      _setGuildIconUrl(newUrl);
     }
   }, [group?.group_icon_url]);
 
-  async function refreshGuildIcon() {
+  async function _refreshGuildIcon() {
     if (!groupSlug) return;
     const latest = await getGroupBySlug(groupSlug);
-    if (latest?.group_icon_url) setGuildIconUrl(latest.group_icon_url);
+    if (latest?.group_icon_url) _setGuildIconUrl(latest.group_icon_url);
   }
 
   if (!group || !userId || !membership) {
     return null;
   }
 
+  // Determine if this game has member ranks (Star Citizen only currently)
+  const gameHasRanks = gameSlug === 'sc' || gameSlug === 'starcitizen';
+
   return (
     <div className="space-y-6">
-      {canEditSettings && group && (
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-2">{t('group_icon')}</h3>
-          <GuildIconUploaderWrapper
-            groupId={group.id}
-            currentUrl={guildIconUrl}
-            onIconChange={refreshGuildIcon}
-          />
-        </div>
+      <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-6">
+        <h2 className="text-xl font-bold text-white mb-2">{t('settings.gameSettingsTitle') || `${gameSlug.toUpperCase()} Settings`}</h2>
+        <p className="text-sm text-slate-400">
+          Configure game-specific settings for {gameSlug === 'aoc' ? 'Ashes of Creation' : gameSlug === 'sc' || gameSlug === 'starcitizen' ? 'Star Citizen' : gameSlug === 'ror' ? 'Return of Reckoning' : gameSlug.toUpperCase()}.
+        </p>
+      </div>
+
+      {/* Rank Management - Only for games with member ranks (Star Citizen) */}
+      {gameHasRanks && canManageMembers && (
+        <RankManagement
+          members={members}
+          onUpdateRank={updateRank}
+          currentUserId={userId}
+          currentUserRole={(membership.role || 'member') as GroupRole}
+          gameSlug={gameSlug}
+        />
       )}
 
-      <ManageTab
-        members={members}
-        pendingMembers={pendingMembers}
-        onAccept={acceptMember}
-        onReject={rejectMember}
-        onUpdateRole={canManageRoles ? updateRole : undefined}
-        onUpdateRank={canManageMembers ? updateRank : undefined}
-        onRemove={canManageRoles ? removeMember : undefined}
-        currentUserId={userId}
-        currentUserRole={(membership.role || 'member') as GroupRole}
-        gameSlug={gameSlug}
-        t={t}
-      />
-
-      {canEditPermissions && group && (
-        <PermissionsSettings groupId={group.id} userRole={(membership.role || 'member') as GroupRole} />
-      )}
-
+      {/* Game-Specific Discord Settings */}
       {canEditSettings && group && (
         <ClanSettings
           groupId={group.id}
           gameSlug={gameSlug}
-          currentWebhookUrl={group.group_webhook_url || ''}
-          currentWelcomeWebhookUrl={group.group_welcome_webhook_url || ''}
           currentAocWebhookUrl={group.aoc_webhook_url || ''}
           currentAocEventsWebhookUrl={group.aoc_events_webhook_url || ''}
           currentScWebhookUrl={group.sc_webhook_url || ''}
           currentScEventsWebhookUrl={group.sc_events_webhook_url || ''}
           currentRorWebhookUrl={group.ror_webhook_url || ''}
           currentRorEventsWebhookUrl={group.ror_events_webhook_url || ''}
-          notifyOnEvents={group.notify_on_events ?? true}
-          notifyOnAnnouncements={group.notify_on_announcements ?? true}
-          announcementRoleId={group.discord_announcement_role_id || ''}
           aocAnnouncementRoleId={group.aoc_announcement_role_id || ''}
           aocEventsRoleId={group.aoc_events_role_id || ''}
           scAnnouncementRoleId={group.sc_announcement_role_id || ''}
           scEventsRoleId={group.sc_events_role_id || ''}
           rorAnnouncementRoleId={group.ror_announcement_role_id || ''}
           rorEventsRoleId={group.ror_events_role_id || ''}
-          aocWelcomeEnabled={group.aoc_welcome_enabled ?? true}
-          scWelcomeEnabled={group.sc_welcome_enabled ?? true}
         />
       )}
 
+      {/* Game-Specific Recruitment Settings */}
       {membership.role === 'admin' && group && (
         <RecruitmentSettings groupId={group.id} groupSlug={groupSlug} />
-      )}
-
-      {membership.role === 'admin' && group && (
-        <GameManagement groupId={group.id} />
       )}
     </div>
   );
