@@ -36,7 +36,15 @@
         "npx eslint": true,
         "EventsList\"": true,
         "FAIL": true,
-        "Test": true
+        "Test": true,
+        "/^node test-changelog\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node test2\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     },
     "codeQL.githubDatabase.download": "never"
 }
