@@ -10,6 +10,10 @@
 
 * Standardized footer across all pages using InlineFooter component (group settings, public group page)
 
+### Fixed
+
+* Markdown linting error (MD024) in CHANGELOG.md by configuring siblings_only mode for duplicate headings
+
 ## \[0.1.1] - 2026-02-12
 
 ### Added
