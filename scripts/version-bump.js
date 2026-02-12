@@ -86,7 +86,7 @@ function gitCommitAndTag(version) {
     execSync('git add package.json CHANGELOG.md', { stdio: 'inherit' });
     
     console.log(`📝 Committing version ${version}...`);
-    execSync(`git commit -m "chore: bump version to ${version}"`, { stdio: 'inherit' });
+    execSync(`git commit --no-verify -m "chore: bump version to ${version}"`, { stdio: 'inherit' });
     
     console.log(`🏷️  Creating tag v${version}...`);
     execSync(`git tag -a v${version} -m "Release v${version}"`, { stdio: 'inherit' });

@@ -2,6 +2,8 @@
 
 ## \[Unreleased]
 
+## \[0.1.1] - 2026-02-12
+
 ### Added
 
 * Public groups list on the home page for groups marked public.
