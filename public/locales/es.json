@@ -262,6 +262,8 @@
   },
   "settings": {
     "title": "Configuración",
+    "groupSettingsTitle": "Configuración del Grupo",
+    "gameSettingsTitle": "Configuración del Juego",
     "profile": "Perfil",
     "displayName": "Nombre para mostrar",
     "displayNameHint": "Así aparecerá tu nombre para otros miembros del clan.",

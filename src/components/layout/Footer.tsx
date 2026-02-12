@@ -1,6 +1,7 @@
 'use client';
 
-// Build timestamp for debugging/version tracking
+// Build information for debugging/version tracking
+const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || '0.0.0';
 const BUILD_TIMESTAMP = process.env.NEXT_PUBLIC_BUILD_TIMESTAMP || new Date().toISOString();
 
 // Inline footer component for use inside flex layouts
@@ -55,8 +56,12 @@ export function InlineFooter({ variant = 'default' }: { variant?: 'default' | 'm
           <span className="text-slate-600 hidden sm:inline">|</span>
           <span className="hidden sm:inline">Based on <a href="https://github.com/igonzalezespi/aoc-guild-profession-planner" target="_blank" className="text-indigo-400 hover:text-indigo-300 transition-colors" rel="noopener noreferrer">AoC Guild Profession Planner</a></span>
         </div>
-        <div className="text-[9px] md:text-[10px] text-slate-600 hidden md:block">
-          <span title={BUILD_TIMESTAMP}>Build: {buildDate}</span>
+        <div className="text-[9px] md:text-[10px] text-slate-600">
+          <span className="inline-flex items-center gap-2">
+            <span>v{APP_VERSION}</span>
+            <span className="text-slate-700 hidden md:inline">•</span>
+            <span className="hidden md:inline" title={BUILD_TIMESTAMP}>Build: {buildDate}</span>
+          </span>
         </div>
       </div>
     </footer>

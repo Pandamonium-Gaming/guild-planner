@@ -4,11 +4,37 @@
 
 ### Added
 
+* Version number and build date/time displayed in footer (auto-injected from package.json at build time)
+
+### Changed
+
+* Standardized footer across all pages using InlineFooter component (group settings, public group page)
+
+### Fixed
+
+* Markdown linting error (MD024) in CHANGELOG.md by configuring siblings\_only mode for duplicate headings
+
+## \[0.1.1] - 2026-02-12
+
+### Added
+
 * Public groups list on the home page for groups marked public.
 * Admin setting to require approval for new members.
 * Configurable starting role (trial or member) for new group members.
 * Separate Group Settings page accessible from group root (`/[group]/settings`).
 * Settings button in group header for admins to access group-wide settings.
+* **Automated version management system with changelog validation**
+  * `check-changelog.js` script validates CHANGELOG.md is updated with significant code changes
+  * `version-bump.js` script automates semver version bumping and CHANGELOG updates with `--commit` flag for one-command releases
+  * Pre-commit hook enforces changelog updates for significant changes
+  * CI pipeline validates changelog is maintained
+  * npm scripts: `version:patch`, `version:minor`, `version:major` for releases
+  * Comprehensive [.github/copilot-instructions.md](.github/copilot-instructions.md) for AI assistant workflow automation
+* **Automated translation sync validation**
+  * `check-translations.js` script ensures all language files (en-GB, es, nl) have matching keys
+  * Pre-commit hook prevents commits with out-of-sync translations
+  * CI pipeline validates translation consistency
+  * npm script: `check:translations` for manual verification
 * **Testing infrastructure with Jest and React Testing Library**
 * **Phase 1 authentication and permission system test suite: 133 passing tests**
   * Permission system tests (30 tests, 100% coverage)

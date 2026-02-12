@@ -1,0 +1,251 @@
+# GitHub Copilot Instructions for Guild Planner
+
+## Critical Rules - Always Follow
+
+### 1. CHANGELOG.md Updates (REQUIRED)
+
+**When making ANY significant code changes, you MUST update CHANGELOG.md:**
+
+* **What requires changelog updates:**
+  * Any changes to `src/`, `components/`, `lib/`, `app/`, `pages/`
+  * Database migrations in `supabase/migrations/`
+  * Changes to `public/` assets or locales
+  * Modifications to `package.json`, `next.config.ts`, or build config
+
+* **What does NOT require changelog updates:**
+  * Documentation files (`*.md`)
+  * Test files (`*.test.*`, `*.spec.*`)
+  * Configuration files (eslint, jest, tsconfig, etc.)
+  * GitHub workflow files (`.github/`)
+  * Script utilities (`scripts/check-*`)
+
+**CHANGELOG format:**
+
+```markdown
+## \[Unreleased]
+
+### Added
+* New features or capabilities
+
+### Changed
+* Changes to existing functionality
+
+### Fixed
+* Bug fixes
+
+### Deprecated
+* Soon-to-be removed features
+
+### Removed
+* Removed features
+
+### Security
+* Security-related changes
+```
+
+**Pre-commit hook will reject commits if:**
+
+* Significant changes exist but CHANGELOG.md `[Unreleased]` section is empty
+* Translation files are out of sync
+
+### 2. Translation Sync (REQUIRED)
+
+**All translation files must have identical keys:**
+
+* `public/locales/en-GB.json` (English - primary)
+* `public/locales/es.json` (Spanish)
+* `public/locales/nl.json` (Dutch)
+
+**When adding/removing translation keys:**
+
+1. Update `en-GB.json` first with English text
+2. Add corresponding keys to `es.json` with Spanish translation
+3. Add corresponding keys to `nl.json` with Dutch translation
+4. Run `npm run check:translations` to verify
+
+**Pre-commit hook will reject commits if:**
+
+* Translation files have mismatched keys
+
+### 3. Version Management
+
+**Semantic Versioning (semver):**
+
+* **patch** (0.0.X): Bug fixes, small changes
+* **minor** (0.X.0): New features, backwards-compatible
+* **major** (X.0.0): Breaking changes
+
+**Version bump workflow:**
+
+```bash
+# After making changes and updating CHANGELOG.md:
+npm run version:patch -- --commit   # Automatically commits and tags
+# Then just: git push && git push --tags
+```
+
+**Manual workflow (if you have other uncommitted changes):**
+
+```bash
+npm run version:patch    # Updates files only
+# Review changes, then:
+git add package.json CHANGELOG.md
+git commit -m "chore: bump version to X.Y.Z"
+git tag -a vX.Y.Z -m "Release vX.Y.Z"
+git push && git push --tags
+```
+
+## Development Workflow
+
+### Making Changes
+
+1. **Implement the change** in source code
+2. **Update CHANGELOG.md** under `[Unreleased]` section
+3. **Update translations** if adding new UI text
+4. **Commit** - pre-commit hooks will validate
+5. **Push** to trigger CI validation
+
+### Creating a Release
+
+1. Ensure CHANGELOG.md is up-to-date
+2. Run `npm run version:patch -- --commit` (or minor/major)
+3. Push: `git push && git push --tags`
+
+**That's it! Three commands total, or just one if using aliases.**
+
+## Automated Checks
+
+### Pre-commit (Husky)
+
+* ✅ Spelling (cspell on \*.md files)
+* ✅ Markdown linting
+* ✅ Translation sync
+* ✅ Changelog updates
+
+### CI Pipeline (GitHub Actions)
+
+* ✅ Linting (ESLint)
+* ✅ Translation sync
+* ✅ Changelog updates
+* ✅ Tests (Jest with coverage)
+* ✅ Build verification
+
+## File Structure Conventions
+
+### Settings Organization
+
+* **Group Settings** (`/[group]/settings`): Guild-wide settings
+  * Recruitment (guild-wide)
+  * Permissions
+  * Games management
+  * Member management
+  * Discord webhooks (guild-wide)
+  * Group icon
+
+* **Game Settings** (`/[group]/[game]/settings`): Game-specific settings
+  * Rank management (per game)
+  * Discord webhooks (per game)
+  * Per-game recruitment settings
+
+### Multi-Game Architecture
+
+* Check `docs/MULTI_GAME_ARCHITECTURE.md` for details
+* Support for: Ashes of Creation, Star Citizen, Return of Reckoning
+* Game-specific components in `src/games/[game]/`
+* Shared components in `src/components/`
+
+## Common Tasks
+
+### Adding a New Translation Key
+
+1. Add to `en-GB.json`: `"key": "English text"`
+2. Add to `es.json`: `"key": "Spanish text"`
+3. Add to `nl.json`: `"key": "Dutch text"`
+4. Verify: `npm run check:translations`
+5. Update CHANGELOG.md under `### Added`
+
+### Adding a New Feature
+
+1. Implement feature in appropriate directory
+
+2. Add tests if applicable
+
+3. Update CHANGELOG.md:
+
+   ```markdown
+   ### Added
+   * Feature description with key details
+   ```
+
+4. Add translations if UI text is involved
+
+5. Commit and let pre-commit hooks validate
+
+### Fixing a Bug
+
+1. Implement fix
+
+2. Add test to prevent regression (if applicable)
+
+3. Update CHANGELOG.md:
+
+   ```markdown
+   ### Fixed
+   * Bug description and what was fixed
+   ```
+
+4. Commit
+
+### Database Migrations
+
+1. Create migration file in `supabase/migrations/`
+2. Follow existing naming convention: `XXX_descriptive_name.sql`
+3. Include migration in `migration_history` table recording
+4. Update CHANGELOG.md under `### Added` or `### Changed`
+5. Test migration locally before committing
+
+## Testing
+
+### Running Tests
+
+```bash
+npm test              # Run all tests
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage report
+```
+
+### Test Coverage
+
+* Minimum 50% coverage threshold enforced
+* See `TESTING.md` for comprehensive testing guide
+
+## Quick Reference
+
+```bash
+# Validation
+npm run check:translations   # Check translation sync
+npm run check:changelog      # Check changelog updates
+
+# Version Management
+npm run version:patch        # Bump patch version
+npm run version:minor        # Bump minor version
+npm run version:major        # Bump major version
+
+# Development
+npm run dev                  # Start dev server
+npm run build                # Production build
+npm run lint                 # Run linter
+npm test                     # Run tests
+
+# Scripts
+npm run update-ships         # Update Star Citizen ship data
+```
+
+## Notes for AI Assistant
+
+* **Always ask** if unsure about version bump type (patch/minor/major)
+* **Always update CHANGELOG.md** when making code changes
+* **Always sync translations** when adding UI text
+* **Reference existing patterns** in codebase before creating new approaches
+* **Follow TypeScript types** - check `src/lib/types.ts` for interfaces
+* **Use existing hooks** - check `src/hooks/` before creating new ones
+* **Check documentation** - `docs/` folder has detailed guides

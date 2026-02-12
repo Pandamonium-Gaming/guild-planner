@@ -30,6 +30,12 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+      - name: Check translation sync
+        run: npm run check:translations
+
+      - name: Check changelog updates
+        run: npm run check:changelog
+
       - name: Run tests
         run: npm run test:coverage
 

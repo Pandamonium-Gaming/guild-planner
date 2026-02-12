@@ -3,15 +3,17 @@
 import { use, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Settings } from 'lucide-react';
+import { ArrowLeft, Settings, LogOut } from 'lucide-react';
 import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGroupData } from '@/hooks/useGroupData';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { usePermissions } from '@/hooks/usePermissions';
+import { InlineFooter } from '@/components/layout/Footer';
 import { GuildIconUploaderWrapper } from '../[game]/GuildIconUploaderWrapper';
 import { PermissionsSettings } from '@/components/settings/PermissionsSettings';
 import { RecruitmentSettings } from '@/components/settings/RecruitmentSettings';
+import { GroupDiscordSettings } from '@/components/settings/GroupDiscordSettings';
 import { GameManagement } from '@/components/settings/GameManagement';
 import { MemberManagement } from '@/components/settings/MemberManagement';
 import { getGroupBySlug } from '@/lib/auth';
@@ -19,7 +21,7 @@ import { ClanLoadingScreen } from '@/components/screens/ClanLoadingScreen';
 
 export default function GroupSettingsPage({ params }: { params: Promise<{ group: string }> }) {
   const { group: groupSlug } = use(params);
-  const { user, profile } = useAuthContext();
+  const { user, profile, signOut } = useAuthContext();
   const { t } = useLanguage();
 
   const { group } = useGroupData(groupSlug);
@@ -110,8 +112,15 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ group:
                 <p className="text-sm text-slate-400">{t('settings.groupSettingsTitle') || 'Group Settings'}</p>
               </div>
             </div>
-            <div className="text-sm text-slate-400">
-              {displayName}
+            <div className="flex items-center gap-2">
+              <span className="text-slate-300 text-sm hidden sm:inline">{displayName}</span>
+              <button
+                onClick={signOut}
+                className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors cursor-pointer"
+                title="Sign out"
+              >
+                <LogOut className="w-[18px] h-[18px]" />
+              </button>
             </div>
           </div>
         </div>
@@ -153,6 +162,46 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ group:
             <PermissionsSettings groupId={group.id} userRole={membership.role || 'member'} />
           )}
 
+          {/* Discord Integration */}
+          {canEditSettings && group && (
+            <>
+              <GroupDiscordSettings
+                groupId={group.id}
+                currentWebhookUrl={group.group_webhook_url || ''}
+                currentWelcomeWebhookUrl={group.group_welcome_webhook_url || ''}
+                notifyOnEvents={group.notify_on_events ?? true}
+                notifyOnAnnouncements={group.notify_on_announcements ?? true}
+              />
+              
+              {/* Links to game-specific Discord settings */}
+              <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700 p-4">
+                <p className="text-sm text-slate-300 mb-3">
+                  Configure game-specific Discord webhooks and role mentions:
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href={`/${groupSlug}/aoc/settings`}
+                    className="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 hover:text-purple-300 rounded-lg transition-colors text-sm border border-slate-600"
+                  >
+                    Ashes of Creation Discord Settings
+                  </Link>
+                  <Link
+                    href={`/${groupSlug}/sc/settings`}
+                    className="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 hover:text-purple-300 rounded-lg transition-colors text-sm border border-slate-600"
+                  >
+                    Star Citizen Discord Settings
+                  </Link>
+                  <Link
+                    href={`/${groupSlug}/ror/settings`}
+                    className="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 hover:text-purple-300 rounded-lg transition-colors text-sm border border-slate-600"
+                  >
+                    Return of Reckoning Discord Settings
+                  </Link>
+                </div>
+              </div>
+            </>
+          )}
+
           {/* Recruitment Settings */}
           <RecruitmentSettings groupId={group.id} groupSlug={groupSlug} />
 
@@ -160,6 +209,9 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ group:
           <GameManagement groupId={group.id} />
         </div>
       </main>
+
+      {/* Footer */}
+      <InlineFooter />
     </div>
   );
 }

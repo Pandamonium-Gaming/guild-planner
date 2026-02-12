@@ -6,6 +6,7 @@ import { Users, Briefcase, Calendar, ChevronRight, ExternalLink, Home } from 'lu
 import { Clan, PARTY_ROLES } from '@/lib/types';
 import { ARCHETYPES } from '@/lib/characters';
 import { RecruitmentForm } from '@/components/forms/RecruitmentForm';
+import { InlineFooter } from '@/components/layout/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PublicGroupData {
@@ -188,14 +189,7 @@ export default function PublicGroupPage({ params }: { params: Promise<{ group: s
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 mt-12 py-6">
-        <div className="max-w-4xl mx-auto px-4 text-center text-sm text-slate-500">
-          <p>{t('publicPage.poweredBy')}</p>
-          <Link href="/" className="text-orange-400 hover:text-orange-300">
-            {t('publicPage.createOwnPage')}
-          </Link>
-        </div>
-      </footer>
+      <InlineFooter />
 
       {/* Recruitment Form Modal */}
       {showRecruitmentForm && (

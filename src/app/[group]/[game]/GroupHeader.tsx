@@ -10,16 +10,19 @@ const pageEquivalencyMap: Record<string, Record<string, string>> = {
     'matrix': 'matrix',      // Both games have matrix
     'fleet': 'matrix',       // AoC doesn't have fleet, use matrix
     'ships': 'matrix',       // AoC doesn't have ships, use matrix
+    'settings': 'settings',  // All games have settings
   },
   'aoc': {
     'matrix': 'matrix',      // Both games have matrix
     'fleet': 'fleet',        // AoC doesn't have fleet, go back to characters
     'ships': 'characters',   // AoC doesn't have ships, go to characters
+    'settings': 'settings',  // All games have settings
   },
   'ror': {
     'matrix': 'characters',  // RoR doesn't have matrix, go to characters
     'fleet': 'characters',   // RoR doesn't have fleet, go to characters
     'ships': 'characters',   // RoR doesn't have ships, go to characters
+    'settings': 'settings',  // All games have settings
   },
 };
 
@@ -28,6 +31,12 @@ function getPageForGame(currentPath: string, targetGame: string): string {
   // Path format: /groupSlug/gameSlug/page
   const pathSegments = currentPath.split('/').filter(Boolean);
   const currentPage = pathSegments[2] || 'characters';
+  
+  // Pages that exist in all games - preserve them when switching
+  const universalPages = ['characters', 'events', 'settings'];
+  if (universalPages.includes(currentPage)) {
+    return currentPage;
+  }
   
   // Get the equivalent page for the target game, default to characters
   const equivalentPage = pageEquivalencyMap[targetGame]?.[currentPage] || 'characters';
