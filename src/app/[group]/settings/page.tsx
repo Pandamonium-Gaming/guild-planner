@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useGroupData } from '@/hooks/useGroupData';
 import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { usePermissions } from '@/hooks/usePermissions';
+import { InlineFooter } from '@/components/layout/Footer';
 import { GuildIconUploaderWrapper } from '../[game]/GuildIconUploaderWrapper';
 import { PermissionsSettings } from '@/components/settings/PermissionsSettings';
 import { RecruitmentSettings } from '@/components/settings/RecruitmentSettings';
@@ -208,6 +209,9 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ group:
           <GameManagement groupId={group.id} />
         </div>
       </main>
+
+      {/* Footer */}
+      <InlineFooter />
     </div>
   );
 }

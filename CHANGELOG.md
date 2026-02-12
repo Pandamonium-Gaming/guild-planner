@@ -6,6 +6,10 @@
 
 * Version number and build date/time displayed in footer (auto-injected from package.json at build time)
 
+### Changed
+
+* Standardized footer across all pages using InlineFooter component (group settings, public group page)
+
 ## \[0.1.1] - 2026-02-12
 
 ### Added
