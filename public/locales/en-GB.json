@@ -264,6 +264,7 @@
   },
   "settings": {
     "title": "Settings",
+    "groupSettingsTitle": "Group Settings",
     "gameSettingsTitle": "Game Settings",
     "profile": "Profile",
     "displayName": "Display Name",

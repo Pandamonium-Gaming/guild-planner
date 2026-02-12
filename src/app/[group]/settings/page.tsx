@@ -3,7 +3,7 @@
 import { use, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Settings } from 'lucide-react';
+import { ArrowLeft, Settings, LogOut } from 'lucide-react';
 import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGroupData } from '@/hooks/useGroupData';
@@ -20,7 +20,7 @@ import { ClanLoadingScreen } from '@/components/screens/ClanLoadingScreen';
 
 export default function GroupSettingsPage({ params }: { params: Promise<{ group: string }> }) {
   const { group: groupSlug } = use(params);
-  const { user, profile } = useAuthContext();
+  const { user, profile, signOut } = useAuthContext();
   const { t } = useLanguage();
 
   const { group } = useGroupData(groupSlug);
@@ -111,8 +111,15 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ group:
                 <p className="text-sm text-slate-400">{t('settings.groupSettingsTitle') || 'Group Settings'}</p>
               </div>
             </div>
-            <div className="text-sm text-slate-400">
-              {displayName}
+            <div className="flex items-center gap-2">
+              <span className="text-slate-300 text-sm hidden sm:inline">{displayName}</span>
+              <button
+                onClick={signOut}
+                className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors cursor-pointer"
+                title="Sign out"
+              >
+                <LogOut className="w-[18px] h-[18px]" />
+              </button>
             </div>
           </div>
         </div>
