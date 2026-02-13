@@ -2,6 +2,8 @@
 
 ## \[Unreleased]
 
+## \[0.1.2] - 2026-02-13
+
 ### Added
 
 * Version number and build date/time displayed in footer (auto-injected from package.json at build time)
