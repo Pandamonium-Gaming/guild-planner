@@ -1,7 +1,7 @@
 {
-  "lastUpdated": "2026-02-12T14:10:00.290Z",
+  "lastUpdated": "2026-02-13T16:24:36.922Z",
   "source": "https://robertsspaceindustries.com/ship-matrix/index",
-  "totalShips": 247,
+  "totalShips": 235,
   "ships": [
     {
       "id": "avenger-stalker",
@@ -154,31 +154,6 @@
       "image": "https://media.robertsspaceindustries.com/asbrpwjjho1z0/store_large.jpg"
     },
     {
-      "id": "gladius-pirate-edition",
-      "name": "Gladius Pirate Edition",
-      "manufacturer": "Aegis Dynamics",
-      "manufacturerCode": "AEGS",
-      "role": "Light Fighter",
-      "size": "small",
-      "length": 20,
-      "beam": 17,
-      "height": 5.5,
-      "mass": 48958,
-      "cargo": 0,
-      "crew": {
-        "min": 1,
-        "max": 1
-      },
-      "speed": {
-        "scm": 225,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": null,
-      "url": "https://robertsspaceindustries.com/pledge/ships/gladius/Gladius-Pirate-Edition",
-      "image": "https://media.robertsspaceindustries.com/9cwz2utclixvt/store_large.jpg"
-    },
-    {
       "id": "gladius-valiant",
       "name": "Gladius Valiant",
       "manufacturer": "Aegis Dynamics",
@@ -227,31 +202,6 @@
       "description": "A fast patrol ship with multiple turrets designed to combat fighters, the Hammerhead is equally suited to support larger capital ships in a fleet or act as a flagship for fighter groups.",
       "url": "https://robertsspaceindustries.com/pledge/ships/hammerhead/Hammerhead",
       "image": "https://media.robertsspaceindustries.com/zuxffe2ckazbk/store_large.jpg"
-    },
-    {
-      "id": "hammerhead-best-in-show-edition-2949",
-      "name": "Hammerhead Best In Show Edition 2949",
-      "manufacturer": "Aegis Dynamics",
-      "manufacturerCode": "AEGS",
-      "role": "Heavy Gun Ship",
-      "size": "large",
-      "length": 115,
-      "beam": 75,
-      "height": 16,
-      "mass": 4260000,
-      "cargo": 40,
-      "crew": {
-        "min": 3,
-        "max": 9
-      },
-      "speed": {
-        "scm": 160,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "A fast patrol ship with multiple turrets designed to combat fighters, the Hammerhead is equally suited to support larger capital ships in a fleet or act as a flagship for fighter groups.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/hammerhead/Hammerhead-Best-In-Show-Edition-2949",
-      "image": "https://media.robertsspaceindustries.com/tmuyqtlpfh64d/store_large.jpg"
     },
     {
       "id": "idris-m",
@@ -354,31 +304,6 @@
       "image": "https://media.robertsspaceindustries.com/c6t6mr400hgx6/store_large.jpg"
     },
     {
-      "id": "nautilus-solstice-edition",
-      "name": "Nautilus Solstice Edition",
-      "manufacturer": "Aegis Dynamics",
-      "manufacturerCode": "AEGS",
-      "role": "Minelayer",
-      "size": "large",
-      "length": 125,
-      "beam": 72,
-      "height": 21.6,
-      "mass": 13526320,
-      "cargo": 64,
-      "crew": {
-        "min": 4,
-        "max": 8
-      },
-      "speed": {
-        "scm": null,
-        "afterburner": null
-      },
-      "productionStatus": "in-concept",
-      "description": "With four centuries of distinguished service under its belt, The Aegis Dynamics Nautilus tactical minelayer represents the ultimate in strategic combat engineering, with fully-integrated mine-deployment, sweeping and disarming capabilities. This limited edition Solstice model is exclusive to members of the Chairman’s Club and includes sequential serial numbering according to production order.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/aegis-nautilus/Nautilus-Solstice-Edition",
-      "image": "https://media.robertsspaceindustries.com/mp9p2pzrvdxw9/store_large.jpg"
-    },
-    {
       "id": "reclaimer",
       "name": "Reclaimer",
       "manufacturer": "Aegis Dynamics",
@@ -402,31 +327,6 @@
       "description": "The Aegis Reclaimer is an industrial salvage ship. Equipped with a reinforced cargo bay, a long-range jump drive and launch pods for unmanned drones, the Reclaimer is an ideal ship for taking advantage of deep space wrecks. Tractor beams, floodlights, scanner options and docking ports round out the tools on this capable, utilitarian spacecraft.\n\nThe listed Cargo Capacity is only for the dedicated Cargo Room and does not account for the salvaged material capacity which will be detailed later.",
       "url": "https://robertsspaceindustries.com/pledge/ships/reclaimer/Reclaimer",
       "image": "https://media.robertsspaceindustries.com/mp4b03l05po17/store_large.jpg"
-    },
-    {
-      "id": "reclaimer-best-in-show-edition-2949",
-      "name": "Reclaimer Best In Show Edition 2949",
-      "manufacturer": "Aegis Dynamics",
-      "manufacturerCode": "AEGS",
-      "role": "Heavy Salvage",
-      "size": "large",
-      "length": 155,
-      "beam": 118,
-      "height": 50,
-      "mass": 9500158,
-      "cargo": 420,
-      "crew": {
-        "min": 4,
-        "max": 5
-      },
-      "speed": {
-        "scm": 110,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "The Aegis Reclaimer is an industrial salvage ship. Equipped with a reinforced cargo bay, a long-range jump drive and launch pods for unmanned drones, the Reclaimer is an ideal ship for taking advantage of deep space wrecks. Tractor beams, floodlights, scanner options and docking ports round out the tools on this capable, utilitarian spacecraft.\n\nThe listed Cargo Capacity is only for the dedicated Cargo Room and does not account for the salvaged material capacity which will be detailed later.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/reclaimer/Reclaimer-Best-In-Show-Edition-2949",
-      "image": "https://media.robertsspaceindustries.com/81432ksmdzn30/store_large.jpg"
     },
     {
       "id": "redeemer",
@@ -954,31 +854,6 @@
       "image": "https://media.robertsspaceindustries.com/bau5bdotm8te8/store_large.png"
     },
     {
-      "id": "carrack-expedition",
-      "name": "Carrack Expedition",
-      "manufacturer": "Anvil Aerospace",
-      "manufacturerCode": "ANVL",
-      "role": "Expedition",
-      "size": "large",
-      "length": 126.5,
-      "beam": 76.5,
-      "height": 30,
-      "mass": 4397858,
-      "cargo": 456,
-      "crew": {
-        "min": 4,
-        "max": 6
-      },
-      "speed": {
-        "scm": 140,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "The Anvil Carrack features reinforced fuel tanks for long-duration flight, an advanced jump drive, and a dedicated computer core for jump charting operations. Originally a military exclusive, the Carrack is now available for civilian use. On-board accommodations include crew medical and repair facilities, and a mapping-oriented sensor suite.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/carrack/Carrack-Expedition",
-      "image": "https://media.robertsspaceindustries.com/gpfapokelyewn/store_large.jpg"
-    },
-    {
       "id": "carrack-expedition-wc8x",
       "name": "Carrack Expedition w/C8X",
       "manufacturer": "Anvil Aerospace",
@@ -1404,31 +1279,6 @@
       "image": "https://media.robertsspaceindustries.com/j6rvfrkux5nrm/store_large.jpg"
     },
     {
-      "id": "f8c-lightning-executive-edition",
-      "name": "F8C Lightning Executive Edition",
-      "manufacturer": "Anvil Aerospace",
-      "manufacturerCode": "ANVL",
-      "role": "Heavy Fighter",
-      "size": "small",
-      "length": 25,
-      "beam": 24,
-      "height": 6.5,
-      "mass": 158770,
-      "cargo": 0,
-      "crew": {
-        "min": 1,
-        "max": 1
-      },
-      "speed": {
-        "scm": 207,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "Few vehicles inspire the same awe as the legendary F8 Lightning. A force to be reckoned with, it has protected Humanity countless times from countless threats at home and far from civilization. ",
-      "url": "https://robertsspaceindustries.com/pledge/ships/lightning/F8C-Lightning-Executive-Edition",
-      "image": "https://media.robertsspaceindustries.com/ekto72z81x9kn/store_large.jpg"
-    },
-    {
       "id": "gladiator",
       "name": "Gladiator",
       "manufacturer": "Anvil Aerospace",
@@ -1679,31 +1529,6 @@
       "image": "https://media.robertsspaceindustries.com/yjh17ca5zprfr/store_large.jpg"
     },
     {
-      "id": "valkyrie-liberator-edition",
-      "name": "Valkyrie Liberator Edition",
-      "manufacturer": "Anvil Aerospace",
-      "manufacturerCode": "ANVL",
-      "role": "Dropship",
-      "size": "small",
-      "length": 46,
-      "beam": 15,
-      "height": 10.5,
-      "mass": 621046,
-      "cargo": 90,
-      "crew": {
-        "min": 1,
-        "max": 5
-      },
-      "speed": {
-        "scm": 207,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "For over a century, Anvil ships have distinguished themselves in countless civilian and military combat operations. Honor that proud tradition with the limited Liberator Edition Valkyrie, featuring an exclusive trim package commemorating the dropship's debut at CitizenCon 2948.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/anvil-valkyrie/Valkyrie-Liberator-Edition",
-      "image": "/media/l87lynolh4pxyr/store_large/128934g7tt.jpg"
-    },
-    {
       "id": "khartu-al",
       "name": "Khartu-Al",
       "manufacturer": "Aopoa",
@@ -1802,56 +1627,6 @@
       "description": "Meet the next evolution of Xi'an tech and design innovation. The San’tok.yāi is a fighter that literally flies circles around the competition.",
       "url": "https://robertsspaceindustries.com/pledge/ships/aopoa-santokyai/Santoky-i",
       "image": "https://media.robertsspaceindustries.com/4s0zrs2svm1n9/store_large.jpg"
-    },
-    {
-      "id": "argo-mole-carbon-edition",
-      "name": "Argo Mole Carbon Edition",
-      "manufacturer": "Argo Astronautics",
-      "manufacturerCode": "ARGO",
-      "role": "Prospecting / Mining",
-      "size": "medium",
-      "length": 45,
-      "beam": 25,
-      "height": 8,
-      "mass": 869686,
-      "cargo": 96,
-      "crew": {
-        "min": 1,
-        "max": 4
-      },
-      "speed": {
-        "scm": 140,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "ARGO’s pragmatic no-nonsense approach to ship design is celebrated in the unmistakable silhouette of the MOLE. Just one look at this machine and you know it means business. Tap into your full potential with the combined force of ARGO’s patented trilateral mining system. The MOLE has a total of 24 mineral pods, each holding 12 SCU. Eight pods are usable at one time – when they’re full, either head home or jettison them for collection by another vessel and carry on mining. Three independently controlled articulated extraction stations allow for maximum power and near-limitless versatility. The MOLE lives by the adage ’many hands make for light work’.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/argo-mole/Argo-Mole-Carbon-Edition",
-      "image": "https://media.robertsspaceindustries.com/ugpy6i9pbgbax/store_large.jpg"
-    },
-    {
-      "id": "argo-mole-talus-edition",
-      "name": "Argo Mole Talus Edition",
-      "manufacturer": "Argo Astronautics",
-      "manufacturerCode": "ARGO",
-      "role": "Prospecting / Mining",
-      "size": "medium",
-      "length": 45,
-      "beam": 25,
-      "height": 8,
-      "mass": 869686,
-      "cargo": 96,
-      "crew": {
-        "min": 1,
-        "max": 4
-      },
-      "speed": {
-        "scm": 140,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "ARGO’s pragmatic no-nonsense approach to ship design is celebrated in the unmistakable silhouette of the MOLE. Just one look at this machine and you know it means business. Tap into your full potential with the combined force of ARGO’s patented trilateral mining system. The MOLE has a total of 24 mineral pods, each holding 12 SCU. Eight pods are usable at one time – when they’re full, either head home or jettison them for collection by another vessel and carry on mining. Three independently controlled articulated extraction stations allow for maximum power and near-limitless versatility. The MOLE lives by the adage ’many hands make for light work’.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/argo-mole/Argo-Mole-Talus-Edition",
-      "image": "https://media.robertsspaceindustries.com/ghac95q2ncobp/store_large.jpg"
     },
     {
       "id": "atls",
@@ -2704,56 +2479,6 @@
       "image": "https://media.robertsspaceindustries.com/0ffxba4wywl0j/store_large.jpg"
     },
     {
-      "id": "caterpillar-best-in-show-edition-2949",
-      "name": "Caterpillar Best In Show Edition 2949",
-      "manufacturer": "Drake Interplanetary",
-      "manufacturerCode": "DRAK",
-      "role": "Heavy Freight",
-      "size": "large",
-      "length": 111.5,
-      "beam": 39,
-      "height": 13.5,
-      "mass": 1608205,
-      "cargo": 576,
-      "crew": {
-        "min": 2,
-        "max": 4
-      },
-      "speed": {
-        "scm": 130,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "First introduced in 2871, Drake Interplanetary’s Caterpillar has long proven to be a reliable, cost-effective multi-role vessel, capable of being outfitted for everything from mercantile operations to combat support. Long hailed as a hard-fought alternative to the ubiquitous Hull series, the Caterpillar is a freighter that doesn’t skimp on weaponry or customization.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/drake-caterpillar/Caterpillar-Best-In-Show-Edition-2949",
-      "image": "https://media.robertsspaceindustries.com/1r1vf9peutpr0/store_large.jpg"
-    },
-    {
-      "id": "caterpillar-pirate-edition",
-      "name": "Caterpillar Pirate Edition",
-      "manufacturer": "Drake Interplanetary",
-      "manufacturerCode": "DRAK",
-      "role": "Heavy Freight",
-      "size": "large",
-      "length": 111.5,
-      "beam": 30,
-      "height": 13.5,
-      "mass": 1660063,
-      "cargo": 576,
-      "crew": {
-        "min": 2,
-        "max": 4
-      },
-      "speed": {
-        "scm": 130,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "Drake maintains that the Caterpillar, a sprawling, modular spacecraft which appears at least somewhat like its namesake, is for legitimate commerce and extended search and rescue missions... but this special livery seems to suggest otherwise.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/drake-caterpillar/Caterpillar-Pirate-Edition",
-      "image": "https://media.robertsspaceindustries.com/pztdfu1y7629m/store_large.jpg"
-    },
-    {
       "id": "clipper",
       "name": "Clipper",
       "manufacturer": "Drake Interplanetary",
@@ -2827,31 +2552,6 @@
       "description": "Drake Interplanetary claims that the Cutlass Black is a low-cost, easy-to-maintain solution for local in-system militia units. The larger-than-average cargo hold, RIO seat and dedicated tractor mount are, the company literature insists, for facilitating search and rescue operations.",
       "url": "https://robertsspaceindustries.com/pledge/ships/drake-cutlass/Cutlass-Black",
       "image": "https://media.robertsspaceindustries.com/56iszc92bl9oi/store_large.jpg"
-    },
-    {
-      "id": "cutlass-black-best-in-show-edition-2949",
-      "name": "Cutlass Black Best In Show Edition 2949",
-      "manufacturer": "Drake Interplanetary",
-      "manufacturerCode": "DRAK",
-      "role": "Medium Fighter / Medium Freight",
-      "size": "medium",
-      "length": 36,
-      "beam": 26,
-      "height": 14,
-      "mass": 226700,
-      "cargo": 46,
-      "crew": {
-        "min": 2,
-        "max": 2
-      },
-      "speed": {
-        "scm": 217,
-        "afterburner": null
-      },
-      "productionStatus": "flight-ready",
-      "description": "Drake Interplanetary claims that the Cutlass Black is a low-cost, easy-to-maintain solution for local in-system militia units. The larger-than-average cargo hold, RIO seat and dedicated tractor mount are, the company literature insists, for facilitating search and rescue operations.",
-      "url": "https://robertsspaceindustries.com/pledge/ships/drake-cutlass/Cutlass-Black-Best-In-Show-Edition-2949",
-      "image": "https://media.robertsspaceindustries.com/vt0f0g30nua1v/store_large.jpg"
     },
     {
       "id": "cutlass-blue",

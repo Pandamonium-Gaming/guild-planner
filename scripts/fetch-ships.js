@@ -28,7 +28,31 @@ https.get(RSI_SHIP_MATRIX_URL, (res) => {
         throw new Error('Invalid response structure from RSI ship matrix');
       }
 
-      const ships = jsonData.data.map(ship => ({
+      // Function to check if a ship is a paint/skin variant
+      const isPaintVariant = (name) => {
+        const variantPatterns = [
+          /Edition$/i,                    // "Best In Show Edition", "Pirate Edition", etc.
+          /Livery$/i,                     // Paint liveries
+          /Paint$/i,                      // Paint schemes
+          /\(.*Paint.*\)$/i,              // "(Special Paint)"
+          /Carbon Edition$/i,             // Argo Mole Carbon Edition
+          /Talus Edition$/i,              // Argo Mole Talus Edition
+          /Best In Show/i,                // Best In Show variants
+          /Bis \d{4}$/i,                  // BIS 2949 etc
+          /Solstice Edition$/i,           // Special edition paints
+        ];
+        return variantPatterns.some(pattern => pattern.test(name));
+      };
+
+      const ships = jsonData.data
+        .filter(ship => {
+          // Filter out paint variants and skins
+          if (!ship.name || isPaintVariant(ship.name)) {
+            return false;
+          }
+          return true;
+        })
+        .map(ship => ({
         id: ship.name ? ship.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : null,
         name: ship.name || 'Unknown',
         manufacturer: ship.manufacturer?.name || ship.manufacturer?.code || 'Unknown',

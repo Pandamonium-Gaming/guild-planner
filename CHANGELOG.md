@@ -9,6 +9,7 @@
 ### Changed
 
 * Standardized footer across all pages using InlineFooter component (group settings, public group page)
+* Ship scraper now filters out paint/skin variants (removed 12 duplicate entries like "Argo Mole Carbon Edition")
 
 ### Fixed
 
