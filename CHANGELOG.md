@@ -5,6 +5,7 @@
 ### Added
 
 * Version number and build date/time displayed in footer (auto-injected from package.json at build time)
+* Version bump enforcement for PRs to main branch (CI check prevents merging without version bump)
 
 ### Changed
 

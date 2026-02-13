@@ -13,6 +13,7 @@
     "update-ships": "node scripts/fetch-ships.js",
     "check:translations": "node scripts/check-translations.js",
     "check:changelog": "node scripts/check-changelog.js",
+    "check:version": "node scripts/check-version-bump.js",
     "version:bump": "node scripts/version-bump.js",
     "version:patch": "node scripts/version-bump.js patch",
     "version:minor": "node scripts/version-bump.js minor",
