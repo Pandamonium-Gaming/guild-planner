@@ -2,9 +2,18 @@
 
 ## \[Unreleased]
 
+## \[0.1.3] - 2026-02-13
+
+### Fixed
+
+* Fleet management now allows adding the same ship with different ownership types (e.g., both loaner and pledged MOLE)
+
+## \[0.1.2] - 2026-02-13
+
 ### Added
 
 * Version number and build date/time displayed in footer (auto-injected from package.json at build time)
+* Version bump enforcement for PRs to main branch (CI check prevents merging without version bump)
 
 ### Changed
 

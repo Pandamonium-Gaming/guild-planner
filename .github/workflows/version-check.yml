@@ -1,0 +1,25 @@
+name: Version Bump Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for tags
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Check version bump
+        run: node scripts/check-version-bump.js
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
