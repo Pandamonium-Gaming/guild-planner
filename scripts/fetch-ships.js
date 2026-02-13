@@ -78,13 +78,8 @@ https.get(RSI_SHIP_MATRIX_URL, (res) => {
         image: ship.media && ship.media[0] ? ship.media[0].images?.store_large || ship.media[0].source_url : null
       })).filter(ship => ship.id && ship.name !== 'Unknown');
 
-      // Sort by manufacturer, then by name
-      ships.sort((a, b) => {
-        if (a.manufacturer !== b.manufacturer) {
-          return a.manufacturer.localeCompare(b.manufacturer);
-        }
-        return a.name.localeCompare(b.name);
-      });
+      // Sort alphabetically by ship name
+      ships.sort((a, b) => a.name.localeCompare(b.name));
 
       const output = {
         lastUpdated: new Date().toISOString(),
