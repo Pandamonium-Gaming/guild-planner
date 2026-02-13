@@ -2,6 +2,12 @@
 
 ## \[Unreleased]
 
+## \[0.1.3] - 2026-02-13
+
+### Fixed
+
+* Fleet management now allows adding the same ship with different ownership types (e.g., both loaner and pledged MOLE)
+
 ## \[0.1.2] - 2026-02-13
 
 ### Added

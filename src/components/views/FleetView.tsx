@@ -427,10 +427,10 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
             >
               <option value="">{t('fleet.selectShip')}</option>
               {shipsData.ships.filter(ship => {
-                // Filter out ships already added for the selected character
+                // Filter out ships already added for the selected character with the same ownership type
                 if (!selectedCharacter) return true;
                 const existingShips = characterShips[selectedCharacter] || [];
-                return !existingShips.some(cs => cs.ship_id === ship.id);
+                return !existingShips.some(cs => cs.ship_id === ship.id && cs.ownership_type === ownershipType);
               }).map(ship => (
                 <option key={ship.id} value={ship.id}>
                   {ship.name} ({ship.manufacturer}) - {ship.role}
