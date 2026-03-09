@@ -18,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: develop
+          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -70,6 +70,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
           branch: chore/update-subscriber-ships
           commit-message: 'chore: Update subscriber ships for current month'
           title: '📦 Update Subscriber Ships'
