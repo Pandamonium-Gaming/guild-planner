@@ -36,6 +36,24 @@ jobs:
           RESULT=$?
           cat /tmp/fetch-output.txt
           echo "exitcode=$RESULT" >> $GITHUB_OUTPUT
+          
+          # Extract source URL if successful
+          if [ $RESULT -eq 0 ]; then
+            PAGE_URL=$(grep "^Source: " /tmp/fetch-output.txt | sed 's/^Source: //')
+            if [ -n "$PAGE_URL" ]; then
+              echo "pageurl=$PAGE_URL" >> $GITHUB_OUTPUT
+            fi
+            
+            # Extract ship lists
+            CENTURION=$(grep "Centurion: " /tmp/fetch-output.txt | sed 's/.*Centurion: //')
+            IMPERATOR=$(grep "Imperator: " /tmp/fetch-output.txt | sed 's/.*Imperator: //')
+            if [ -n "$CENTURION" ]; then
+              echo "centurion=$CENTURION" >> $GITHUB_OUTPUT
+            fi
+            if [ -n "$IMPERATOR" ]; then
+              echo "imperator=$IMPERATOR" >> $GITHUB_OUTPUT
+            fi
+          fi
         continue-on-error: true
 
       - name: Check if config changed
@@ -62,10 +80,18 @@ jobs:
             
             **Automated via**: `scripts/fetch-subscriber-ships.ts`
             
-            ### Changes
-            - Updates `src/games/starcitizen/config/subscriber-ships.ts` with current month's ships
+            ### 🚀 Ships This Month
             
-            ### Verification Steps
+            **Centurion Tier:**
+            ${{ steps.fetch.outputs.centurion || 'See config file' }}
+            
+            **Imperator Tier:**
+            ${{ steps.fetch.outputs.imperator || 'See config file' }}
+            
+            ### 📚 Source
+            ${{ steps.fetch.outputs.pageurl || 'RSI Comm-Link Subscriber Promotions' }}
+            
+            ### ✅ Verification Checklist
             - [ ] Review the ships match RSI's official promotion
             - [ ] Verify ship IDs match existing entries in ship database
             - [ ] Check insurance durations are correct (12m Centurion, 24m Imperator)
