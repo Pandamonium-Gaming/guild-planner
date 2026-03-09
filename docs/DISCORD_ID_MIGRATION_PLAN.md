@@ -34,21 +34,27 @@ Migrate from volatile Supabase auth user IDs to immutable Discord IDs as the pri
 
 ### Phase 2: Data Population
 
-1. **First login sync** (easiest, least risky):
-   * Extract Discord ID from Supabase auth metadata
+1. **Batch migration script** (recommended, safest):
+   * Location: `supabase/migrations/006_populate_discord_id_from_auth.sql`
+   * Extracts Discord ID from `auth.users.raw_app_meta_data` (provider_id)
+   * Falls back to `auth.identities` table if metadata missing
+   * Updates all `members.discord_id` in bulk
+   * Uses two-stage validation (pre/post counts, duplicate check)
+   * Reports any members still missing Discord ID for manual review
+
+2. **First login sync** (alternative, for gradual rollout):
+   * Extract Discord ID from Supabase auth metadata on login
    * On user login: populate `members.discord_id` from `auth.users.raw_app_meta_data`
+   * Only runs if `discord_id` still NULL
    * Automatic, no manual migration needed
    * Gradual: populates as users log in
-
-2. **Batch migration script** (optional, for speed):
-   * Query auth system for all user Discord IDs
-   * Update `members` in bulk
-   * Validates before/after counts
+   * Slower but safest for production
 
 3. **Validation**:
    * Check all members have either `user_id` OR `discord_id`
    * No orphaned characters
-   * No duplicate Discord IDs per group
+   * No duplicate Discord IDs per group (UNIQUE constraint enforced)
+   * Report members without Discord auth linked
 
 ### Phase 3: Application Code Updates
 
@@ -115,13 +121,22 @@ Migrate from volatile Supabase auth user IDs to immutable Discord IDs as the pri
 * \[ ] Queries correctly filtered by `group_id + discord_id`
 * \[ ] No cross-contamination
 
-## Scenario 4: Duplicate/Corrupt Data
+## Scenario 4: Batch Data Population
+
+* \[ ] Test auth users created with Discord metadata
+* \[ ] Run `006_populate_discord_id_from_auth.sql` migration
+* \[ ] Verify all members get populated with Discord IDs
+* \[ ] Validate pre/post counts match expected
+* \[ ] Check for duplicates and conflicts
+* \[ ] Identify members without Discord auth for manual review
+
+## Scenario 5: Duplicate/Corrupt Data
 
 * \[ ] Manually create duplicate user\_id records (to simulate corruption)
 * \[ ] Discord ID lookup still finds correct character
 * \[ ] System resilient to auth-layer issues
 
-## Scenario 5: RLS Policy Validation
+## Scenario 6: RLS Policy Validation
 
 * \[ ] User A logged in as Discord ID X
 * \[ ] Can see/edit their own characters
