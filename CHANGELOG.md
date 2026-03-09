@@ -4,6 +4,18 @@
 
 ### Added
 
+* **Discord ID Migration for Disaster Recovery Resilience**
+  * Added `discord_id` column to `members` table for immutable user identification
+  * Solves Supabase auth UUID volatility issue during database restores
+  * Created migration: `005_discord_id_migration.sql` with indexes for fast lookups
+  * Includes composite index `idx_members_group_discord_id` for group-scoped queries
+  * Test scenarios all passed:
+    * Scenario 1: Discord ID linking and character association ✅
+    * Scenario 2: Character ownership survives database restore ✅
+    * Scenario 3: Multi-guild handling with same Discord user ✅
+  * Documentation: `DISCORD_ID_MIGRATION_PLAN.md` and `DISCORD_ID_MIGRATION_TEST_RESULTS.md`
+  * Production-ready schema change, app-side code updates in next phase
+
 * **Machine-enforced Copilot command compliance system**
   * `.copilot-rules.json`: Declarative rules for OS context, file policies, and violations
   * `validate-copilot-compliance.js`: Pre-commit validation script

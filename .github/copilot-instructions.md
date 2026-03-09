@@ -67,7 +67,40 @@
 
 * Translation files have mismatched keys
 
-### 3. Version Management
+### 3. Database Safety (CRITICAL)
+
+**Never perform simultaneous write operations to both prod and dev databases.**
+
+This prevents data consistency issues, auth conflicts, and disaster recovery failures.
+
+* **ALLOWED**: Dump prod → file (read-only), then restore file → dev (write)
+* **ALLOWED**: Write to prod only, write to dev only (separate operations)
+* **FORBIDDEN**: Direct sync prod → dev (simultaneous writes)
+* **FORBIDDEN**: Tools that directly copy data between databases in one operation
+
+**Pattern for any sync/backup/restore operations:**
+
+```powershell
+# Step 1: Read prod, write to local file (read-only on prod)
+pg_dump $prodDbUrl --data-only | Out-File temp.sql
+
+# Step 2: Read file, write to dev (safe file-based transfer)
+psql $devDbUrl -f temp.sql
+```
+
+**Why this matters:**
+* Auth systems can conflict if both databases modified simultaneously
+* Disaster recovery/restore scenarios fail if both DB written at once
+* RLS policies and user permissions can become inconsistent
+* Transaction isolation breaks
+
+**Scripts that follow this pattern:**
+* ✅ `backup-prod-database.ps1` - dump only
+* ✅ `backup-dev-database.ps1` - dump only
+* ✅ `restore-prod-to-dev.ps1` - read file, write dev
+* ✅ `sync-prod-to-dev-data.ps1` - dump prod, restore to dev separately
+
+### 4. Version Management
 
 **Semantic Versioning (semver):**
 
@@ -217,6 +250,45 @@ npm run test:coverage # With coverage report
 
 * Minimum 50% coverage threshold enforced
 * See `TESTING.md` for comprehensive testing guide
+
+## Quick Reference
+
+```bash
+# Validation
+npm run check:translations   # Check translation sync
+npm run check:changelog      # Check changelog updates
+
+# Version Management
+npm run version:patch        # Bump patch version
+npm run version:minor        # Bump minor version
+npm run version:major        # Bump major version
+
+# Development
+npm run dev                  # Start dev server
+npm run build                # Production build
+npm run lint                 # Run linter
+npm test                     # Run tests
+
+# Database Operations
+.\scripts\backup-prod-database.ps1       # Backup prod DB (read-only)
+.\scripts\backup-dev-database.ps1        # Backup dev DB (read-only)
+.\scripts\restore-prod-to-dev.ps1        # Restore prod backup to dev
+.\scripts\sync-prod-to-dev-data.ps1      # Sync prod data to dev (file-based)
+
+# Scripts
+npm run update-ships         # Update Star Citizen ship data
+```
+
+## Notes for AI Assistant
+
+* **Always ask** if unsure about version bump type (patch/minor/major)
+* **Always update CHANGELOG.md** when making code changes
+* **Always sync translations** when adding UI text
+* **NEVER do direct database syncs** - always use dump→restore pattern
+* **Reference existing patterns** in codebase before creating new approaches
+* **Follow TypeScript types** - check `src/lib/types.ts` for interfaces
+* **Use existing hooks** - check `src/hooks/` before creating new ones
+* **Check documentation** - `docs/` folder has detailed guides
 
 ## Quick Reference
 
