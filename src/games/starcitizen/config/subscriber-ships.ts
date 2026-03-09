@@ -110,17 +110,15 @@ export function getSubscriberShips(
   const key = month || getCurrentMonthKey();
   const monthData = SUBSCRIBER_SHIPS[key];
   
+  console.log('[getSubscriberShips]', { tier, month, key, monthData: monthData ? monthData.label : 'NOT FOUND', available: Object.keys(SUBSCRIBER_SHIPS) });
+  
   if (!monthData) {
-    if (typeof window !== 'undefined') {
-      console.log('[Subscriber Ships] No data found for month:', key, 'Available months:', Object.keys(SUBSCRIBER_SHIPS));
-    }
+    console.log('[Subscriber Ships] No data found for month:', key, 'Available months:', Object.keys(SUBSCRIBER_SHIPS));
     return [];
   }
   
   const ships = tier === 'imperator' ? monthData.imperator : monthData.centurion;
-  if (typeof window !== 'undefined') {
-    console.log(`[Subscriber Ships] Loading ships for ${tier} (${key}):`, ships);
-  }
+  console.log(`[Subscriber Ships] Loading ships for ${tier} (${key}):`, ships);
   
   return ships;
 }
