@@ -110,13 +110,19 @@ export function getSubscriberShips(
   const key = month || getCurrentMonthKey();
   const monthData = SUBSCRIBER_SHIPS[key];
   
-  if (!monthData) return [];
-  
-  if (tier === 'imperator') {
-    return monthData.imperator;
+  if (!monthData) {
+    if (typeof window !== 'undefined') {
+      console.log('[Subscriber Ships] No data found for month:', key, 'Available months:', Object.keys(SUBSCRIBER_SHIPS));
+    }
+    return [];
   }
   
-  return monthData.centurion;
+  const ships = tier === 'imperator' ? monthData.imperator : monthData.centurion;
+  if (typeof window !== 'undefined') {
+    console.log(`[Subscriber Ships] Loading ships for ${tier} (${key}):`, ships);
+  }
+  
+  return ships;
 }
 
 /**
@@ -126,7 +132,11 @@ export function getCurrentMonthKey(): string {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
-  return `${year}-${month}`;
+  const key = `${year}-${month}`;
+  if (typeof window !== 'undefined') {
+    console.log('[Subscriber Ships] Current month detected:', key, '(date:', now.toISOString(), ')');
+  }
+  return key;
 }
 
 /**

@@ -2,6 +2,15 @@
 
 ## \[Unreleased]
 
+## \[0.2.3] - 2026-03-09
+
+### Changed
+
+* **Subscriber ships debugging** - Added diagnostic console logging
+  * Logs the detected month key and available months to console
+  * Logs which ships are loaded for each tier
+  * Helps troubleshoot month detection issues
+
 ## \[0.2.2] - 2026-03-09
 
 ### Fixed
