@@ -4,11 +4,12 @@
 
 ### Fixed
 
-* **March 2026 subscriber ships** - Fixed invalid ship IDs that prevented ships from displaying
-  * Changed from incorrect `rsi-apollo-*` prefixed IDs to valid database IDs
-  * Centurion tier now correctly shows Ursa Medivac (Apollo variant not yet in database)
-  * Imperator tier now correctly shows Ursa Medivac and Ursa
-  * Resolves issue where February ships continued to display instead of March ships
+* **Subscriber ships automation** - Fixed script and ship ID mapping
+  * Fetch script now loads actual ship database instead of using hardcoded names
+  * Ship names are now correctly mapped to database IDs (e.g., 'Apollo Medivac' -> 'apollo-medivac')
+  * Eliminates incorrect `rsi-` prefix that was being added to ship IDs
+  * Updated March 2026 ships with correct IDs: apollo-medivac, ursa-medivac, ursa
+  * Future automated updates will now use correct ship identifiers
 
 ## \[0.2.1] - 2026-03-09
 
