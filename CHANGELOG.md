@@ -2,9 +2,16 @@
 
 ## \[Unreleased]
 
-## \[0.2.7] - 2026-03-09
+## \[0.2.8] - 2026-03-09
 
-## \[0.2.6] - 2026-03-09
+### Fixed
+
+* **Ship name parsing bug in subscriber ships fetcher** - Fixed duplicate ship matching
+  * Parser was matching both "Ursa" and "Ursa Medivac" from the same text, causing incorrect ship IDs
+  * Now skips sub-names of already-matched longer ship names
+  * Example: if "Ursa Medivac" is matched, "Ursa" is skipped to prevent the plain ursa from being added
+
+## \[0.2.7] - 2026-03-09
 
 ### Fixed
 
@@ -12,7 +19,7 @@
   * Only Ursa Medivac should be in the March subscriber promotions
   * Corrected Imperator tier: apollo-medivac, ursa-medivac (removed plain ursa)
 
-## \[0.2.5] - 2026-03-09
+## \[0.2.6] - 2026-03-09
 
 ### Fixed
 
@@ -22,9 +29,7 @@
   * Added `needsSubscriberShipResync()` helper to detect if resync is needed
   * Ships are now correctly replaced on each sync instead of accumulating
 
-## \[0.2.4] - 2026-03-09
-
-### Changed
+## \[0.2.5] - 2026-03-09
 
 * **Subscriber ships debugging** - Added diagnostic console logging
   * Logs the detected month key and available months to console

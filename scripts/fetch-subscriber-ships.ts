@@ -306,18 +306,30 @@ function loadShipDatabase(): Map<string, string> {
  */
 function extractShipNames(text: string, shipDatabase: Map<string, string>): string[] {
   const found: Set<string> = new Set();
+  const matchedNames: Set<string> = new Set(); // Track names we've already matched
   
   // Try to match ship names from the database
   // Sort by length descending to match longer names first
   const sortedShips = Array.from(shipDatabase.entries()).sort((a, b) => b[0].length - a[0].length);
   
   for (const [name, id] of sortedShips) {
+    // Skip if this name is a substring of an already-matched name
+    // e.g., don't match "Ursa" if we already matched "Ursa Medivac"
+    const isSubstring = Array.from(matchedNames).some(matched => 
+      matched.toLowerCase().includes(name.toLowerCase())
+    );
+    if (isSubstring) {
+      console.log(`  Skipping "${name}" (substring of already-matched name)`);
+      continue;
+    }
+    
     // Create case-insensitive regex for the ship name with word boundaries
     const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(`\\b${escapedName}\\b`, 'i');
     
     if (regex.test(text)) {
       found.add(id);
+      matchedNames.add(name);
       console.log(`  Found ship in text: "${name}" -> "${id}"`);
       
       // Once we have 5 ships, stop looking
