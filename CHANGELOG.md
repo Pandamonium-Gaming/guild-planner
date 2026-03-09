@@ -2,6 +2,16 @@
 
 ## \[Unreleased]
 
+## \[0.2.7] - 2026-03-09
+
+## \[0.2.6] - 2026-03-09
+
+### Fixed
+
+* **March 2026 subscriber ships** - Removed base Ursa from Imperator tier
+  * Only Ursa Medivac should be in the March subscriber promotions
+  * Corrected Imperator tier: apollo-medivac, ursa-medivac (removed plain ursa)
+
 ## \[0.2.5] - 2026-03-09
 
 ### Fixed
@@ -14,16 +24,12 @@
 
 ## \[0.2.4] - 2026-03-09
 
-## \[0.2.3] - 2026-03-09
-
 ### Changed
 
 * **Subscriber ships debugging** - Added diagnostic console logging
   * Logs the detected month key and available months to console
   * Logs which ships are loaded for each tier
   * Helps troubleshoot month detection issues
-
-## \[0.2.2] - 2026-03-09
 
 ### Fixed
 

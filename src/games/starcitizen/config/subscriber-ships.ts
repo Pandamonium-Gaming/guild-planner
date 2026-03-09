@@ -92,7 +92,7 @@ export const SUBSCRIBER_SHIPS: Record<string, SubscriberShipMonth> = {
   '2026-03': {
     label: 'March 2026',
     centurion: ["apollo-medivac"],
-    imperator: ["apollo-medivac", "ursa-medivac", "ursa"],
+    imperator: ["apollo-medivac", "ursa-medivac"],
     flair: 'Medical themed cosmetics and vehicles',
     notes: 'Auto-fetched from RSI comm-link. Ships have 12m insurance for Centurion, 24m for Imperator.',
   },
