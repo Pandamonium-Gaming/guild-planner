@@ -2,8 +2,8 @@ name: Update Subscriber Ships
 
 on:
   schedule:
-    # Run at 10 AM UTC on the 1st of each month
-    - cron: '0 10 1 * *'
+    # Run at 10 AM UTC on the 1st, 5th, and 10th of each month
+    - cron: '0 10 1,5,10 * *'
   workflow_dispatch:
 
 jobs:
