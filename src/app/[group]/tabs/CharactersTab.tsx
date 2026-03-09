@@ -1,22 +1,24 @@
 "use client";
 import { AddCharacterButton } from "@/components/characters/AddCharacterButton";
-import { CharacterFiltersBar, filterCharacters } from "@/components/characters/CharacterFilters";
+import { CharacterFiltersBar, filterCharacters, CharacterFilters } from "@/components/characters/CharacterFilters";
 import { CharacterCard } from "@/components/characters/MemberCard";
 import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { useAuthContext } from '@/components/auth/AuthProvider';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { roleHasPermission } from '@/lib/permissions';
-import { CharacterWithProfessions } from "@/lib/types";
+import { CharacterWithProfessions, RankLevel } from "@/lib/types";
+import { CharacterData } from "@/hooks/useGroupData";
 
 interface CharactersTabProps {
   groupId: string;
   characters: CharacterWithProfessions[];
-  addCharacter: (data: any) => Promise<void>;
+  addCharacter: (data: CharacterData) => Promise<void>;
   updateMember: (id: string, name: string) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
-  setProfessionRank: (characterId: string, professionId: string, rank: any, level?: number, quality?: number) => Promise<void>;
+  setProfessionRank: (characterId: string, professionId: string, rank: RankLevel | null, level?: number, quality?: number) => Promise<void>;
   setEditingCharacter: (character: CharacterWithProfessions) => void;
-  characterFilters: any;
-  setCharacterFilters: (filters: any) => void;
+  characterFilters: CharacterFilters;
+  setCharacterFilters: (filters: CharacterFilters) => void;
 }
 
 export function CharactersTab({
@@ -31,6 +33,7 @@ export function CharactersTab({
   setCharacterFilters,
 }: CharactersTabProps) {
   const { user } = useAuthContext();
+  const { t } = useLanguage();
   const clanMembership = useGroupMembership(groupId, user?.id || null);
   const userRole = clanMembership.membership?.role || 'pending';
 
@@ -46,9 +49,9 @@ export function CharactersTab({
         />
       )}
       {characters.length === 0 ? (
-        <div className="text-slate-400 text-center py-8">No characters found.</div>
+        <div className="text-slate-400 text-center py-8">{t('characters.noCharactersFound') || 'No characters found.'}</div>
       ) : filterCharacters(characters, characterFilters).length === 0 ? (
-        <div className="text-slate-400 text-center py-8">No characters match the filters.</div>
+        <div className="text-slate-400 text-center py-8">{t('characters.noCharactersMatch') || 'No characters match the filters.'}</div>
       ) : (
         filterCharacters(characters, characterFilters).map((character) => {
           // Only allow edit if user owns character AND has 'characters_edit_own', or has 'characters_edit_any' permission

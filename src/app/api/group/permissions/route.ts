@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { GroupRole } from '@/lib/permissions';
 
+interface PostgrestErrorWithDetails {
+  code?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+}
+
 // Get Supabase service role client for server-side operations
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -235,11 +242,12 @@ export async function POST(request: NextRequest) {
     const { error: upsertError } = result;
 
     if (upsertError) {
+      const postgresError = upsertError as PostgrestErrorWithDetails;
       console.error('Upsert error response:', { 
-        code: upsertError.code,
-        message: upsertError.message,
-        details: (upsertError as any).details,
-        hint: (upsertError as any).hint
+        code: postgresError.code,
+        message: postgresError.message,
+        details: postgresError.details,
+        hint: postgresError.hint
       });
       
       // If table doesn't exist yet (migration not applied)

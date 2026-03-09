@@ -87,6 +87,7 @@
     "accessAfterApproval": "Je krijgt toegang tot clan gegevens zodra je bent goedgekeurd.",
     "charactersCount": "{{count}} personages",
     "noCharacters": "Nog geen personages. Voeg hierboven je eerste groep personage toe!",
+    "noCharactersFound": "Geen personages gevonden.",
     "noCharactersMatch": "Geen personages komen overeen met je filters.",
     "viewPublicPage": "Bekijk openbare pagina",
     "admin": "beheerder",

@@ -13,6 +13,15 @@
   * Provides clear violation messages with fixes for developers
   * Stops repeating broken patterns across conversations by using external validation
 
+### Fixed
+
+* Resolved 11 ESLint/TypeScript warnings across 4 files
+  * **permissions/route.ts**: Replaced `(upsertError as any)` casting with proper `PostgrestErrorWithDetails` interface
+  * **achievements/sync/route.ts**: Prefixed unused `gatheringSkills` variable with underscore
+  * **ManageTab.tsx**: Replaced 2x `<img>` tags with Next.js `<Image>` component for improved LCP
+  * **CharactersTab.tsx**: Replaced 4x `any` type annotations with proper types (`CharacterData`, `RankLevel`, `CharacterFilters`)
+  * **CharactersTab.tsx**: Wrapped 2x hardcoded strings with i18n `t()` function, added translations for `characters.noCharactersFound` across all locales
+
 ## \[0.2.0] - 2026-03-09
 
 ### Added

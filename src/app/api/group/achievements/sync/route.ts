@@ -177,7 +177,7 @@ async function calculateAchievementProgress(
 
       // Gathering profession mastery
       'gathering_journeyman_all': async () => {
-        const gatheringSkills = ['mining', 'lumberjacking', 'herbalism', 'fishing', 'hunting'];
+        const _gatheringSkills = ['mining', 'lumberjacking', 'herbalism', 'fishing', 'hunting'];
         return await checkProfessionMastery('gathering', 2); // Journeyman = rank 2
       },
 

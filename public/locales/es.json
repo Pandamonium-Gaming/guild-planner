@@ -87,6 +87,7 @@
     "accessAfterApproval": "Podrás acceder a los datos del clan una vez aprobado.",
     "charactersCount": "{{count}} personajes",
     "noCharacters": "Aún no hay personajes. ¡Añade tu primer personaje arriba!",
+    "noCharactersFound": "No se han encontrado personajes.",
     "noCharactersMatch": "Ningún personaje coincide con tus filtros.",
     "viewPublicPage": "Ver Página Pública",
     "admin": "admin",
