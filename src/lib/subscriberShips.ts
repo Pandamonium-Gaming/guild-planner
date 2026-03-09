@@ -14,6 +14,23 @@ import {
 export type SubscriberTier = 'centurion' | 'imperator' | null;
 
 /**
+ * Check if a character's subscriber ships need to be re-synced
+ * (stored month doesn't match current month)
+ */
+export function needsSubscriberShipResync(storedMonth: string | null | undefined): boolean {
+  if (!storedMonth) return false;
+  
+  const currentMonth = getCurrentMonthKey();
+  const needsResync = storedMonth !== currentMonth;
+  
+  if (needsResync) {
+    console.log(`[Subscriber Ships] Character needs re-sync: stored "${storedMonth}" vs current "${currentMonth}"`);
+  }
+  
+  return needsResync;
+}
+
+/**
  * Sync subscriber ships to a character's hangar
  * 
  * Adds all ships the character is entitled to based on their subscriber tier.
@@ -35,9 +52,22 @@ export async function syncSubscriberShips(
 
     const monthKey = month || getCurrentMonthKey();
 
-    // Upsert ships into character_ships table
-    // Using upsert to avoid duplicates if user changes tier multiple times
+    // First, delete any old subscriber ships for this character/tier to clean up previous months
+    console.log(`[Subscriber Ships] Removing old subscriber ships for character ${characterId}...`);
+    const { error: deleteError } = await supabase
+      .from('character_ships')
+      .delete()
+      .eq('character_id', characterId)
+      .eq('ownership_type', 'subscriber');
+    
+    if (deleteError) {
+      console.warn('Warning removing old subscriber ships:', deleteError);
+      // Don't fail, just warn - we can still add the new ones
+    }
+
+    // Now upsert the new ships
     // Subscriber ships are marked as 'subscriber' ownership type with notes indicating tier/month
+    console.log(`[Subscriber Ships] Adding ${ships.length} ships for ${monthKey}...`);
     const { data, error } = await supabase.from('character_ships').upsert(
       ships.map(ship => ({
         character_id: characterId,
@@ -59,6 +89,7 @@ export async function syncSubscriberShips(
       };
     }
 
+    console.log(`[Subscriber Ships] Successfully synced ships:`, ships);
     return {
       success: true,
       shipsAdded: ships,

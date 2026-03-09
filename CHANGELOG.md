@@ -2,6 +2,16 @@
 
 ## \[Unreleased]
 
+## \[0.2.5] - 2026-03-09
+
+### Fixed
+
+* **Subscriber ship sync duplication** - Fixed sync to remove old ships before adding new ones
+  * Sync function now deletes existing subscriber ships before upserting new ones
+  * Prevents February ships from lingering when syncing to different months
+  * Added `needsSubscriberShipResync()` helper to detect if resync is needed
+  * Ships are now correctly replaced on each sync instead of accumulating
+
 ## \[0.2.4] - 2026-03-09
 
 ## \[0.2.3] - 2026-03-09
