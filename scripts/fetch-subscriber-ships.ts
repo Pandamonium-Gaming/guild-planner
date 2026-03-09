@@ -144,6 +144,9 @@ async function parseSubscriberPromotions(pageUrl: string): Promise<SubscriberShi
   try {
     console.log(`Fetching subscriber promotions page: ${pageUrl}`);
     
+    // Load ship database for proper ID mapping
+    const shipDatabase = loadShipDatabase();
+    
     let response = await fetch(pageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -199,12 +202,12 @@ async function parseSubscriberPromotions(pageUrl: string): Promise<SubscriberShi
     
     if (centurionMatch) {
       console.log(`Centurion match: "${centurionMatch[1].substring(0, 100)}"`);
-      centurionShips = extractShipNames(centurionMatch[1]);
+      centurionShips = extractShipNames(centurionMatch[1], shipDatabase);
     }
     
     if (imperatorMatch) {
       console.log(`Imperator match: "${imperatorMatch[1].substring(0, 100)}"`);
-      imperatorShips = extractShipNames(imperatorMatch[1]);
+      imperatorShips = extractShipNames(imperatorMatch[1], shipDatabase);
     }
     
     // Try an alternative method: look for ship names anywhere as a fallback
@@ -212,8 +215,8 @@ async function parseSubscriberPromotions(pageUrl: string): Promise<SubscriberShi
       console.log(`\nTrying alternative ship detection...`);
       
       // Find mentions of both Ursa and Apollo (which were visible in our earlier output)
-      const allShips = extractShipNames(normalized);
-      console.log(`Found shipsin overall text: ${allShips.join(', ')}`);
+      const allShips = extractShipNames(normalized, shipDatabase);
+      console.log(`Found ships in overall text: ${allShips.join(', ')}`);
       
       // If we found ships, try to split them between Centurion and Imperator
       if (allShips.length > 0) {
@@ -265,82 +268,64 @@ async function parseSubscriberPromotions(pageUrl: string): Promise<SubscriberShi
 }
 
 /**
- * Extract ship names from text using known ship list
+ * Load the ship database and create a mapping from display names to ship IDs
  */
-function extractShipNames(text: string): string[] {
-  // Known ship name patterns (add more as needed)
-  // Match both full names and abbreviations
-  const knownShips = [
-    // Fighters
-    'Sabre', 'Sabre Firebird', 'Sabre Peregrine',
-    'Hornet', 'Super Hornet', 'Hornet F7C', 'Hornet F7A', 'Hornet E',
-    'Gladius', 'Arrow', 'Razor',
+function loadShipDatabase(): Map<string, string> {
+  try {
+    const shipsPath = resolve(__dirname, '../src/config/games/star-citizen-ships.json');
+    const shipsContent = readFileSync(shipsPath, 'utf-8');
+    const shipsData = JSON.parse(shipsContent);
     
-    // Starters
-    'Aurora', 'Aurora LN', 'Aurora MR', 'Aurora ES',
-    'Mustang', 'Mustang Alpha', 'Mustang Beta', 'Mustang Gamma', 'Mustang Delta',
-    'Avenger', 'Avenger Titan', 'Avenger Stalwart', 'Avenger Warlock',
+    const nameToId = new Map<string, string>();
     
-    // Transport  
-    'Starlancer', 'Starlancer MAX', 'Starlancer TAC',
-    'Reliant', 'Reliant Tana', 'Reliant Mako',
-    'Herald',
-    
-    // Exploration  
-    'Reliant', 'Freelancer', 'Freelancer DUR', 'Freelancer MAX', 'Freelancer MIS',
-    'Star Runner', 'Carrack',
-    
-    // Mining
-    'Prospector', 'Mole',
-    
-    // Industrial
-    'Caterpillar', 'Hull', 'Reclaimer',
-    
-    // Large Ships
-    'Constellation', 'Andromeda', 'Aquila', 'Phoenix',
-    'Cutlass', 'Cutlass Black', 'Cutlass Red', 'Cutlass Blue',
-    'Drake', 'Corsair',
-    
-    // Military
-    'Javelin', 'Idris', 'Bengal',
-    'Glaive', 'Scythe', 'Eclipse', 'Vulcan',
-   
-    // Medical
-    'Apollo', 'Endeavor', 'Crucible', 'Redeemer',
-    'Ursa', 'RSI Ursa', 'RSI Ursa Medivac', 'RSI Apollo', 'RSI Apollo Medivac',
-    
-    // Other
-    'Banu', 'Merchantman', 'Xi\'an', 'Vis', 'Scimitar', 'Spirit',
-    'Anvil', 'Titan', 'Cutter',
-  ];
-  
-  const found: string[] = [];
-  const seenLower = new Set<string>();
-  
-  // Sort by length descending to match longer names first
-  const sortedShips = [...knownShips].sort((a, b) => b.length - a.length);
-  
-  for (const ship of sortedShips) {
-    // Create case-insensitive regex for the ship name with word boundaries
-    const escapedShip = ship.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escapedShip}\\b`, 'i');
-    
-    if (regex.test(text)) {
-      const normalized = ship.toLowerCase().replace(/\s+/g, '-');
-      // Avoid duplicates (e.g., "Ursa" and "RSI Ursa")
-      if (!seenLower.has(normalized)) {
-        found.push(normalized);
-        seenLower.add(normalized);
-        // Mark related names as seen to avoid duplication
-        seenLower.add(ship.toLowerCase());
-        if (ship.includes(' ')) {
-          ship.split(' ').forEach(word => seenLower.add(word.toLowerCase()));
+    if (Array.isArray(shipsData)) {
+      for (const ship of shipsData) {
+        if (ship.id && ship.name) {
+          // Map exact name
+          nameToId.set(ship.name.toLowerCase(), ship.id);
+          
+          // Also map variants without parentheses (e.g., "Apollo Medivac" for "Apollo (Medivac)")
+          const nameWithoutParens = ship.name.replace(/\s*\([^)]*\)/g, '').trim();
+          if (nameWithoutParens) {
+            nameToId.set(nameWithoutParens.toLowerCase(), ship.id);
+          }
         }
       }
     }
+    
+    console.log(`Loaded ${nameToId.size} ships from database`);
+    return nameToId;
+  } catch (error) {
+    console.warn('Could not load ship database, using fallback matching:', error);
+    return new Map();
+  }
+}
+
+/**
+ * Extract ship names from text using actual ship database
+ */
+function extractShipNames(text: string, shipDatabase: Map<string, string>): string[] {
+  const found: Set<string> = new Set();
+  
+  // Try to match ship names from the database
+  // Sort by length descending to match longer names first
+  const sortedShips = Array.from(shipDatabase.entries()).sort((a, b) => b[0].length - a[0].length);
+  
+  for (const [name, id] of sortedShips) {
+    // Create case-insensitive regex for the ship name with word boundaries
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escapedName}\\b`, 'i');
+    
+    if (regex.test(text)) {
+      found.add(id);
+      console.log(`  Found ship in text: "${name}" -> "${id}"`);
+      
+      // Once we have 5 ships, stop looking
+      if (found.size >= 5) break;
+    }
   }
   
-  return found.filter(ship => ship.length > 0).slice(0, 5); // Limit results
+  return Array.from(found).slice(0, 5); // Limit results
 }
 
 /**
