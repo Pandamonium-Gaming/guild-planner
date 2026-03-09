@@ -22,6 +22,12 @@
   * **CharactersTab.tsx**: Replaced 4x `any` type annotations with proper types (`CharacterData`, `RankLevel`, `CharacterFilters`)
   * **CharactersTab.tsx**: Wrapped 2x hardcoded strings with i18n `t()` function, added translations for `characters.noCharactersFound` across all locales
 
+* **Subscriber ships workflow robustness**
+  * Added `continue-on-error: true` to PR creation step to prevent workflow failure on GitHub Actions token restrictions
+  * Replaced issue creation fallback with warning message (issues disabled in repo)
+  * Added status verification step to report PR creation outcome
+  * Workflow now succeeds even if PR creation fails due to repository configuration
+
 ## \[0.2.0] - 2026-03-09
 
 ### Added
