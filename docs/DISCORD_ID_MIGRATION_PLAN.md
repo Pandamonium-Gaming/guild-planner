@@ -1,5 +1,27 @@
 # Discord ID Migration Plan
 
+## Status: PHASES 1-5 COMPLETE ✅
+
+### Completion Summary
+
+| Phase | Description | Status | Files |
+| --- | --- | --- | --- |
+| 1 | Schema: Add `discord_id` column, indexes | ✅ Complete | `005_discord_id_migration.sql` |
+| 2 | Data: Populate from auth metadata | ✅ Complete | `006_populate_discord_id_from_auth.sql` |
+| 3 | App: Login sync, character lookups | ✅ Complete | `src/lib/auth.ts`, `src/app/auth/callback/page.tsx` |
+| 4 | Queries: Resilient character lookup helpers | ✅ Complete | `src/lib/character-lookup.ts` |
+| 5 | RLS: Discord ID-based access control | ✅ Complete | `007_discord_id_rls_policies.sql` |
+| 6 | Optional: Deprecate `user_id` entirely | 🔹 Pending | Future work |
+
+### Deployment Status
+
+* ✅ **Dev Database**: All phases deployed and tested
+  * 13 members restored from production
+  * 1 member with Discord ID synced (auth metadata available)
+  * 12 members pending Discord ID population (will sync on next login)
+  * RLS policies working: users can access characters via auth UUID or Discord ID
+* ⏳ **Production Database**: Ready for deployment (Phase 6 spec complete, awaiting approval)
+
 ## Overview
 
 Migrate from volatile Supabase auth user IDs to immutable Discord IDs as the primary user identifier. This improves disaster recovery, auth resilience, and user linkage stability.
@@ -36,7 +58,7 @@ Migrate from volatile Supabase auth user IDs to immutable Discord IDs as the pri
 
 1. **Batch migration script** (recommended, safest):
    * Location: `supabase/migrations/006_populate_discord_id_from_auth.sql`
-   * Extracts Discord ID from `auth.users.raw_app_meta_data` (provider_id)
+   * Extracts Discord ID from `auth.users.raw_app_meta_data` (provider\_id)
    * Falls back to `auth.identities` table if metadata missing
    * Updates all `members.discord_id` in bulk
    * Uses two-stage validation (pre/post counts, duplicate check)

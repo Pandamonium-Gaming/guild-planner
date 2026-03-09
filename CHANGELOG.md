@@ -4,17 +4,25 @@
 
 ### Added
 
-* **Discord ID Migration for Disaster Recovery Resilience**
-  * Added `discord_id` column to `members` table for immutable user identification
-  * Solves Supabase auth UUID volatility issue during database restores
-  * Created migration: `005_discord_id_migration.sql` with indexes for fast lookups
-  * Includes composite index `idx_members_group_discord_id` for group-scoped queries
-  * Test scenarios all passed:
-    * Scenario 1: Discord ID linking and character association ✅
-    * Scenario 2: Character ownership survives database restore ✅
-    * Scenario 3: Multi-guild handling with same Discord user ✅
-  * Documentation: `DISCORD_ID_MIGRATION_PLAN.md` and `DISCORD_ID_MIGRATION_TEST_RESULTS.md`
-  * Production-ready schema change, app-side code updates in next phase
+* **Discord ID Migration for Disaster Recovery Resilience (6-Phase Implementation)**
+  * Phase 1: Schema design with `discord_id` column, indexes, and composite lookups
+    * Migration: `005_discord_id_migration.sql` ✅
+  * Phase 2: Data population from Discord OAuth metadata with fallback to identities table
+    * Migration: `006_populate_discord_id_from_auth.sql` ✅
+    * Tested on production backup restore: 1 member synced, 12 pending auth linkage
+  * Phase 3: App-side Discord sync on login (non-blocking, gradual population)
+    * Implementation: `syncDiscordIdToMembers()` in `src/lib/auth.ts` ✅
+    * Integrated: `src/app/auth/callback/page.tsx` calls sync after session established ✅
+  * Phase 4: Resilient character lookup helpers with dual-path access
+    * Created: `src/lib/character-lookup.ts` with Discord ID + user\_id fallback ✅
+    * Functions: `getCharacterByDiscordId()`, `getCurrentUserMainCharacter()`, `checkCharacterResilience()`
+  * Phase 5: RLS policies with Discord ID-based fallback access
+    * Migration: `007_discord_id_rls_policies.sql` ✅
+    * New functions: `user_has_clan_role_by_discord()` for Discord-based access checks
+    * Updated policies: Members can view/manage via auth UUID or Discord ID
+    * Tested: Discord ID fallback working, functions callable
+  * Phase 6: Optional - Deprecate user\_id entirely (future work)
+  * Impact: Characters remain accessible after database restore even if auth UUID changes
 
 * **Machine-enforced Copilot command compliance system**
   * `.copilot-rules.json`: Declarative rules for OS context, file policies, and violations
