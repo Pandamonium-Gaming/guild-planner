@@ -2,6 +2,8 @@
 
 ## \[Unreleased]
 
+## \[0.2.1] - 2026-03-09
+
 ### Added
 
 * **Machine-enforced Copilot command compliance system**
