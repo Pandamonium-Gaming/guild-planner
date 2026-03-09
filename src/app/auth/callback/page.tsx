@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { syncDiscordIdToMembers } from '@/lib/auth';
 import { Loader2 } from 'lucide-react';
 
 export default function AuthCallbackPage() {
@@ -10,12 +11,22 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleCallback = async () => {
-      const { error } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
         console.error('Auth callback error:', error);
         router.push('/?error=auth_failed');
         return;
+      }
+
+      // Phase 3: Sync Discord ID to members table (Discord ID Migration)
+      if (session?.user?.id) {
+        try {
+          await syncDiscordIdToMembers(session.user.id);
+        } catch (err) {
+          console.error('Error syncing Discord ID:', err);
+          // Don't fail login - this is a background sync
+        }
       }
 
       // Redirect to home - getURL() already ensures we're on the correct domain

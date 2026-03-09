@@ -104,3 +104,46 @@ WHERE m.discord_id IS NULL
 ORDER BY m.created_at DESC;
 
 RAISE NOTICE '✅ Phase 2 (Data Population) Complete - See results above';
+
+-- Phase 3: Application Code Updates (TypeScript/JavaScript changes)
+-- These changes are implemented in src/ directory, not as SQL
+-- 
+-- ✅ COMPLETED:
+-- 1. src/lib/auth.ts
+--    - Added syncDiscordIdToMembers(userId) function
+--    - Extracts Discord ID from auth.users metadata
+--    - Syncs to members table on each login
+--    - Non-blocking: doesn't fail if sync unsuccessful
+--
+-- 2. src/app/auth/callback/page.tsx
+--    - Calls syncDiscordIdToMembers() after session established
+--    - Ensures Discord IDs populated on every login
+--    - Gradual data population as users log in
+--
+-- 3. src/lib/character-lookup.ts (NEW)
+--    - getCharacterByDiscordId(discordId, groupId, gameSlug)
+--    - getCharactersByDiscordId(discordId, groupId, gameSlug)
+--    - checkCharacterResilience(characterId)
+--    - Provides Discord ID-based character lookups
+--    - Maintains backward compatibility with user_id
+--
+-- NEXT PHASE 4 TASKS (FUTURE):
+-- 1. Update useGroupMembership.ts
+--    - Add discord_id as fallback for member lookups
+--    - Try discord_id if user_id lookup fails
+--
+-- 2. Update RLS policies
+--    - Add discord_id-based access control
+--    - Ensure users can only access their own characters
+--
+-- 3. Update character queries in useGroupData.ts
+--    - Use discord_id for character ownership where needed
+--    - Maintain dual-path queries during transition
+--
+-- MIGRATION STRATEGY:
+-- Phase 1: ✅ Schema (005_discord_id_migration.sql)
+-- Phase 2: ✅ Data population (006_populate_discord_id_from_auth.sql)
+-- Phase 3: ✅ App code sync on login (src/ updates)
+-- Phase 4: 🔜 Character queries update (implement on next iteration)
+-- Phase 5: 🔜 RLS policies (implement on next iteration)
+-- Phase 6: 🔜 Deprecate user_id (optional, much later)

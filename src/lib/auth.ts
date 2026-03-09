@@ -121,6 +121,52 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 }
 
 /**
+ * Sync Discord ID from auth metadata to all user's characters
+ * Called on login to ensure members.discord_id is populated (Phase 3 - Discord ID Migration)
+ */
+export async function syncDiscordIdToMembers(userId: string): Promise<number> {
+  try {
+    // Get Discord ID from auth metadata
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    
+    if (!authUser || authUser.id !== userId) {
+      return 0; // Can't sync without auth data
+    }
+    
+    const discordId = authUser.user_metadata?.provider_id || null;
+    
+    if (!discordId) {
+      console.warn(`No Discord ID found in auth metadata for user ${userId}`);
+      return 0;
+    }
+    
+    // Sync Discord ID to all NULL discord_id records for this user
+    // RLS policy ensures user can only update their own records
+    const { data, error } = await supabase
+      .from('members')
+      .update({ discord_id: discordId })
+      .eq('user_id', userId)
+      .is('discord_id', null)
+      .select();
+    
+    if (error) {
+      console.error('Error syncing Discord ID to members:', error);
+      return 0;
+    }
+    
+    const syncedCount = (data || []).length;
+    if (syncedCount > 0) {
+      console.log(`✅ Synced Discord ID to ${syncedCount} member(s) for user ${userId}`);
+    }
+    
+    return syncedCount;
+  } catch (err) {
+    console.error('Error in syncDiscordIdToMembers:', err);
+    return 0;
+  }
+}
+
+/**
  * Update user's display name
  */
 export async function updateDisplayName(userId: string, displayName: string) {
