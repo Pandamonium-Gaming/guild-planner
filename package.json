@@ -10,6 +10,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "check:copilot": "node scripts/validate-copilot-compliance.js",
     "update-ships": "node scripts/fetch-ships.js",
     "check:translations": "node scripts/check-translations.js",
     "check:changelog": "node scripts/check-changelog.js",
