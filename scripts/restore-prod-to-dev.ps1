@@ -11,15 +11,6 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-function Get-LatestBackup {
-  param([string]$BackupDir)
-  
-  Get-ChildItem $BackupDir -Filter "prod-backup_*.sql" | 
-    Where-Object { $_.Name -notlike "*schema-only*" -and $_.Name -notlike "*data-only*" } |
-    Sort-Object LastWriteTime -Descending | 
-    Select-Object -First 1
-}
-
 function Confirm-Action {
   param([string]$Message)
   
@@ -44,25 +35,29 @@ if (-not $BackupFile) {
     exit 1
   }
   
-  $BackupFile = Get-LatestBackup $BackupDir
+  $backups = @(Get-ChildItem $BackupDir -Filter "prod-backup_*.sql" | 
+    Where-Object { $_.Name -notlike "*schema-only*" -and $_.Name -notlike "*data-only*" } |
+    Sort-Object LastWriteTime -Descending)
   
-  if (-not $BackupFile) {
+  if ($backups.Count -eq 0) {
     Write-Host "❌ No production backups found in $BackupDir" -ForegroundColor Red
     Write-Host "   (Looking for prod-backup_*.sql, excluding schema-only/data-only)" -ForegroundColor Gray
     exit 1
   }
   
-  Write-Host "Using latest backup: $($BackupFile.Name)" -ForegroundColor Cyan
-  $BackupFile = $BackupFile.FullName
+  $latestBackup = $backups[0]
+  Write-Host "Using latest backup: $($latestBackup.Name)" -ForegroundColor Cyan
+  $backupSize = $latestBackup.Length / 1MB
+  $BackupFile = $latestBackup.FullName
 } else {
   if (-not (Test-Path $BackupFile)) {
     Write-Host "❌ Backup file not found: $BackupFile" -ForegroundColor Red
     exit 1
   }
   Write-Host "Using specified backup: $BackupFile" -ForegroundColor Cyan
+  $backupSize = (Get-Item $BackupFile).Length / 1MB
 }
 
-$backupSize = (Get-Item $BackupFile).Length / 1MB
 Write-Host "Backup size: $([math]::Round($backupSize, 2)) MB" -ForegroundColor Gray
 
 # Get dev database URL from Key Vault

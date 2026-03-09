@@ -28,7 +28,7 @@
 
 **Results:**
 
-```
+```sql
 Character: QuarterBall
 Discord ID: 679287061039284235 ← IMMUTABLE
 Old Auth UUID: 9db22906-3f7e-4e16-a23d-202a0d22a9cd ← Would change on restore
@@ -53,7 +53,7 @@ New auth UUID could find character: 2 characters matched via Discord ID
 
 **Results:**
 
-```
+```sql
 Discord User 999999999999999999:
 - Characters: 2 (GarrettSlavic, Orcetri)
 - Guilds: Can be in multiple groups
@@ -70,7 +70,7 @@ Discord User 999999999999999999:
 **All Scenarios Passed:** ✅
 
 1. **Scenario 1 - Discord ID Linking**: Basic Discord ID linking works  perfectly
-2. **Scenario 2 - DR Resilience**: Characters survive restore via Discord ID  
+2. **Scenario 2 - DR Resilience**: Characters survive restore via Discord ID
 3. **Scenario 3 - Multi-guild**: Guild isolation enforced, multi-guild works
 
 ***
