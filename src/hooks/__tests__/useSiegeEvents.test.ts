@@ -16,6 +16,11 @@ describe('useSiegeEvents', () => {
   const mockGroupId = 'group-123';
   const mockUserId = 'user-123';
 
+  // Generate dynamic dates relative to today
+  const now = new Date();
+  const futureDateStr = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days from now
+  const pastDateStr = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days ago
+
   const mockSiegeData = [
     {
       id: 'siege-1',
@@ -24,7 +29,7 @@ describe('useSiegeEvents', () => {
       description: 'Attack on Red Castle',
       siege_type: 'castle_attack',
       target_name: 'Red Castle',
-      starts_at: '2026-03-01T18:00:00Z',
+      starts_at: futureDateStr, // Future date
       declaration_ends_at: '2026-02-28T18:00:00Z',
       max_participants: 250,
       frontline_needed: 80,
@@ -71,7 +76,7 @@ describe('useSiegeEvents', () => {
       description: 'Defend our node',
       siege_type: 'node_defense',
       target_name: 'Winstead',
-      starts_at: '2026-01-01T18:00:00Z', // Past date
+      starts_at: pastDateStr, // Past date
       declaration_ends_at: null,
       max_participants: 200,
       frontline_needed: 60,
@@ -540,8 +545,8 @@ describe('useSiegeEvents', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      // Only siege-1 has a future date (2026-03-01)
-      // siege-2 has a past date (2026-01-01)
+      // Only siege-1 has a future date (7 days from now)
+      // siege-2 has a past date (30 days ago)
       expect(result.current.upcomingSieges).toHaveLength(1);
       expect(result.current.upcomingSieges[0].id).toBe('siege-1');
       expect(result.current.upcomingSieges[0].title).toBe('Castle Siege Alpha');

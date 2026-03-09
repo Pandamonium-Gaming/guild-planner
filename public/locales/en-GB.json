@@ -87,6 +87,7 @@
     "accessAfterApproval": "You'll be able to access clan data once approved.",
     "charactersCount": "{{count}} characters",
     "noCharacters": "No characters yet. Add your first group character above!",
+    "noCharactersFound": "No characters found.",
     "noCharactersMatch": "No characters match your filters.",
     "viewPublicPage": "View Public Page",
     "admin": "admin",

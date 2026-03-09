@@ -1,4 +1,5 @@
 import { Clock, Users } from 'lucide-react';
+import Image from 'next/image';
 import { ROLE_CONFIG, GroupRole } from '@/lib/permissions';
 
 interface ManageTabProps {
@@ -53,10 +54,12 @@ export function ManageTab({
               >
                 <div className="flex items-center gap-3">
                   {member.user?.discord_avatar ? (
-                    <img
+                    <Image
                       src={member.user.discord_avatar}
-                      alt=""
-                      className="w-10 h-10 rounded-full"
+                      alt="Discord avatar"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
                     />
                   ) : (
                     <div className="w-10 h-10 bg-slate-700 rounded-full" />
@@ -151,10 +154,12 @@ export function ManageTab({
                       {/* Colored dot for role */}
                       <span className={roleConfig.color}>{String.fromCharCode(9679)}</span>
                     {member.user?.discord_avatar ? (
-                      <img
+                      <Image
                         src={member.user.discord_avatar}
-                        alt=""
-                        className="w-10 h-10 rounded-full"
+                        alt="Discord avatar"
+                        width={40}
+                        height={40}
+                        className="rounded-full"
                       />
                     ) : (
                       <div className="w-10 h-10 bg-slate-700 rounded-full" />

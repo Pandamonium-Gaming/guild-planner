@@ -2,6 +2,37 @@
 
 ## \[Unreleased]
 
+### Added
+
+* **Machine-enforced Copilot command compliance system**
+  * `.copilot-rules.json`: Declarative rules for OS context, file policies, and violations
+  * `validate-copilot-compliance.js`: Pre-commit validation script
+  * `.github/workflows/copilot-compliance.yml`: CI workflow running on Windows, Linux, macOS
+  * Enforces: OS-appropriate commands, CHANGELOG updates, translation sync
+  * Prevents Unix commands (`head`, `grep`) being committed in Windows context
+  * Provides clear violation messages with fixes for developers
+  * Stops repeating broken patterns across conversations by using external validation
+
+### Fixed
+
+* Resolved 11 ESLint/TypeScript warnings across 4 files
+  * **permissions/route.ts**: Replaced `(upsertError as any)` casting with proper `PostgrestErrorWithDetails` interface
+  * **achievements/sync/route.ts**: Prefixed unused `gatheringSkills` variable with underscore
+  * **ManageTab.tsx**: Replaced 2x `<img>` tags with Next.js `<Image>` component for improved LCP
+  * **CharactersTab.tsx**: Replaced 4x `any` type annotations with proper types (`CharacterData`, `RankLevel`, `CharacterFilters`)
+  * **CharactersTab.tsx**: Wrapped 2x hardcoded strings with i18n `t()` function, added translations for `characters.noCharactersFound` across all locales
+
+## \[0.2.0] - 2026-03-09
+
+### Added
+
+* **Automated subscriber ship updates** - GitHub Action that runs monthly to auto-fetch Star Citizen subscriber promotions and create PRs
+  * Scheduled workflow runs 1st of each month at 10 AM UTC
+  * Scrapes RSI comm-link for current month's subscriber ships
+  * Auto-creates PR if successful, or creates reminder issue if fetch fails
+  * Significantly reduces manual effort for monthly updates
+  * See `docs/STAR_CITIZEN_SUBSCRIBER_UPDATES.md` for details
+
 ## \[0.1.3] - 2026-02-13
 
 ### Fixed

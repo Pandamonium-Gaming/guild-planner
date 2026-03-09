@@ -1,0 +1,74 @@
+name: Copilot Command Compliance
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'pages/**'
+      - 'CHANGELOG.md'
+      - 'public/locales/**'
+      - '.copilot-rules.json'
+      - 'scripts/validate-copilot-compliance.js'
+
+jobs:
+  copilot-compliance:
+    name: Check compliance on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check Copilot compliance
+        run: node scripts/validate-copilot-compliance.js
+        
+      - name: Validate .copilot-rules.json format
+        run: node -e "JSON.parse(require('fs').readFileSync('.copilot-rules.json', 'utf-8'))"
+
+  changelog-check:
+    name: Changelog must be updated
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check changelog
+        run: node scripts/check-changelog.js
+
+  translation-check:
+    name: Translation files must be synced
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check translations
+        run: node scripts/check-translations.js

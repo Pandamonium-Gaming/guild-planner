@@ -1,0 +1,101 @@
+{
+  "enforceLevel": "MANDATORY",
+  "version": "1.0.0",
+  "description": "Machine-readable enforcement rules for Copilot commands and practices",
+  
+  "osCommandPolicy": {
+    "enforcement": "BLOCKING",
+    "checkPoint": "pre-commit",
+    
+    "Windows": {
+      "allowed": ["powershell", "pwsh", "cmd", "npm", "npx", "node", "git"],
+      "blocked": ["head", "grep", "tail", "cat", "sed", "awk", "ls", "rm", "cp", "mv"],
+      "required": ["Select-Object", "Select-String", "Get-ChildItem", "Where-Object", "Get-Content", "Set-Content", "Test-Path"],
+      "pattern": ".*\\|(\\s+head|\\s+grep|\\s+tail|\\s+sed|\\s+awk|@\\s+ls|@\\s+rm)"
+    },
+    
+    "Linux": {
+      "allowed": ["bash", "sh", "npm", "npx", "node", "git"],
+      "blocked": [],
+      "required": ["POSIX standard"],
+      "pattern": null
+    },
+    
+    "macOS": {
+      "allowed": ["bash", "zsh", "npm", "npx", "node", "git"],
+      "blocked": [],
+      "required": ["POSIX standard"],
+      "pattern": null
+    }
+  },
+
+  "instructionPriorities": {
+    "CRITICAL": [
+      "osCommandContext",
+      "changelogUpdates",
+      "translationSync",
+      "semanticVersioning"
+    ],
+    "HIGH": [
+      "multiReplaceTools",
+      "parallelOperations",
+      "codebaseExploration"
+    ],
+    "MEDIUM": [
+      "fileOrganization",
+      "namingConventions"
+    ]
+  },
+
+  "fileChangePolicies": {
+    "CHANGELOG.md": {
+      "requiresUpdate": true,
+      "scope": ["src/", "components/", "lib/", "app/", "pages/", "supabase/migrations/", "public/"],
+      "excludeScope": ["*.md", "*test*", "*.spec.*", ".github/", "scripts/", "eslint*", "jest*", "tsconfig*"]
+    },
+    "translations": {
+      "requiresSync": true,
+      "files": ["public/locales/en-GB.json", "public/locales/es.json", "public/locales/nl.json"],
+      "tool": "npm run check:translations"
+    },
+    "versionBump": {
+      "requiresChangelogUpdate": true,
+      "requiredFormat": "SEMVER",
+      "tool": "npm run version:patch|minor|major"
+    }
+  },
+
+  "toolUsageRules": {
+    "replace_string_in_file": {
+      "context": "3-5 lines before and after target",
+      "multipleEdits": "use multi_replace_string_in_file for >1 independent change"
+    },
+    "codebaseExploration": {
+      "parallel": "invoke multiple tools in single call when independent",
+      "sequential": "wait for results if dependent"
+    }
+  },
+
+  "violations": {
+    "level": "ERROR",
+    "blocking": true,
+    "examples": [
+      {
+        "violation": "Unix command on Windows",
+        "example": "npm test | head -100",
+        "windows": "Windows",
+        "fix": "npm test | Select-Object -First 100"
+      },
+      {
+        "violation": "Empty [Unreleased] in CHANGELOG.md",
+        "example": "## [Unreleased]\\n\\n## [1.0.0]",
+        "fix": "Add content under [Unreleased] or use version-bump tool"
+      },
+      {
+        "violation": "Mismatched translation keys",
+        "scope": "any commit touching translations",
+        "fix": "npm run check:translations must pass"
+      }
+    ]
+  }
+}

@@ -6,6 +6,33 @@ Star Citizen subscriber ships are granted monthly to active subscribers based on
 their tier. This document explains how to monitor for new promotions and update
 the system.
 
+## Automated Update Process
+
+**Since March 2026**, subscriber ship updates are **partially automated**:
+
+### How It Works
+
+1. **Automatic**: A scheduled GitHub Action runs on the **1st of each month at 10 AM UTC**
+   * Fetches the official RSI comm-link for subscriber promotions
+   * Attempts to extract ship data automatically
+   * Creates a **Pull Request** if successful with the new ships
+
+2. **Fallback**: If automated fetching fails
+   * Creates a **GitHub Issue** reminder to manually update
+   * Provides links and instructions for manual extraction
+   * Assigns to maintainers for review
+
+### For Reviewers
+
+When a PR is created by the automation:
+
+1. ✅ Review the extracted ships against [RSI's official promotion](https://robertsspaceindustries.com/comm-link/transmission/)
+2. ✅ Verify ship IDs are correct (match database)
+3. ✅ Confirm insurance durations (12m Centurion, 24m Imperator)
+4. ✅ Merge if accurate, or request changes
+
+**If an issue is created instead**, follow the [Manual Update](#manual-update-when-automation-doesnt-work) steps below.
+
 ## RSI Comm-Link Pattern
 
 ### URL Structure
@@ -26,92 +53,107 @@ the system.
 New subscriber promotions are typically announced in the **first week of each
 month** (usually around the 1st-5th).
 
-## Monitoring for Updates
+## Manual Update (When Automation Doesn't Work)
 
-### RSS Feed (Recommended)
+**Use this process when:**
+
+* No PR was created on the 1st of the month
+* An issue was created asking for manual review
+* The automated PR needs corrections
+
+### Finding the Promotion Post
+
+#### Option A: RSS Feed (Recommended)
 
 **Feed URL**: <https://robertsspaceindustries.com/en/comm-link/rss>
 
-This official RSS feed includes all comm-link transmissions, including monthly
-subscriber promotions.
-
-**How to use:**
-
-1. **RSS Reader**: Add the feed to Feedly, Inoreader, or your preferred RSS
-   reader
+1. **RSS Reader**: Add the feed to Feedly, Inoreader, or your preferred RSS reader
 2. **Filter for**: Posts titled "\[Month] \[Year] Subscriber Promotions"
-3. **Frequency**: Check first week of each month (typically posts 1st-5th)
-4. **Auto-alert**: Set up RSS alerts/notifications for posts containing
-   "Subscriber Promotions"
+3. **Set alerts** for posts containing "Subscriber Promotions"
 
-* Link: Direct URL to promotion page
-* Posted date: Timestamp
-* Category: "transmission"
+#### Option B: Direct Search
 
-### Manual Check (Alternative)
-
-1. **First week of each month**: Visit
-   <https://robertsspaceindustries.com/comm-link/transmission/>
+1. Visit <https://robertsspaceindustries.com/comm-link/transmission/>
 2. Look for posts titled "\[Month] \[Year] Subscriber Promotions"
-3. Extract ship and flair information
-4. Update the codebase (see below)
+3. Click to open the promotion post
 
-### Community Sources (Backup)
+#### Option C: Community Sources
 
-1. **Reddit**: r/starcitizen announces promotions immediately
-2. **Spectrum**: Official RSI forums
-3. **Discord**: Star Citizen community servers often have
-   auto-notifications
+1. **Reddit**: [r/starcitizen](https://reddit.com/r/starcitizen) announces immediately
+2. **Spectrum**: [Official RSI forums](https://robertsspaceindustries.com/spectrum/)
+3. **Discord**: Star Citizen community servers
 
-## Updating Subscriber Ships
+### Extracting Ship Information
 
-### 1. Extract Information from Comm-Link
-
-Look for these key details:
+Look for these key details in the promotion post:
 
 * **Centurion Ships**: Listed as "Centurion Subscribers receive..."
 * **Imperator Ships**: Listed as "Imperator Subscribers receive..."
 * **Flair Items**: Monthly cosmetic rewards
-* **Insurance Duration**: 12 months (Centurion) or 24 months
-  (Imperator)
+* **Insurance Duration**: 12 months (Centurion) or 24 months (Imperator)
 
-### 2. Update Configuration File
+### Updating Configuration File
 
 Edit: `src/games/starcitizen/config/subscriber-ships.ts`
 
-Add new month entry:
+#### Step 1: Find Ship IDs
+
+Ship names from RSI need to be converted to ship IDs (kebab-case). Check existing entries in the file or search `src/games/starcitizen/data/star-citizen-ships.json`.
+
+**Examples:**
+
+* "Sabre" → `'sabre'`
+* "Starlancer MAX" → `'starlancer-max'`
+* "Corsair" → `'corsair'`
+
+#### Step 2: Add Month Entry
 
 ```typescript
 '2026-03': {
   label: 'March 2026',
-  centurion: ['Ship Name'],
-  imperator: ['Ship Name', 'Additional Ship'],
+  centurion: ['ship-id-1'],
+  imperator: ['ship-id-1', 'ship-id-2'],
   flair: 'Flair Item Description',
-  notes: 'Ship Name (12m insurance for Centurion, 24m for Imperator)',
+  notes: 'Ship names (12m insurance for Centurion, 24m for Imperator)',
 },
 ```
 
-### 3. Commit and Deploy
+**Important:**
+
+* Use ship IDs from database (lowercase, hyphenated)
+* Imperator tier always includes Centurion ships PLUS additional ships
+* Include insurance duration in notes
+
+#### Step 3: Create PR
 
 ```bash
 git add src/games/starcitizen/config/subscriber-ships.ts
-git commit -m "chore: Add March 2026 subscriber ships"
-git push
+git commit -m "chore: Add [Month Year] subscriber ships"
+git push -u origin feature/subscriber-[month]-[year]
 ```
+
+Then create a Pull Request for team review.
+
+## Automatic Updates
 
 The system automatically syncs ships when:
 
 * A character's subscriber tier is set or changed
-* The month changes (if auto-sync is enabled)
+* A character is created with subscriber tier
+* New ships are added to subscriber config
 
 ## Subscriber Tiers
 
 ### Centurion ($10/month)
 
-* **Color**: Gold/Bronze (#D4AF37)
-* **Icon**: 🥉
+* **Color**: Blue (#54ADF7)
+
+* **Ships per month**: 1
+
 * **Ships**: 1 per month
+
 * **Flair**: 1 per month
+
 * **Insurance**: 12 months
 
 ### Imperator ($20/month)
@@ -190,13 +232,59 @@ handles ship additions/removals automatically.
 Ships auto-update when month changes. Manual sync available via
 CharacterForm.
 
+## Automation Details (GitHub Action)
+
+### How It Works
+
+The `Update Subscriber Ships` workflow (`.github/workflows/update-subscriber-ships.yml`):
+
+1. **Triggers**: 1st of each month at 10 AM UTC (and manually via workflow\_dispatch)
+2. **Scripts**: Runs `scripts/fetch-subscriber-ships.ts`
+3. **Success Path**:
+   * Extracts ship data from RSI comm-link
+   * Updates `src/games/starcitizen/config/subscriber-ships.ts`
+   * Creates PR for review (`chore/update-subscriber-ships` branch)
+4. **Failure Path**:
+   * Posts GitHub Issue asking for manual update
+   * Includes links and instructions
+   * Assigns to maintainers
+
+### Requirements
+
+* Node.js 20+
+* Dependencies: `cheerio`, `node-fetch`
+* GitHub permissions: `contents:write`, `pull-requests:write`, `issues:write`
+
+### Known Limitations
+
+* Depends on RSI's HTML structure (may fail if layout changes)
+* Heuristic-based ship name extraction (may need manual correction)
+* No verification against actual ship database
+
+### Manual Workflow Skip
+
+If needed to run immediately without waiting for schedule:
+
+```bash
+# In GitHub Actions UI:
+# 1. Go to ".github/workflows/update-subscriber-ships.yml"
+# 2. Click "Run workflow"
+# 3. Select branch: "develop"
+# 4. Click "Run workflow"
+```
+
+Or via CLI:
+
+```bash
+# Requires GitHub CLI installed
+gh workflow run update-subscriber-ships.yml --ref develop
+```
+
 ## External Resources
 
 * **Subscriptions Page**:
   <https://robertsspaceindustries.com/pledge/subscriptions>
 * **Comm-Link Archive**:
   <https://robertsspaceindustries.com/comm-link/transmission>
-* **Subscriber Store**:
-  <https://robertsspaceindustries.com/store/pledge/browse/extras/subscribers-store>
-* **Support FAQ**:
-  <https://support.robertsspaceindustries.com/hc/en-us/articles/115013374428-Subscriber-Discount-Coupons>
+* **RSS Feed**:
+  <https://robertsspaceindustries.com/en/comm-link/rss>

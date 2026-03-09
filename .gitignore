@@ -32,7 +32,9 @@ yarn-error.log*
 build.log*
 build-output.log
 *.log
-
+lint.*.txt
+tsc-errors.txt
+ci-logs.txt
 # env files (keep real secrets out, but allow example)
 .env
 .env.local
@@ -51,3 +53,4 @@ next-env.d.ts
 .tmp
 .backups
 supabase/.temp
+test-output.txt

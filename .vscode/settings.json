@@ -45,7 +45,8 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "git tag": true
+        "git tag": true,
+        "npx tsx": true
     },
     "codeQL.githubDatabase.download": "never"
 }

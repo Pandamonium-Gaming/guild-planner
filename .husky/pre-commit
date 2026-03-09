@@ -2,6 +2,9 @@
 set -e
 
 # Husky v10 compatible initialization
+echo "🤖 Checking Copilot command compliance..."
+node scripts/validate-copilot-compliance.js || { echo "❌ Copilot command violations detected. Fix and retry."; exit 1; }
+
 echo "🔤 Checking spelling and markdown..."
 
 # Run cspell on changed markdown files
