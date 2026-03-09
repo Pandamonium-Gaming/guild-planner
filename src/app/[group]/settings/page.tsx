@@ -186,7 +186,7 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ group:
                     Ashes of Creation Discord Settings
                   </Link>
                   <Link
-                    href={`/${groupSlug}/sc/settings`}
+                    href={`/${groupSlug}/starcitizen/settings`}
                     className="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 hover:text-purple-300 rounded-lg transition-colors text-sm border border-slate-600"
                   >
                     Star Citizen Discord Settings

@@ -28,6 +28,11 @@
   * Automated PR body now includes actual ship names (Centurion and Imperator tier lists)
   * Improved PR details with direct link to RSI source post
 
+* Fixed route configuration and caching issues
+  * Corrected Star Citizen route from `/sc/settings` to `/starcitizen/settings`
+  * Added documentation that subscriber-ships.ts requires rebuild/redeploy to take effect (config cached at build time)
+  * Added warning comment in config file explaining cache invalidation
+
 ## \[0.2.0] - 2026-03-09
 
 ### Added

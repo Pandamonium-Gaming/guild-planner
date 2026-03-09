@@ -4,6 +4,12 @@
  * These are the ships granted to subscribers each month based on their subscription tier.
  * Updated monthly from https://robertsspaceindustries.com/en/comm-link/
  * 
+ * ⚠️  IMPORTANT: After updating this file, the app must be rebuilt/redeployed to reflect changes.
+ * The config is cached at build time. Simply pushing changes won't update the running app.
+ * 
+ * For local development: `npm run dev` (Next.js watch mode auto-rebuilds)
+ * For production: Deployment/rebuild required (see CI/CD pipeline)
+ * 
  * Tiers:
  * - centurion: Base subscription ($10/month) - Gold/Bronze branding
  * - imperator: Premium subscription ($20/month) - Platinum/Silver branding
