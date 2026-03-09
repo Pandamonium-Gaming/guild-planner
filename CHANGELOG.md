@@ -2,6 +2,16 @@
 
 ## \[Unreleased]
 
+### Fixed
+
+* **March 2026 subscriber ships** - Fixed invalid ship IDs that prevented ships from displaying
+  * Changed from incorrect `rsi-apollo-*` prefixed IDs to valid database IDs
+  * Centurion tier now correctly shows Ursa Medivac (Apollo variant not yet in database)
+  * Imperator tier now correctly shows Ursa Medivac and Ursa
+  * Resolves issue where February ships continued to display instead of March ships
+
+## \[0.2.1] - 2026-03-09
+
 ### Added
 
 * **Machine-enforced Copilot command compliance system**
