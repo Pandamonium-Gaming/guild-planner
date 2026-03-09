@@ -4,7 +4,14 @@
 
 ### Added
 
-* (None yet)
+* **Machine-enforced Copilot command compliance system**
+  * `.copilot-rules.json`: Declarative rules for OS context, file policies, and violations
+  * `validate-copilot-compliance.js`: Pre-commit validation script
+  * `.github/workflows/copilot-compliance.yml`: CI workflow running on Windows, Linux, macOS
+  * Enforces: OS-appropriate commands, CHANGELOG updates, translation sync
+  * Prevents Unix commands (`head`, `grep`) being committed in Windows context
+  * Provides clear violation messages with fixes for developers
+  * Stops repeating broken patterns across conversations by using external validation
 
 ## \[0.2.0] - 2026-03-09
 
