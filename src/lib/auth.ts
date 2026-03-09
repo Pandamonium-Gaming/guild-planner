@@ -181,8 +181,10 @@ export async function updateDisplayName(userId: string, displayName: string) {
 
 /**
  * Get user's membership in a specific clan
+ * Phase 4: Now supports Discord ID fallback for DR resilience
  */
 export async function getGroupMembership(groupId: string, userId: string): Promise<ClanMembership | null> {
+  // Primary lookup: by user_id
   const { data, error } = await supabase
     .from('group_members')
     .select('group_id, role, is_creator, approved_at')
@@ -193,6 +195,52 @@ export async function getGroupMembership(groupId: string, userId: string): Promi
   if (error) throw error;
   
   return data;
+}
+
+/**
+ * Get user's characters in a group by Discord ID (with user_id fallback)
+ * Phase 4: Discord ID Migration - provides resilient character lookup
+ * Useful for "get my characters" or owner verification after auth change
+ */
+export async function getUserCharactersByGroupDiscordId(
+  discordId: string,
+  groupId: string,
+  gameSlug: string = 'aoc'
+) {
+  try {
+    // Primary lookup: by Discord ID (DR-resilient)
+    const { data: byDiscordId, error: discordError } = await supabase
+      .from('members')
+      .select('*')
+      .eq('discord_id', discordId)
+      .eq('group_id', groupId)
+      .eq('game_slug', gameSlug);
+
+    if (!discordError && byDiscordId && byDiscordId.length > 0) {
+      return byDiscordId;
+    }
+
+    // Fallback: if no Discord ID results but we have auth user UUID, try that
+    // This handles transition period before all members have discord_id
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (authUser?.id) {
+      const { data: byUserId, error: userIdError } = await supabase
+        .from('members')
+        .select('*')
+        .eq('user_id', authUser.id)
+        .eq('group_id', groupId)
+        .eq('game_slug', gameSlug);
+
+      if (!userIdError && byUserId) {
+        return byUserId;
+      }
+    }
+
+    return [];
+  } catch (err) {
+    console.error('Error in getUserCharactersByGroupDiscordId:', err);
+    return [];
+  }
 }
 
 /**

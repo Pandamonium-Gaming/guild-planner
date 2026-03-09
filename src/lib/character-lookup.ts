@@ -129,6 +129,101 @@ export async function checkCharacterResilience(characterId: string): Promise<{
 }
 
 /**
+ * Get current user's main character in a group
+ * Phase 4: Uses Discord ID with fallback to user_id (DR-resilient)
+ * Returns first result ordered by is_main then created_at
+ */
+export async function getCurrentUserMainCharacter(
+  groupId: string,
+  gameSlug: string = 'aoc'
+): Promise<CharacterWithProfessions | null> {
+  try {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    
+    if (!authUser) {
+      return null;
+    }
+
+    const discordId = authUser.user_metadata?.provider_id || null;
+
+    // Primary lookup: by Discord ID (DR-resilient)
+    if (discordId) {
+      const { data: byDiscordId } = await supabase
+        .from('members')
+        .select(`
+          *,
+          member_professions (*)
+        `)
+        .eq('discord_id', discordId)
+        .eq('group_id', groupId)
+        .eq('game_slug', gameSlug)
+        .eq('is_main', true)
+        .maybeSingle();
+
+      if (byDiscordId) {
+        return transformCharacter(byDiscordId);
+      }
+    }
+
+    // Fallback: by user_id (old method, for backward compat)
+    const { data: byUserId } = await supabase
+      .from('members')
+      .select(`
+        *,
+        member_professions (*)
+      `)
+      .eq('user_id', authUser.id)
+      .eq('group_id', groupId)
+      .eq('game_slug', gameSlug)
+      .eq('is_main', true)
+      .maybeSingle();
+
+    if (byUserId) {
+      return transformCharacter(byUserId);
+    }
+
+    // If no main character found, return first non-main by any lookup
+    if (discordId) {
+      const { data: firstByDiscord } = await supabase
+        .from('members')
+        .select(`
+          *,
+          member_professions (*)
+        `)
+        .eq('discord_id', discordId)
+        .eq('group_id', groupId)
+        .eq('game_slug', gameSlug)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (firstByDiscord) {
+        return transformCharacter(firstByDiscord);
+      }
+    }
+
+    // Final fallback
+    const { data: firstByUserId } = await supabase
+      .from('members')
+      .select(`
+        *,
+        member_professions (*)
+      `)
+      .eq('user_id', authUser.id)
+      .eq('group_id', groupId)
+      .eq('game_slug', gameSlug)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    return firstByUserId ? transformCharacter(firstByUserId) : null;
+  } catch (err) {
+    console.error('Error in getCurrentUserMainCharacter:', err);
+    return null;
+  }
+}
+
+/**
  * Transform character data to include professions
  */
 function transformCharacter(char: any): CharacterWithProfessions {

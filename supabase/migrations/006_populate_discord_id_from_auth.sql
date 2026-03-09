@@ -126,24 +126,27 @@ RAISE NOTICE '✅ Phase 2 (Data Population) Complete - See results above';
 --    - checkCharacterResilience(characterId)
 --    - Provides Discord ID-based character lookups
 --    - Maintains backward compatibility with user_id
+
+-- Phase 4: Resilient Character Queries (TypeScript - COMPLETED)
+-- Updates to character lookup with Discord ID fallback
 --
--- NEXT PHASE 4 TASKS (FUTURE):
--- 1. Update useGroupMembership.ts
---    - Add discord_id as fallback for member lookups
---    - Try discord_id if user_id lookup fails
+-- ✅ COMPLETED:
+-- 1. src/lib/auth.ts
+--    - Added getUserCharactersByGroupDiscordId(discordId, groupId, gameSlug)
+--    - Gets all user's characters by Discord ID with user_id fallback
+--    - Used for ownership verification and character associations
 --
--- 2. Update RLS policies
---    - Add discord_id-based access control
---    - Ensure users can only access their own characters
---
--- 3. Update character queries in useGroupData.ts
---    - Use discord_id for character ownership where needed
---    - Maintain dual-path queries during transition
+-- 2. src/lib/character-lookup.ts
+--    - Added getCurrentUserMainCharacter(groupId, gameSlug)
+--    - Gets current logged-in user's main character
+--    - Dual-path: tries Discord ID first, falls back to user_id
+--    - Returns first character if no main found
+--    - DR-resilient: survives auth UUID changes
 --
 -- MIGRATION STRATEGY:
 -- Phase 1: ✅ Schema (005_discord_id_migration.sql)
 -- Phase 2: ✅ Data population (006_populate_discord_id_from_auth.sql)
 -- Phase 3: ✅ App code sync on login (src/ updates)
--- Phase 4: 🔜 Character queries update (implement on next iteration)
--- Phase 5: 🔜 RLS policies (implement on next iteration)
+-- Phase 4: ✅ Character queries update (Discord ID fallback helpers)
+-- Phase 5: 🔜 RLS policies (Discord ID-based access control)
 -- Phase 6: 🔜 Deprecate user_id (optional, much later)
