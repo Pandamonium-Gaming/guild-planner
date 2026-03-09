@@ -102,7 +102,51 @@ psql $devDbUrl -f temp.sql
 * ✅ `restore-prod-to-dev.ps1` - read file, write dev
 * ✅ `sync-prod-to-dev-data.ps1` - dump prod, restore to dev separately
 
-### 4. Version Management
+### 4. Pre-commit Compliance (MANDATORY)
+
+**NEVER skip linting or pre-commit checks. Always fix violations instead.**
+
+Using `--no-verify` or `--allow-empty` bypasses critical safety checks and creates tech debt.
+
+**Pre-commit checks validate:**
+
+* ✅ Markdown linting (markdownlint) - format issues
+* ✅ Spelling (CSpell) - typos in docs
+* ✅ Translation sync - all locale files have identical keys
+* ✅ Changelog updates - required for significant code changes
+* ✅ Copilot command compliance - Windows/Unix commands match OS
+
+**If pre-commit fails:**
+
+1. **Read the error message** - identifies exact issue
+2. **Fix the violation** - correct code, markdown, spelling, etc.
+3. **Re-run commit** - let hooks re-validate
+4. **Repeat until pass** - all checks must pass before commit
+
+**Common fixes:**
+
+| Issue | Fix |
+| --- | --- |
+| Markdown lint error | Open file, fix formatting (typically spacing, heading style) |
+| Spelling error | Add word to `cspell.json` if it's a valid domain term |
+| Translation mismatch | Ensure all 3 locale files have identical keys |
+| Empty `[Unreleased]` | Add entry to CHANGELOG.md under appropriate section |
+| Unix command on Windows | Replace `head`, `tail`, `grep` with PowerShell equivalents (see table below) |
+
+**PowerShell Command Equivalents (use ALWAYS on Windows):**
+
+| Unix | PowerShell | Example |
+| --- | --- | --- |
+| `head -N file` | `Get-Content file \| Select-Object -First N` | `Get-Content log.txt \| Select-Object -First 20` |
+| `tail -N file` | `Get-Content file \| Select-Object -Last N` | `Get-Content log.txt \| Select-Object -Last 5` |
+| `grep pattern file` | `Select-String -Pattern pattern file` | `Select-String -Pattern "error" log.txt` |
+| `cat file` | `Get-Content file` | `Get-Content package.json` |
+| `wc -l file` | `(Get-Content file).Count` | `(Get-Content results.txt).Count` |
+| `ls directory` | `Get-ChildItem directory` | `Get-ChildItem src/` |
+| `rm file` | `Remove-Item file` | `Remove-Item temp.txt` |
+| `cp src dst` | `Copy-Item src dst` | `Copy-Item file.js file.backup` |
+
+### 5. Version Management
 
 **Semantic Versioning (semver):**
 
