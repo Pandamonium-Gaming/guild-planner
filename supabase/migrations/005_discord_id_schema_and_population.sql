@@ -1,6 +1,30 @@
--- Phase 2: Populate discord_id column from auth metadata
--- Non-destructive: Only updates NULL discord_id values
--- Safe: Validates before/after counts match
+-- Migration: 005_discord_id_schema_and_population
+-- Purpose: Add Discord ID column and populate from auth metadata
+-- Date: 2026-03-09
+-- Phases: 1 & 2 (Schema + Data Population)
+-- Description:
+--   Phase 1: Adds discord_id column to members table for resilient character ownership
+--           Discord IDs are immutable across restores, unlike Supabase auth UUIDs
+--   Phase 2: Populates discord_id from auth metadata with fallback to identities table
+--           Non-destructive: Only updates NULL values, validates before/after state
+
+-- =====================================================
+-- PHASE 1: SCHEMA - ADD DISCORD ID COLUMN
+-- =====================================================
+
+ALTER TABLE public.members ADD COLUMN discord_id TEXT;
+
+-- Index for fast lookups when syncing characters via Discord ID
+CREATE INDEX idx_members_discord_id ON public.members(discord_id);
+
+-- Index for composite lookups: group + discord_id
+CREATE INDEX idx_members_group_discord_id ON public.members(group_id, discord_id);
+
+COMMENT ON COLUMN public.members.discord_id IS 'Discord user ID (snowflake) - immutable across database restores for DR resilience';
+
+-- =====================================================
+-- PHASE 2: DATA POPULATION - POPULATE FROM AUTH
+-- =====================================================
 
 -- Step 1: Validate starting state
 DO $$
@@ -103,17 +127,17 @@ LEFT JOIN auth.users u ON m.user_id = u.id
 WHERE m.discord_id IS NULL
 ORDER BY m.created_at DESC;
 
-RAISE NOTICE '✅ Phase 2 (Data Population) Complete - See results above';
-
--- Phase 3: Application Code Updates (TypeScript/JavaScript changes)
--- These changes are implemented in src/ directory, not as SQL
--- 
+-- =====================================================
+-- PHASE 3 & 4: APPLICATION CODE UPDATES (TypeScript)
+-- =====================================================
+-- These changes are implemented in src/ directory, not as SQL:
+--
 -- ✅ COMPLETED:
 -- 1. src/lib/auth.ts
 --    - Added syncDiscordIdToMembers(userId) function
+--    - Added getUserCharactersByGroupDiscordId(discordId, groupId)
 --    - Extracts Discord ID from auth.users metadata
---    - Syncs to members table on each login
---    - Non-blocking: doesn't fail if sync unsuccessful
+--    - Syncs to members table on each login (non-blocking)
 --
 -- 2. src/app/auth/callback/page.tsx
 --    - Calls syncDiscordIdToMembers() after session established
@@ -123,30 +147,13 @@ RAISE NOTICE '✅ Phase 2 (Data Population) Complete - See results above';
 -- 3. src/lib/character-lookup.ts (NEW)
 --    - getCharacterByDiscordId(discordId, groupId, gameSlug)
 --    - getCharactersByDiscordId(discordId, groupId, gameSlug)
+--    - getCurrentUserMainCharacter(groupId, gameSlug)
 --    - checkCharacterResilience(characterId)
 --    - Provides Discord ID-based character lookups
 --    - Maintains backward compatibility with user_id
 
--- Phase 4: Resilient Character Queries (TypeScript - COMPLETED)
--- Updates to character lookup with Discord ID fallback
---
--- ✅ COMPLETED:
--- 1. src/lib/auth.ts
---    - Added getUserCharactersByGroupDiscordId(discordId, groupId, gameSlug)
---    - Gets all user's characters by Discord ID with user_id fallback
---    - Used for ownership verification and character associations
---
--- 2. src/lib/character-lookup.ts
---    - Added getCurrentUserMainCharacter(groupId, gameSlug)
---    - Gets current logged-in user's main character
---    - Dual-path: tries Discord ID first, falls back to user_id
---    - Returns first character if no main found
---    - DR-resilient: survives auth UUID changes
---
--- MIGRATION STRATEGY:
--- Phase 1: ✅ Schema (005_discord_id_migration.sql)
--- Phase 2: ✅ Data population (006_populate_discord_id_from_auth.sql)
--- Phase 3: ✅ App code sync on login (src/ updates)
--- Phase 4: ✅ Character queries update (Discord ID fallback helpers)
--- Phase 5: 🔜 RLS policies (Discord ID-based access control)
--- Phase 6: 🔜 Deprecate user_id (optional, much later)
+-- =====================================================
+-- MIGRATION TRACKING
+-- =====================================================
+
+INSERT INTO migration_history (filename) VALUES ('005_discord_id_schema_and_population.sql') ON CONFLICT DO NOTHING;

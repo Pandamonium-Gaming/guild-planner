@@ -1,4 +1,4 @@
--- Migration: 007_discord_id_rls_policies
+-- Migration: 006_discord_id_rls_policies
 -- Purpose: Add Discord ID-based RLS policies for resilience to auth UUID changes
 -- Date: 2026-03-09
 -- Phase: 5 (RLS Policy Updates)
@@ -137,6 +137,4 @@ END $$;
 -- PART 5: MIGRATION TRACKING
 -- =====================================================
 
-INSERT INTO migration_history (filename) VALUES ('007_discord_id_rls_policies.sql') ON CONFLICT DO NOTHING;
-
-COMMIT;
+INSERT INTO migration_history (filename) VALUES ('006_discord_id_rls_policies.sql') ON CONFLICT DO NOTHING;
