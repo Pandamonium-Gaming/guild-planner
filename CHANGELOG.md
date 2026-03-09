@@ -22,9 +22,11 @@
   * **CharactersTab.tsx**: Replaced 4x `any` type annotations with proper types (`CharacterData`, `RankLevel`, `CharacterFilters`)
   * **CharactersTab.tsx**: Wrapped 2x hardcoded strings with i18n `t()` function, added translations for `characters.noCharactersFound` across all locales
 
-* **Subscriber ships workflow** - Fixed PR creation blocked by organization policy
+* **Subscriber ships workflow** - Fixed PR creation and enhanced PR information
   * Organization-level policy updated to allow GitHub Actions to create and approve pull requests
-  * Workflow now creates automated PRs successfully when subscriber ships are fetched
+  * Workflow now captures and displays subscriber post URL in PR for easy cross-referencing
+  * Automated PR body now includes actual ship names (Centurion and Imperator tier lists)
+  * Improved PR details with direct link to RSI source post
 
 ## \[0.2.0] - 2026-03-09
 

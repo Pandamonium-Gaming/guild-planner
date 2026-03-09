@@ -34,6 +34,7 @@ interface FetchResult {
   data?: SubscriberShipMonth;
   error?: string;
   explanation: string;
+  pageUrl?: string;
 }
 
 /**
@@ -432,6 +433,7 @@ async function main(): Promise<FetchResult> {
       success: true,
       month: monthKey,
       data: shipData,
+      pageUrl: pageUrl,
       explanation: `Successfully fetched and updated ${monthLabel} subscriber ships!`
     };
   } catch (error) {
@@ -457,6 +459,10 @@ if (isMainModule) {
       console.log('\nFetched ships:');
       console.log(`  Centurion: ${result.data.centurion.join(', ')}`);
       console.log(`  Imperator: ${result.data.imperator.join(', ')}`);
+    }
+    
+    if (result.pageUrl) {
+      console.log(`\nSource: ${result.pageUrl}`);
     }
     
     process.exit(result.success ? 0 : 1);
