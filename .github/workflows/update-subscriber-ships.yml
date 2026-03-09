@@ -74,28 +74,25 @@ jobs:
             *This is an automated PR. Please review and merge if the extracted data is accurate.*
           labels: 'automation,subscriber-ships'
           draft: false
-          continue-on-error: true
-        id: create_pr
 
-      - name: Verify PR creation succeeded
-        if: steps.fetch.outputs.exitcode == '0' && steps.check_changes.outputs.changed == 'true'
-        run: |
-          if [ "${{ steps.create_pr.outcome }}" = "success" ]; then
-            echo "✅ PR created successfully: ${{ steps.create_pr.outputs.pull-request-url }}"
-          else
-            echo "⚠️  PR creation encountered an issue (may be configuration related)"
-            echo "📝 Changes are staged and ready to push:"
-            git diff --stat
-          fi
-
-      - name: Warn on fetch failure
+      - name: Create reminder issue (if fetch failed)
         if: failure() || steps.fetch.outputs.exitcode != '0'
-        run: |
-          echo "⚠️  Automated fetch failed. Manual update may be needed."
-          echo "See workflow logs for details and check:"
-          echo "- https://robertsspaceindustries.com/comm-link/transmission/"
-          echo "- Configuration: src/games/starcitizen/config/subscriber-ships.ts"
-          exit 1
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const now = new Date();
+            const monthName = now.toLocaleString('en-US', { month: 'long' });
+            const year = now.getFullYear();
+            
+            const body = '## Automated Fetch Failed\n\nThe automated subscriber ships fetcher encountered an error. Please manually check and update:\n\n### Steps\n1. Visit https://robertsspaceindustries.com/comm-link/transmission/\n2. Look for the "' + monthName + ' ' + year + ' Subscriber Promotions" post\n3. Extract ships and flair information\n4. Update src/games/starcitizen/config/subscriber-ships.ts with:\n   - centurion: Ships for base tier subscribers\n   - imperator: Ships for premium tier subscribers\n   - flair: Monthly cosmetic items\n   - notes: Insurance duration info\n5. Create a PR with the changes\n\n### Reference\n- Subscriber Promotions Feed: https://robertsspaceindustries.com/en/comm-link/rss\n- Configuration File: https://github.com/Pandamonium-Gaming/guild-planner/blob/develop/src/games/starcitizen/config/subscriber-ships.ts\n- Update Guide: https://github.com/Pandamonium-Gaming/guild-planner/blob/develop/docs/STAR_CITIZEN_SUBSCRIBER_UPDATES.md\n\nThis issue was created because automated fetching failed. See GitHub Actions logs for details.';
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '📢 Manual Check: ' + monthName + ' ' + year + ' Subscriber Ships',
+              body: body,
+              labels: ['manual-action-required', 'subscriber-ships']
+            });
 
       - name: Comment on existing issue if ships already updated
         if: steps.fetch.outputs.exitcode == '0' && steps.check_changes.outputs.changed == 'false'
