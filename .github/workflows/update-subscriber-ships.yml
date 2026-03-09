@@ -1,0 +1,102 @@
+name: Update Subscriber Ships
+
+on:
+  schedule:
+    # Run at 10 AM UTC on the 1st of each month
+    - cron: '0 10 1 * *'
+  workflow_dispatch:
+
+jobs:
+  fetch-and-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch subscriber ships
+        id: fetch
+        run: |
+          npx tsx scripts/fetch-subscriber-ships.ts > /tmp/fetch-output.txt 2>&1
+          RESULT=$?
+          cat /tmp/fetch-output.txt
+          echo "exitcode=$RESULT" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Check if config changed
+        id: check_changes
+        run: |
+          if git diff --quiet src/games/starcitizen/config/subscriber-ships.ts; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create PR with updates (if successful)
+        if: steps.fetch.outputs.exitcode == '0' && steps.check_changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/update-subscriber-ships
+          commit-message: 'chore: Update subscriber ships for current month'
+          title: '📦 Update Subscriber Ships'
+          body: |
+            ## Automated Subscriber Ships Update
+            
+            This PR automatically fetches the latest subscriber ship promotions from RSI and updates the configuration.
+            
+            **Automated via**: `scripts/fetch-subscriber-ships.ts`
+            
+            ### Changes
+            - Updates `src/games/starcitizen/config/subscriber-ships.ts` with current month's ships
+            
+            ### Verification Steps
+            - [ ] Review the ships match RSI's official promotion
+            - [ ] Verify ship IDs match existing entries in ship database
+            - [ ] Check insurance durations are correct (12m Centurion, 24m Imperator)
+            
+            ---
+            *This is an automated PR. Please review and merge if the extracted data is accurate.*
+          labels: 'automation,subscriber-ships'
+          draft: false
+
+      - name: Create reminder issue (if fetch failed)
+        if: failure() || steps.fetch.outputs.exitcode != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const now = new Date();
+            const monthName = now.toLocaleString('en-US', { month: 'long' });
+            const year = now.getFullYear();
+            
+            const body = '## Automated Fetch Failed\n\nThe automated subscriber ships fetcher encountered an error. Please manually check and update:\n\n### Steps\n1. Visit https://robertsspaceindustries.com/comm-link/transmission/\n2. Look for the "' + monthName + ' ' + year + ' Subscriber Promotions" post\n3. Extract ships and flair information\n4. Update src/games/starcitizen/config/subscriber-ships.ts with:\n   - centurion: Ships for base tier subscribers\n   - imperator: Ships for premium tier subscribers\n   - flair: Monthly cosmetic items\n   - notes: Insurance duration info\n5. Create a PR with the changes\n\n### Reference\n- Subscriber Promotions Feed: https://robertsspaceindustries.com/en/comm-link/rss\n- Configuration File: https://github.com/Pandamonium-Gaming/guild-planner/blob/develop/src/games/starcitizen/config/subscriber-ships.ts\n- Update Guide: https://github.com/Pandamonium-Gaming/guild-planner/blob/develop/docs/STAR_CITIZEN_SUBSCRIBER_UPDATES.md\n\nThis issue was created because automated fetching failed. See GitHub Actions logs for details.';
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '📢 Manual Check: ' + monthName + ' ' + year + ' Subscriber Ships',
+              body: body,
+              labels: ['manual-action-required', 'subscriber-ships']
+            });
+
+      - name: Comment on existing issue if ships already updated
+        if: steps.fetch.outputs.exitcode == '0' && steps.check_changes.outputs.changed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('✓ Subscriber ships are already up to date for this month');

@@ -2,6 +2,21 @@
 
 ## \[Unreleased]
 
+### Added
+
+* (None yet)
+
+## \[0.2.0] - 2026-03-09
+
+### Added
+
+* **Automated subscriber ship updates** - GitHub Action that runs monthly to auto-fetch Star Citizen subscriber promotions and create PRs
+  * Scheduled workflow runs 1st of each month at 10 AM UTC
+  * Scrapes RSI comm-link for current month's subscriber ships
+  * Auto-creates PR if successful, or creates reminder issue if fetch fails
+  * Significantly reduces manual effort for monthly updates
+  * See `docs/STAR_CITIZEN_SUBSCRIBER_UPDATES.md` for details
+
 ## \[0.1.3] - 2026-02-13
 
 ### Fixed

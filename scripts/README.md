@@ -139,6 +139,50 @@ npm run update-ships
 
 ***
 
-## Archived Scripts
+### `fetch-subscriber-ships.ts`
 
-The `archived/` subdirectory contains old migration and refactoring scripts that are no longer actively used but kept for reference.
+**Purpose:** Automatically fetches monthly Star Citizen subscriber ship promotions from RSI and updates the configuration.
+
+**Usage:**
+
+```bash
+# Manual run (useful for testing or immediate updates)
+bun run scripts/fetch-subscriber-ships.ts
+
+# Automatic (via GitHub Action every 1st of month at 10 AM UTC)
+# See `.github/workflows/update-subscriber-ships.yml`
+```
+
+**What it does:**
+
+1. Finds the current month's subscriber promotions post on RSI comm-link
+2. Scrapes the page to extract Centurion and Imperator ships
+3. Maps ship names to ship IDs using configured database
+4. Updates `src/games/starcitizen/config/subscriber-ships.ts`
+5. Returns success/failure status for GitHub Action
+
+**How it's used:**
+
+* **Primary**: Automated by GitHub Action (`.github/workflows/update-subscriber-ships.yml`)
+* **Secondary**: Run manually if immediate update is needed
+* **Fallback**: If scraping fails, GitHub Action creates an issue for manual update
+
+**Exit codes:**
+
+* `0` = Success (ships updated or already up-to-date)
+* `1` = Failure (could not fetch or parse promotions)
+
+**Output:**
+
+* Logs fetching progress
+* Prints extracted ships on success
+* Logs errors and explains issues
+
+**Dependencies:**
+
+* `cheerio` - HTML parsing
+* `node-fetch` - HTTP requests
+
+For details: See `docs/STAR_CITIZEN_SUBSCRIBER_UPDATES.md`
+
+***
