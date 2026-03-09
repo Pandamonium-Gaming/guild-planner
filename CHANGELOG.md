@@ -4,11 +4,11 @@
 
 ### Added
 
-* **Discord ID Migration for Disaster Recovery Resilience (6-Phase Implementation)**
-  * Phase 1: Schema design with `discord_id` column, indexes, and composite lookups
-    * Migration: `005_discord_id_migration.sql` ✅
-  * Phase 2: Data population from Discord OAuth metadata with fallback to identities table
-    * Migration: `006_populate_discord_id_from_auth.sql` ✅
+* **Discord ID Migration for Disaster Recovery Resilience (2 Consolidated Migrations)**
+  * Phase 1 & 2: Schema and data population in single migration
+    * Migration: `005_discord_id_schema_and_population.sql` ✅
+    * Adds `discord_id` column with indexes
+    * Populates from Discord OAuth metadata (auth.users) with identities table fallback
     * Tested on production backup restore: 1 member synced, 12 pending auth linkage
   * Phase 3: App-side Discord sync on login (non-blocking, gradual population)
     * Implementation: `syncDiscordIdToMembers()` in `src/lib/auth.ts` ✅
@@ -17,7 +17,7 @@
     * Created: `src/lib/character-lookup.ts` with Discord ID + user\_id fallback ✅
     * Functions: `getCharacterByDiscordId()`, `getCurrentUserMainCharacter()`, `checkCharacterResilience()`
   * Phase 5: RLS policies with Discord ID-based fallback access
-    * Migration: `007_discord_id_rls_policies.sql` ✅
+    * Migration: `006_discord_id_rls_policies.sql` ✅
     * New functions: `user_has_clan_role_by_discord()` for Discord-based access checks
     * Updated policies: Members can view/manage via auth UUID or Discord ID
     * Tested: Discord ID fallback working, functions callable

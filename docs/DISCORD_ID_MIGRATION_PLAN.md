@@ -6,11 +6,10 @@
 
 | Phase | Description | Status | Files |
 | --- | --- | --- | --- |
-| 1 | Schema: Add `discord_id` column, indexes | ✅ Complete | `005_discord_id_migration.sql` |
-| 2 | Data: Populate from auth metadata | ✅ Complete | `006_populate_discord_id_from_auth.sql` |
+| 1-2 | Schema + Data: `discord_id` column, populate from auth | ✅ Complete | `005_discord_id_schema_and_population.sql` |
 | 3 | App: Login sync, character lookups | ✅ Complete | `src/lib/auth.ts`, `src/app/auth/callback/page.tsx` |
 | 4 | Queries: Resilient character lookup helpers | ✅ Complete | `src/lib/character-lookup.ts` |
-| 5 | RLS: Discord ID-based access control | ✅ Complete | `007_discord_id_rls_policies.sql` |
+| 5 | RLS: Discord ID-based access control | ✅ Complete | `006_discord_id_rls_policies.sql` |
 | 6 | Optional: Deprecate `user_id` entirely | 🔹 Pending | Future work |
 
 ### Deployment Status
