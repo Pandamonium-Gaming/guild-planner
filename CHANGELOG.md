@@ -4,6 +4,17 @@
 
 ### Added
 
+* **Comprehensive Test Coverage for Discord ID Functions**
+  * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
+  * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user_id fallback
+  * Test coverage for `getCharactersByDiscordId()` - Multi-character queries
+  * Test coverage for `getCurrentUserMainCharacter()` - Main character resolution with dual-path access
+  * Test coverage for `checkCharacterResilience()` - Validation for disaster recovery resilience
+  * Added `syncDiscordIdToMembers()` tests in `auth.test.ts` (8 tests)
+  * All edge cases covered: no auth, missing Discord ID, database errors, non-blocking behaviour
+  * 32 new tests added (321 → 353 total tests)
+  * All tests passing
+
 * **Discord ID Migration for Disaster Recovery Resilience (2 Consolidated Migrations)**
   * Phase 1 & 2: Schema and data population in single migration
     * Migration: `005_discord_id_schema_and_population.sql` ✅
