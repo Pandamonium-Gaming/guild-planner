@@ -19,6 +19,7 @@ import {
   getGroupById,
   updateClanIconUrl,
   getUserGroups,
+  syncDiscordIdToMembers,
   type UserProfile,
   type ClanMembership,
 } from '../auth';
@@ -1034,10 +1035,217 @@ describe('Authentication & User Management', () => {
       expect(supabase.from).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('syncDiscordIdToMembers', () => {
+    const mockUserId = 'user-uuid-123';
+    const mockDiscordId = '123456789012345678';
+
+    it('should sync Discord ID to member records without discord_id', async () => {
+      const mockAuthUser = {
+        id: mockUserId,
+        user_metadata: {
+          provider_id: mockDiscordId,
+        },
+      };
+
+      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+        data: { user: mockAuthUser },
+        error: null,
+      });
+
+      const mockUpdatedMembers = [
+        { id: 'member-1', user_id: mockUserId, discord_id: mockDiscordId },
+        { id: 'member-2', user_id: mockUserId, discord_id: mockDiscordId },
+      ];
+
+      const mockFrom = {
+        update: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        is: jest.fn().mockReturnThis(),
+        select: jest.fn().mockResolvedValue({
+          data: mockUpdatedMembers,
+          error: null,
+        }),
+      };
+
+      (supabase.from as jest.Mock).mockReturnValue(mockFrom);
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+      const result = await syncDiscordIdToMembers(mockUserId);
+
+      expect(result).toBe(2); // 2 members synced
+      expect(supabase.from).toHaveBeenCalledWith('members');
+      expect(mockFrom.update).toHaveBeenCalledWith({ discord_id: mockDiscordId });
+      expect(mockFrom.eq).toHaveBeenCalledWith('user_id', mockUserId);
+      expect(mockFrom.is).toHaveBeenCalledWith('discord_id', null);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        `✅ Synced Discord ID to 2 member(s) for user ${mockUserId}`
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should return 0 when no Discord ID in auth metadata', async () => {
+      const mockAuthUser = {
+        id: mockUserId,
+        user_metadata: {}, // No provider_id
+      };
+
+      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+        data: { user: mockAuthUser },
+        error: null,
+      });
+
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+      const result = await syncDiscordIdToMembers(mockUserId);
+
+      expect(result).toBe(0);
+      expect(supabase.from).not.toHaveBeenCalled(); // No DB call without Discord ID
+      expect(consoleSpy).toHaveBeenCalledWith(
+        `No Discord ID found in auth metadata for user ${mockUserId}`
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should return 0 when no auth user found', async () => {
+      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+        data: { user: null },
+        error: null,
+      });
+
+      const result = await syncDiscordIdToMembers(mockUserId);
+
+      expect(result).toBe(0);
+      expect(supabase.from).not.toHaveBeenCalled();
+    });
+
+    it('should return 0 when user ID does not match auth user', async () => {
+      const mockAuthUser = {
+        id: 'different-user-id',
+        user_metadata: {
+          provider_id: mockDiscordId,
+        },
+      };
+
+      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+        data: { user: mockAuthUser },
+        error: null,
+      });
+
+      const result = await syncDiscordIdToMembers(mockUserId);
+
+      expect(result).toBe(0);
+      expect(supabase.from).not.toHaveBeenCalled(); // Can't sync for different user
+    });
+
+    it('should return 0 when no members need syncing', async () => {
+      const mockAuthUser = {
+        id: mockUserId,
+        user_metadata: {
+          provider_id: mockDiscordId,
+        },
+      };
+
+      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+        data: { user: mockAuthUser },
+        error: null,
+      });
+
+      const mockFrom = {
+        update: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        is: jest.fn().mockReturnThis(),
+        select: jest.fn().mockResolvedValue({
+          data: [], // No members updated
+          error: null,
+        }),
+      };
+
+      (supabase.from as jest.Mock).mockReturnValue(mockFrom);
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+      const result = await syncDiscordIdToMembers(mockUserId);
+
+      expect(result).toBe(0);
+      expect(consoleSpy).not.toHaveBeenCalled(); // No log when 0 synced
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle database errors gracefully and return 0', async () => {
+      const mockAuthUser = {
+        id: mockUserId,
+        user_metadata: {
+          provider_id: mockDiscordId,
+        },
+      };
+
+      (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+        data: { user: mockAuthUser },
+        error: null,
+      });
+
+      const mockFrom = {
+        update: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        is: jest.fn().mockReturnThis(),
+        select: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'Database error', code: 'PGRST116' },
+        }),
+      };
+
+      (supabase.from as jest.Mock).mockReturnValue(mockFrom);
+
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      const result = await syncDiscordIdToMembers(mockUserId);
+
+      expect(result).toBe(0);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Error syncing Discord ID to members:',
+        expect.objectContaining({ message: 'Database error' })
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle exceptions gracefully and return 0', async () => {
+      (supabase.auth.getUser as jest.Mock).mockRejectedValue(
+        new Error('Auth service down')
+      );
+
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      const result = await syncDiscordIdToMembers(mockUserId);
+
+      expect(result).toBe(0);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Error in syncDiscordIdToMembers:',
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should be non-blocking (always returns a number, never throws)', async () => {
+      (supabase.auth.getUser as jest.Mock).mockRejectedValue(
+        new Error('Catastrophic failure')
+      );
+
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      // Should not throw
+      const result = await syncDiscordIdToMembers(mockUserId);
+
+      expect(typeof result).toBe('number');
+      expect(result).toBe(0);
+
+      consoleSpy.mockRestore();
+    });
+  });
 });
-
-
-
-
-
-
