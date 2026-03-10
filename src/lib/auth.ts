@@ -121,6 +121,52 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 }
 
 /**
+ * Sync Discord ID from auth metadata to all user's characters
+ * Called on login to ensure members.discord_id is populated (Phase 3 - Discord ID Migration)
+ */
+export async function syncDiscordIdToMembers(userId: string): Promise<number> {
+  try {
+    // Get Discord ID from auth metadata
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    
+    if (!authUser || authUser.id !== userId) {
+      return 0; // Can't sync without auth data
+    }
+    
+    const discordId = authUser.user_metadata?.provider_id || null;
+    
+    if (!discordId) {
+      console.warn(`No Discord ID found in auth metadata for user ${userId}`);
+      return 0;
+    }
+    
+    // Sync Discord ID to all NULL discord_id records for this user
+    // RLS policy ensures user can only update their own records
+    const { data, error } = await supabase
+      .from('members')
+      .update({ discord_id: discordId })
+      .eq('user_id', userId)
+      .is('discord_id', null)
+      .select();
+    
+    if (error) {
+      console.error('Error syncing Discord ID to members:', error);
+      return 0;
+    }
+    
+    const syncedCount = (data || []).length;
+    if (syncedCount > 0) {
+      console.log(`✅ Synced Discord ID to ${syncedCount} member(s) for user ${userId}`);
+    }
+    
+    return syncedCount;
+  } catch (err) {
+    console.error('Error in syncDiscordIdToMembers:', err);
+    return 0;
+  }
+}
+
+/**
  * Update user's display name
  */
 export async function updateDisplayName(userId: string, displayName: string) {
@@ -135,8 +181,10 @@ export async function updateDisplayName(userId: string, displayName: string) {
 
 /**
  * Get user's membership in a specific clan
+ * Phase 4: Now supports Discord ID fallback for DR resilience
  */
 export async function getGroupMembership(groupId: string, userId: string): Promise<ClanMembership | null> {
+  // Primary lookup: by user_id
   const { data, error } = await supabase
     .from('group_members')
     .select('group_id, role, is_creator, approved_at')
@@ -147,6 +195,52 @@ export async function getGroupMembership(groupId: string, userId: string): Promi
   if (error) throw error;
   
   return data;
+}
+
+/**
+ * Get user's characters in a group by Discord ID (with user_id fallback)
+ * Phase 4: Discord ID Migration - provides resilient character lookup
+ * Useful for "get my characters" or owner verification after auth change
+ */
+export async function getUserCharactersByGroupDiscordId(
+  discordId: string,
+  groupId: string,
+  gameSlug: string = 'aoc'
+) {
+  try {
+    // Primary lookup: by Discord ID (DR-resilient)
+    const { data: byDiscordId, error: discordError } = await supabase
+      .from('members')
+      .select('*')
+      .eq('discord_id', discordId)
+      .eq('group_id', groupId)
+      .eq('game_slug', gameSlug);
+
+    if (!discordError && byDiscordId && byDiscordId.length > 0) {
+      return byDiscordId;
+    }
+
+    // Fallback: if no Discord ID results but we have auth user UUID, try that
+    // This handles transition period before all members have discord_id
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (authUser?.id) {
+      const { data: byUserId, error: userIdError } = await supabase
+        .from('members')
+        .select('*')
+        .eq('user_id', authUser.id)
+        .eq('group_id', groupId)
+        .eq('game_slug', gameSlug);
+
+      if (!userIdError && byUserId) {
+        return byUserId;
+      }
+    }
+
+    return [];
+  } catch (err) {
+    console.error('Error in getUserCharactersByGroupDiscordId:', err);
+    return [];
+  }
 }
 
 /**

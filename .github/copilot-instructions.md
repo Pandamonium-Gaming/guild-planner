@@ -67,7 +67,86 @@
 
 * Translation files have mismatched keys
 
-### 3. Version Management
+### 3. Database Safety (CRITICAL)
+
+**Never perform simultaneous write operations to both prod and dev databases.**
+
+This prevents data consistency issues, auth conflicts, and disaster recovery failures.
+
+* **ALLOWED**: Dump prod → file (read-only), then restore file → dev (write)
+* **ALLOWED**: Write to prod only, write to dev only (separate operations)
+* **FORBIDDEN**: Direct sync prod → dev (simultaneous writes)
+* **FORBIDDEN**: Tools that directly copy data between databases in one operation
+
+**Pattern for any sync/backup/restore operations:**
+
+```powershell
+# Step 1: Read prod, write to local file (read-only on prod)
+pg_dump $prodDbUrl --data-only | Out-File temp.sql
+
+# Step 2: Read file, write to dev (safe file-based transfer)
+psql $devDbUrl -f temp.sql
+```
+
+**Why this matters:**
+
+* Auth systems can conflict if both databases modified simultaneously
+* Disaster recovery/restore scenarios fail if both DB written at once
+* RLS policies and user permissions can become inconsistent
+* Transaction isolation breaks
+
+**Scripts that follow this pattern:**
+
+* ✅ `backup-prod-database.ps1` - dump only
+* ✅ `backup-dev-database.ps1` - dump only
+* ✅ `restore-prod-to-dev.ps1` - read file, write dev
+* ✅ `sync-prod-to-dev-data.ps1` - dump prod, restore to dev separately
+
+### 4. Pre-commit Compliance (MANDATORY)
+
+**NEVER skip linting or pre-commit checks. Always fix violations instead.**
+
+Using `--no-verify` or `--allow-empty` bypasses critical safety checks and creates tech debt.
+
+**Pre-commit checks validate:**
+
+* ✅ Markdown linting (markdownlint) - format issues
+* ✅ Spelling (CSpell) - typos in docs
+* ✅ Translation sync - all locale files have identical keys
+* ✅ Changelog updates - required for significant code changes
+* ✅ Copilot command compliance - Windows/Unix commands match OS
+
+**If pre-commit fails:**
+
+1. **Read the error message** - identifies exact issue
+2. **Fix the violation** - correct code, markdown, spelling, etc.
+3. **Re-run commit** - let hooks re-validate
+4. **Repeat until pass** - all checks must pass before commit
+
+**Common fixes:**
+
+| Issue | Fix |
+| --- | --- |
+| Markdown lint error | Open file, fix formatting (typically spacing, heading style) |
+| Spelling error | Add word to `cspell.json` if it's a valid domain term |
+| Translation mismatch | Ensure all 3 locale files have identical keys |
+| Empty `[Unreleased]` | Add entry to CHANGELOG.md under appropriate section |
+| Unix command on Windows | Replace `head`, `tail`, `grep` with PowerShell equivalents (see table below) |
+
+**PowerShell Command Equivalents (use ALWAYS on Windows):**
+
+| Unix | PowerShell | Example |
+| --- | --- | --- |
+| `head -N file` | `Get-Content file \| Select-Object -First N` | `Get-Content log.txt \| Select-Object -First 20` |
+| `tail -N file` | `Get-Content file \| Select-Object -Last N` | `Get-Content log.txt \| Select-Object -Last 5` |
+| `grep pattern file` | `Select-String -Pattern pattern file` | `Select-String -Pattern "error" log.txt` |
+| `cat file` | `Get-Content file` | `Get-Content package.json` |
+| `wc -l file` | `(Get-Content file).Count` | `(Get-Content results.txt).Count` |
+| `ls directory` | `Get-ChildItem directory` | `Get-ChildItem src/` |
+| `rm file` | `Remove-Item file` | `Remove-Item temp.txt` |
+| `cp src dst` | `Copy-Item src dst` | `Copy-Item file.js file.backup` |
+
+### 5. Version Management
 
 **Semantic Versioning (semver):**
 
@@ -236,6 +315,12 @@ npm run build                # Production build
 npm run lint                 # Run linter
 npm test                     # Run tests
 
+# Database Operations
+.\scripts\backup-prod-database.ps1       # Backup prod DB (read-only)
+.\scripts\backup-dev-database.ps1        # Backup dev DB (read-only)
+.\scripts\restore-prod-to-dev.ps1        # Restore prod backup to dev
+.\scripts\sync-prod-to-dev-data.ps1      # Sync prod data to dev (file-based)
+
 # Scripts
 npm run update-ships         # Update Star Citizen ship data
 ```
@@ -245,6 +330,7 @@ npm run update-ships         # Update Star Citizen ship data
 * **Always ask** if unsure about version bump type (patch/minor/major)
 * **Always update CHANGELOG.md** when making code changes
 * **Always sync translations** when adding UI text
+* **NEVER do direct database syncs** - always use dump→restore pattern
 * **Reference existing patterns** in codebase before creating new approaches
 * **Follow TypeScript types** - check `src/lib/types.ts` for interfaces
 * **Use existing hooks** - check `src/hooks/` before creating new ones

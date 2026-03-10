@@ -34,7 +34,8 @@
       "osCommandContext",
       "changelogUpdates",
       "translationSync",
-      "semanticVersioning"
+      "semanticVersioning",
+      "preLintCompliance"
     ],
     "HIGH": [
       "multiReplaceTools",
@@ -76,10 +77,41 @@
     }
   },
 
+  "preCommitCompliance": {
+    "enforcement": "MANDATORY",
+    "skipAllowed": false,
+    "message": "Never skip linting/pre-commit hooks. Fix violations, do not bypass.",
+    "checklist": [
+      "✅ All markdown files pass markdownlint",
+      "✅ Spelling check passes (cspell)",
+      "✅ Translation files are synchronized",
+      "✅ CHANGELOG.md is updated (if code changes)",
+      "✅ Copilot command compliance passes",
+      "✅ All code committed (no --no-verify allowed)"
+    ],
+    "commandAlternatives": {
+      "Unix": "PowerShell",
+      "head -N": "Select-Object -First N",
+      "tail -N": "Select-Object -Last N",
+      "grep pattern": "Select-String -Pattern pattern",
+      "cat file": "Get-Content file",
+      "wc -l": "Measure-Object -Property Length | Select-Object -ExpandProperty Count",
+      "ls directory": "Get-ChildItem directory",
+      "sed 's/a/b/'": "[regex]::Replace($text, 'a', 'b')",
+      "pipe | command": "| command (same in PS)"
+    }
+  },
+
   "violations": {
     "level": "ERROR",
     "blocking": true,
     "examples": [
+      {
+        "violation": "Skipping pre-commit checks with --no-verify",
+        "example": "git commit --no-verify",
+        "scope": "Windows",
+        "fix": "NEVER use --no-verify. Fix actual linting errors instead."
+      },
       {
         "violation": "Unix command on Windows",
         "example": "npm test | head -100",

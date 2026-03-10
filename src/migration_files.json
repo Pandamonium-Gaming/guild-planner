@@ -1,7 +1,9 @@
 [
   "000_baseline.sql",
   "001_group_join_settings.sql",
-  "002_add_star_citizen_event_types.sql",
-  "003_relax_events_rls_for_permissions.sql",
-  "004_comprehensive_rls_permissions_fix.sql"
+  "002_comprehensive_rls_and_sc_support.sql",
+  "003_fix_event_rsvps_policies.sql",
+  "004_per_game_recruitment_settings.sql",
+  "005_discord_id_migration.sql",
+  "006_populate_discord_id_from_auth.sql"
 ]

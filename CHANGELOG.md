@@ -49,6 +49,37 @@
 
 ### Added
 
+* **Comprehensive Test Coverage for Discord ID Functions**
+  * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
+  * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user\_id fallback
+  * Test coverage for `getCharactersByDiscordId()` - Multi-character queries
+  * Test coverage for `getCurrentUserMainCharacter()` - Main character resolution with dual-path access
+  * Test coverage for `checkCharacterResilience()` - Validation for disaster recovery resilience
+  * Added `syncDiscordIdToMembers()` tests in `auth.test.ts` (8 tests)
+  * All edge cases covered: no auth, missing Discord ID, database errors, non-blocking behaviour
+  * 32 new tests added (321 → 353 total tests)
+  * All tests passing
+
+* **Discord ID Migration for Disaster Recovery Resilience (2 Consolidated Migrations)**
+  * Phase 1 & 2: Schema and data population in single migration
+    * Migration: `005_discord_id_schema_and_population.sql` ✅
+    * Adds `discord_id` column with indexes
+    * Populates from Discord OAuth metadata (auth.users) with identities table fallback
+    * Tested on production backup restore: 1 member synced, 12 pending auth linkage
+  * Phase 3: App-side Discord sync on login (non-blocking, gradual population)
+    * Implementation: `syncDiscordIdToMembers()` in `src/lib/auth.ts` ✅
+    * Integrated: `src/app/auth/callback/page.tsx` calls sync after session established ✅
+  * Phase 4: Resilient character lookup helpers with dual-path access
+    * Created: `src/lib/character-lookup.ts` with Discord ID + user\_id fallback ✅
+    * Functions: `getCharacterByDiscordId()`, `getCurrentUserMainCharacter()`, `checkCharacterResilience()`
+  * Phase 5: RLS policies with Discord ID-based fallback access
+    * Migration: `006_discord_id_rls_policies.sql` ✅
+    * New functions: `user_has_clan_role_by_discord()` for Discord-based access checks
+    * Updated policies: Members can view/manage via auth UUID or Discord ID
+    * Tested: Discord ID fallback working, functions callable
+  * Phase 6: Optional - Deprecate user\_id entirely (future work)
+  * Impact: Characters remain accessible after database restore even if auth UUID changes
+
 * **Machine-enforced Copilot command compliance system**
   * `.copilot-rules.json`: Declarative rules for OS context, file policies, and violations
   * `validate-copilot-compliance.js`: Pre-commit validation script
@@ -72,6 +103,11 @@
   * Workflow now captures and displays subscriber post URL in PR for easy cross-referencing
   * Automated PR body now includes actual ship names (Centurion and Imperator tier lists)
   * Improved PR details with direct link to RSI source post
+
+* Fixed route configuration and caching issues
+  * Corrected Star Citizen route from `/sc/settings` to `/starcitizen/settings`
+  * Added documentation that subscriber-ships.ts requires rebuild/redeploy to take effect (config cached at build time)
+  * Added warning comment in config file explaining cache invalidation
 
 ## \[0.2.0] - 2026-03-09
 

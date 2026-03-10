@@ -46,7 +46,11 @@
             "matchCommandLine": true
         },
         "git tag": true,
-        "npx tsx": true
+        "npx tsx": true,
+        ".\\scripts\\backup-prod-database.ps1": true,
+        "gh": true,
+        "Get-AzKeyVaultSecret": true,
+        "ConvertFrom-SecureString": true
     },
     "codeQL.githubDatabase.download": "never"
 }
