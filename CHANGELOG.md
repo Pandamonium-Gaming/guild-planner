@@ -6,7 +6,7 @@
 
 * **Comprehensive Test Coverage for Discord ID Functions**
   * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
-  * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user_id fallback
+  * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user\_id fallback
   * Test coverage for `getCharactersByDiscordId()` - Multi-character queries
   * Test coverage for `getCurrentUserMainCharacter()` - Main character resolution with dual-path access
   * Test coverage for `checkCharacterResilience()` - Validation for disaster recovery resilience

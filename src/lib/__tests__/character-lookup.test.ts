@@ -38,7 +38,7 @@ describe('Character Lookup - Discord ID Functions', () => {
       discord_id: mockDiscordId,
       group_id: mockGroupId,
       game_slug: gameSlug,
-      character_name: 'TestChar',
+      name: 'TestChar',
       is_main: true,
       race: 'Human',
       primary_archetype: 'Mage',
@@ -64,7 +64,7 @@ describe('Character Lookup - Discord ID Functions', () => {
       const result = await getCharacterByDiscordId(mockDiscordId, mockGroupId, gameSlug);
 
       expect(result).not.toBeNull();
-      expect(result?.character_name).toBe('TestChar');
+      expect(result?.name).toBe('TestChar');
       expect(result?.discord_id).toBe(mockDiscordId);
       expect(result?.is_main).toBe(true);
       expect(result?.professions).toHaveLength(1);
@@ -180,7 +180,7 @@ describe('Character Lookup - Discord ID Functions', () => {
         discord_id: mockDiscordId,
         group_id: mockGroupId,
         game_slug: 'aoc',
-        character_name: 'MainChar',
+        name: 'MainChar',
         is_main: true,
         member_professions: [],
       },
@@ -189,7 +189,7 @@ describe('Character Lookup - Discord ID Functions', () => {
         discord_id: mockDiscordId,
         group_id: mockGroupId,
         game_slug: 'aoc',
-        character_name: 'AltChar',
+        name: 'AltChar',
         is_main: false,
         member_professions: [],
       },
@@ -215,8 +215,8 @@ describe('Character Lookup - Discord ID Functions', () => {
       const result = await getCharactersByDiscordId(mockDiscordId, mockGroupId, 'aoc');
 
       expect(result).toHaveLength(2);
-      expect(result[0].character_name).toBe('MainChar');
-      expect(result[1].character_name).toBe('AltChar');
+      expect(result[0].name).toBe('MainChar');
+      expect(result[1].name).toBe('AltChar');
       
       expect(mockFrom.eq).toHaveBeenCalledWith('discord_id', mockDiscordId);
       expect(mockFrom.eq).toHaveBeenCalledWith('group_id', mockGroupId);
@@ -446,7 +446,7 @@ describe('Character Lookup - Discord ID Functions', () => {
       discord_id: '123456789012345678',
       group_id: mockGroupId,
       game_slug: gameSlug,
-      character_name: 'MainChar',
+      name: 'MainChar',
       is_main: true,
       member_professions: [],
     };
@@ -474,7 +474,7 @@ describe('Character Lookup - Discord ID Functions', () => {
       const result = await getCurrentUserMainCharacter(mockGroupId, gameSlug);
 
       expect(result).not.toBeNull();
-      expect(result?.character_name).toBe('MainChar');
+      expect(result?.name).toBe('MainChar');
       expect(result?.discord_id).toBe('123456789012345678');
       
       // Should use Discord ID lookup first
@@ -496,7 +496,7 @@ describe('Character Lookup - Discord ID Functions', () => {
       const result = await getCurrentUserMainCharacter(mockGroupId, gameSlug);
 
       expect(result).not.toBeNull();
-      expect(result?.character_name).toBe('MainChar');
+      expect(result?.name).toBe('MainChar');
       
       // Should try Discord ID first, then user_id
       expect(mockFrom.eq).toHaveBeenCalledWith('discord_id', '123456789012345678');

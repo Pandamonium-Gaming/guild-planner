@@ -86,6 +86,7 @@ export interface Character {
   id: string;
   group_id: string;
   user_id: string | null;
+  discord_id?: string | null;
   game_slug?: string | null;
   name: string;
   race: Race | null;
