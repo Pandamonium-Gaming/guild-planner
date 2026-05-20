@@ -4,6 +4,10 @@
     {
       "path": "/api/sync/achievements",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/sync/subscriber-ships",
+      "schedule": "10 0 * * *"
     }
   ]
 }

@@ -46,6 +46,12 @@
 
 ### Fixed
 
+* **Subscriber ships auto-sync reliability**
+  * Fixed Star Citizen subscriber tier change handling to compare against the pre-update tier value, ensuring add/remove sync logic runs correctly
+  * Added a scheduled background sync endpoint (`/api/sync/subscriber-ships`) to apply current-month subscriber ships for all subscriber characters automatically
+  * Added Star Citizen loaner reconciliation to the same sync cycle to check pledged-to-loaner mappings and repair missing/stale auto-managed loaner entries
+  * Added Vercel cron schedule to run subscriber ship sync daily and update each character's `subscriber_ships_month`
+
 * Resolved 11 ESLint/TypeScript warnings across 4 files
   * **permissions/route.ts**: Replaced `(upsertError as any)` casting with proper `PostgrestErrorWithDetails` interface
   * **achievements/sync/route.ts**: Prefixed unused `gatheringSkills` variable with underscore

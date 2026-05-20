@@ -320,14 +320,7 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
 
     // Handle subscriber tier changes for Star Citizen
     if (effectiveGame === 'starcitizen') {
-      // Get fresh character data to ensure we have the correct old tier
-      const { data: freshCharacter } = await supabase
-        .from('members')
-        .select('subscriber_tier')
-        .eq('id', id)
-        .single();
-
-      const oldTier = (freshCharacter as any)?.subscriber_tier;
+      const oldTier = (character as any)?.subscriber_tier as 'centurion' | 'imperator' | null | undefined;
       const newTier = data.subscriber_tier as 'centurion' | 'imperator' | null | undefined;
 
       if (newTier && newTier !== oldTier) {
