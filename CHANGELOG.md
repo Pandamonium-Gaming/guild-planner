@@ -65,6 +65,10 @@
   * Corrected May 2026 subscriber ship data from RSI post `21023-May-2026-Subscriber-Promotions` (Centurion: Dragonfly Black, Imperator: Cutlass Black + Dragonfly Black)
   * Improved subscriber fetch parser to support current RSI "Centurion Subscribers / Imperator Subscribers" text blocks and map ships to canonical app ship IDs
   * Updated sync skip logic to re-validate existing `subscriber` ownership rows before skipping, so stale May ship rows are repaired even when `subscriber_ships_month` is already current
+  * Fixed loaner matrix refresh script to run in Node/tsx environments (removed `Bun.write` dependency), parse current RSI markdown table rows, and normalize ship names to canonical IDs
+  * Changed loaner matrix updates to a direct data sync workflow (`npm run update-loaners`) that refreshes `sc_loaner_matrix` from RSI without creating new schema migrations
+  * Added preview mode (`npm run update-loaners:preview`) and SQL snapshot output (`scripts/generated/refresh_sc_loaner_matrix.sql`) for auditing/manual fallback
+  * Removed accidental generation of `supabase/migrations/070_populate_sc_loaner_matrix.sql`; historical 070 remains in `supabase/migrations_archive/` and baseline source comments only
 
 * **Build type-check regressions after dependency update**
   * Fixed `group_members` insert payload typing in `applyToGroup()` by normalizing payload shape and using `approved_at: null` for pending memberships

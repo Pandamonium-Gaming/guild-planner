@@ -12,6 +12,8 @@
     "test:coverage": "jest --coverage",
     "check:copilot": "node scripts/validate-copilot-compliance.js",
     "update-ships": "node scripts/fetch-ships.js",
+    "update-loaners": "tsx scripts/fetch-loaner-matrix.ts --apply",
+    "update-loaners:preview": "tsx scripts/fetch-loaner-matrix.ts",
     "check:translations": "node scripts/check-translations.js",
     "check:changelog": "node scripts/check-changelog.js",
     "check:version": "node scripts/check-version-bump.js",

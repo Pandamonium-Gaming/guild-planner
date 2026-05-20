@@ -191,6 +191,28 @@ This script ensures consistency across different development machines (Windows, 
 npm run update-ships
 ```
 
+### `fetch-loaner-matrix.ts`
+
+**Purpose:** Refreshes Star Citizen loaner matrix data from RSI and writes directly to `sc_loaner_matrix`.
+
+**Usage:**
+
+```bash
+# Apply to database
+npm run update-loaners
+
+# Preview only (no DB writes)
+npm run update-loaners:preview
+```
+
+**What it does:**
+
+1. Fetches loaner matrix data from RSI support article API
+2. Normalizes ship names to canonical IDs
+3. Writes SQL snapshot to `scripts/generated/refresh_sc_loaner_matrix.sql`
+4. Regenerates `src/types/sc-ships-loaner.ts`
+5. With `update-loaners`, replaces `sc_loaner_matrix` contents directly via service role
+
 ***
 
 ### `fetch-subscriber-ships.ts`
