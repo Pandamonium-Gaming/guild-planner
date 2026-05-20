@@ -59,6 +59,11 @@
   * Added Star Citizen loaner reconciliation to the same sync cycle to check pledged-to-loaner mappings and repair missing/stale auto-managed loaner entries
   * Added Vercel cron schedule to run subscriber ship sync daily and update each character's `subscriber_ships_month`
 
+* **Build type-check regressions after dependency update**
+  * Fixed `group_members` insert payload typing in `applyToGroup()` by normalizing payload shape and using `approved_at: null` for pending memberships
+  * Fixed `SubscriberTier` type import in `/api/sync/subscriber-ships` to import from `src/lib/subscriberShips.ts` (source of the exported type)
+  * Verified with full local install + production build (`npm install` and `npm run build`)
+
 * Resolved 11 ESLint/TypeScript warnings across 4 files
   * **permissions/route.ts**: Replaced `(upsertError as any)` casting with proper `PostgrestErrorWithDetails` interface
   * **achievements/sync/route.ts**: Prefixed unused `gatheringSkills` variable with underscore
