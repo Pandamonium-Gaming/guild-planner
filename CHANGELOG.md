@@ -51,8 +51,9 @@
 
 * **Dependency and tooling package bumps**
   * Runtime updates: `next` 16.1.6 → 16.2.6, `react`/`react-dom` 19.2.4 → 19.2.6, `@supabase/supabase-js` 2.94.1 → 2.106.1, `@vercel/analytics` 1.6.1 → 2.0.1, `lucide-react` 0.563.0 → 1.16.0
-  * Tooling updates: `typescript` 5.9.3 → 6.0.3, `eslint` 9.39.2 → 10.4.0, `eslint-config-next` 16.1.6 → 16.2.6, `tsx` 4.21.0 → 4.22.3, `supabase` CLI 2.75.3 → 2.100.1
+  * Tooling updates: `typescript` 5.9.3 → 6.0.3, `eslint-config-next` 16.1.6 → 16.2.6, `tsx` 4.21.0 → 4.22.3, `supabase` CLI 2.75.3 → 2.100.1
   * Test and quality tooling updates: `jest` 30.2.0 → 30.4.2, `jest-environment-jsdom` 30.2.0 → 30.4.1, `ts-jest` 29.4.6 → 29.4.10, `cspell` 9.6.4 → 10.0.0, `markdownlint-cli2` 0.20.0 → 0.22.1
+  * CI workflow updates: bumped GitHub Actions to latest major versions (`actions/checkout@v6`, `actions/setup-node@v6`, `codecov/codecov-action@v6`, `actions/github-script@v9`, `peter-evans/create-pull-request@v8`) and moved workflow Node runtime to 22
 
 ### Fixed
 
@@ -65,6 +66,7 @@
 * **Build type-check regressions after dependency update**
   * Fixed `group_members` insert payload typing in `applyToGroup()` by normalizing payload shape and using `approved_at: null` for pending memberships
   * Fixed `SubscriberTier` type import in `/api/sync/subscriber-ships` to import from `src/lib/subscriberShips.ts` (source of the exported type)
+  * Resolved CI lint runtime crash (`react/display-name` / `contextOrFilename.getFilename`) by pinning `eslint` to a Next-compatible v9 release
   * Verified with full local install + production build (`npm install` and `npm run build`)
 
 * Resolved 11 ESLint/TypeScript warnings across 4 files
