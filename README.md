@@ -62,6 +62,45 @@ A comprehensive group management and planning tool supporting multiple MMOs.
 
 See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for full instructions.
 
+## Cron Jobs and Manual Triggering
+
+The app has two Vercel cron jobs configured in [vercel.json](./vercel.json):
+
+| Job | Endpoint | Schedule (UTC) |
+| --- | --- | --- |
+| Achievements sync | `/api/sync/achievements` | `0 0 * * *` (daily at 00:00) |
+| Subscriber + loaner sync | `/api/sync/subscriber-ships` | `10 0 * * *` (daily at 00:10) |
+
+### Manual testing endpoints
+
+Use your deployed site URL or local dev URL:
+
+* `https://<your-domain>/api/sync/achievements`
+* `https://<your-domain>/api/sync/subscriber-ships`
+
+> There is currently **no separate loaners endpoint**. Loaner reconciliation runs as part of `/api/sync/subscriber-ships`.
+
+Local development examples:
+
+* `http://localhost:3000/api/sync/achievements`
+* `http://localhost:3000/api/sync/subscriber-ships`
+
+### Trigger examples (PowerShell)
+
+```powershell
+# GET (both endpoints)
+Invoke-RestMethod -Method Get -Uri "http://localhost:3000/api/sync/achievements"
+Invoke-RestMethod -Method Get -Uri "http://localhost:3000/api/sync/subscriber-ships"
+
+# POST (subscriber sync endpoint also supports POST)
+Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/sync/subscriber-ships"
+```
+
+### Expected responses
+
+* `/api/sync/achievements` returns summary counts like `clans` and `achievementsUpdated`.
+* `/api/sync/subscriber-ships` returns separate summaries for `subscribers` and `loaners`.
+
 ## Development
 
 ### Testing

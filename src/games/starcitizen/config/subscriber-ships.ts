@@ -102,6 +102,13 @@ export const SUBSCRIBER_SHIPS: Record<string, SubscriberShipMonth> = {
     flair: 'Flair and Vehicles of the Month are suitably medical themed.',
     notes: 'Auto-fetched from RSI comm-link. Ships have 12m insurance for Centurion, 24m for Imperator.',
   },
+  '2026-05': {
+    label: 'May 2026',
+    centurion: ['dragonfly-black'],
+    imperator: ['cutlass-black', 'dragonfly-black'],
+    flair: "R6 Pro Yaeger Aviator Glasses, Behring P8-AR 'Dominion Camo' Rifle, Top Gunner's Kit",
+    notes: 'Drake Dragonfly Black for Centurion (12m insurance), Drake Cutlass Black + Drake Dragonfly Black for Imperator (24m insurance).',
+  },
 };
 
 /**

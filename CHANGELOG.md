@@ -62,6 +62,9 @@
   * Added a scheduled background sync endpoint (`/api/sync/subscriber-ships`) to apply current-month subscriber ships for all subscriber characters automatically
   * Added Star Citizen loaner reconciliation to the same sync cycle to check pledged-to-loaner mappings and repair missing/stale auto-managed loaner entries
   * Added Vercel cron schedule to run subscriber ship sync daily and update each character's `subscriber_ships_month`
+  * Corrected May 2026 subscriber ship data from RSI post `21023-May-2026-Subscriber-Promotions` (Centurion: Dragonfly Black, Imperator: Cutlass Black + Dragonfly Black)
+  * Improved subscriber fetch parser to support current RSI "Centurion Subscribers / Imperator Subscribers" text blocks and map ships to canonical app ship IDs
+  * Updated sync skip logic to re-validate existing `subscriber` ownership rows before skipping, so stale May ship rows are repaired even when `subscriber_ships_month` is already current
 
 * **Build type-check regressions after dependency update**
   * Fixed `group_members` insert payload typing in `applyToGroup()` by normalizing payload shape and using `approved_at: null` for pending memberships

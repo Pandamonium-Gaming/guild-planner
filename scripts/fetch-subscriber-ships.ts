@@ -37,6 +37,20 @@ interface FetchResult {
   pageUrl?: string;
 }
 
+const SHIP_NAME_TO_ID: Array<{ pattern: RegExp; id: string }> = [
+  { pattern: /\bdragonfly\s+black\b/i, id: 'dragonfly-black' },
+  { pattern: /\bcutlass\s+black\b/i, id: 'cutlass-black' },
+  { pattern: /\bstarlancer\s+max\b/i, id: 'starlancer-max' },
+  { pattern: /\bstarlancer\s+tac\b/i, id: 'starlancer-tac' },
+  { pattern: /\brsi\s+apollo\s+medivac\b/i, id: 'rsi-apollo-medivac' },
+  { pattern: /\brsi\s+ursa\s+medivac\b/i, id: 'rsi-ursa-medivac' },
+  { pattern: /\brsi\s+apollo\b/i, id: 'rsi-apollo' },
+  { pattern: /\brsi\s+ursa\b/i, id: 'rsi-ursa' },
+  { pattern: /\bsabre\s+firebird\b/i, id: 'sabre-firebird' },
+  { pattern: /\bsabre\s+peregrine\b/i, id: 'sabre-peregrine' },
+  { pattern: /\bsabre\b/i, id: 'sabre' },
+];
+
 /**
  * Get the current month's subscriber promotions URL pattern
  * Format: https://robertsspaceindustries.com/comm-link/transmission/[ID]-[Month]-[Year]-Subscriber-Promotions
@@ -193,6 +207,14 @@ async function parseSubscriberPromotions(pageUrl: string): Promise<SubscriberShi
     
     const centurionPattern = /Centurion[^.!]*?(?:ship|vehicle|receive)[\s:]*([^.!?\n]+?)(?=Imperator|Flair|$)/i;
     const imperatorPattern = /Imperator[^.!]*?(?:ship|vehicle|receive)[\s:]*([^.!?\n]+?)(?=Flair|Merch|$)/i;
+    const explicitTierPattern = /Centurion Subscribers:\s*(.*?)\s*\(with[^)]*\)\s*Imperator Subscribers:\s*(.*?)\s*\(with[^)]*\)/i;
+
+    const explicitTierMatch = normalized.match(explicitTierPattern);
+    if (explicitTierMatch) {
+      centurionShips = extractShipNames(explicitTierMatch[1]);
+      imperatorShips = extractShipNames(explicitTierMatch[2]);
+      console.log(`Found explicit tier block`);
+    }
     
     const centurionMatch = normalized.match(centurionPattern);
     const imperatorMatch = normalized.match(imperatorPattern);
@@ -222,10 +244,10 @@ async function parseSubscriberPromotions(pageUrl: string): Promise<SubscriberShi
       }
     }
     
-    // Try to find flair info
-    const flairMatch = normalized.match(/(?:flair|reward|cosmetic)[^.!]*?(?:CureLife|medivac|medical)[^.!]*?(?:[.!]|$)/i);
-    if (flairMatch) {
-      flairText = flairMatch[0].substring(0, 200).trim();
+    // Try to find flair info from the dedicated section on the promotions page
+    const flairSectionMatch = normalized.match(/IN-GAME REWARDS \(FLAIR\)\s*(.*?)\s*Earnable In-Game:/i);
+    if (flairSectionMatch) {
+      flairText = flairSectionMatch[1].replace(/\s+/g, ' ').trim().substring(0, 220);
     }
     
     if (centurionShips.length === 0 || imperatorShips.length === 0) {
@@ -255,7 +277,7 @@ async function parseSubscriberPromotions(pageUrl: string): Promise<SubscriberShi
       label: monthLabel,
       centurion: centurionShips,
       imperator: imperatorShips,
-      flair: flairText || 'RSI Ursa Medivac & RSI Apollo Medivac (Medical themed)',
+      flair: flairText || 'See RSI subscriber promotions post for monthly flair details.',
       notes: `Auto-fetched from RSI comm-link. Ships have 12m insurance for Centurion, 24m for Imperator.`
     };
   } catch (error) {
@@ -268,79 +290,15 @@ async function parseSubscriberPromotions(pageUrl: string): Promise<SubscriberShi
  * Extract ship names from text using known ship list
  */
 function extractShipNames(text: string): string[] {
-  // Known ship name patterns (add more as needed)
-  // Match both full names and abbreviations
-  const knownShips = [
-    // Fighters
-    'Sabre', 'Sabre Firebird', 'Sabre Peregrine',
-    'Hornet', 'Super Hornet', 'Hornet F7C', 'Hornet F7A', 'Hornet E',
-    'Gladius', 'Arrow', 'Razor',
-    
-    // Starters
-    'Aurora', 'Aurora LN', 'Aurora MR', 'Aurora ES',
-    'Mustang', 'Mustang Alpha', 'Mustang Beta', 'Mustang Gamma', 'Mustang Delta',
-    'Avenger', 'Avenger Titan', 'Avenger Stalwart', 'Avenger Warlock',
-    
-    // Transport  
-    'Starlancer', 'Starlancer MAX', 'Starlancer TAC',
-    'Reliant', 'Reliant Tana', 'Reliant Mako',
-    'Herald',
-    
-    // Exploration  
-    'Reliant', 'Freelancer', 'Freelancer DUR', 'Freelancer MAX', 'Freelancer MIS',
-    'Star Runner', 'Carrack',
-    
-    // Mining
-    'Prospector', 'Mole',
-    
-    // Industrial
-    'Caterpillar', 'Hull', 'Reclaimer',
-    
-    // Large Ships
-    'Constellation', 'Andromeda', 'Aquila', 'Phoenix',
-    'Cutlass', 'Cutlass Black', 'Cutlass Red', 'Cutlass Blue',
-    'Drake', 'Corsair',
-    
-    // Military
-    'Javelin', 'Idris', 'Bengal',
-    'Glaive', 'Scythe', 'Eclipse', 'Vulcan',
-   
-    // Medical
-    'Apollo', 'Endeavor', 'Crucible', 'Redeemer',
-    'Ursa', 'RSI Ursa', 'RSI Ursa Medivac', 'RSI Apollo', 'RSI Apollo Medivac',
-    
-    // Other
-    'Banu', 'Merchantman', 'Xi\'an', 'Vis', 'Scimitar', 'Spirit',
-    'Anvil', 'Titan', 'Cutter',
-  ];
-  
   const found: string[] = [];
-  const seenLower = new Set<string>();
-  
-  // Sort by length descending to match longer names first
-  const sortedShips = [...knownShips].sort((a, b) => b.length - a.length);
-  
-  for (const ship of sortedShips) {
-    // Create case-insensitive regex for the ship name with word boundaries
-    const escapedShip = ship.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escapedShip}\\b`, 'i');
-    
-    if (regex.test(text)) {
-      const normalized = ship.toLowerCase().replace(/\s+/g, '-');
-      // Avoid duplicates (e.g., "Ursa" and "RSI Ursa")
-      if (!seenLower.has(normalized)) {
-        found.push(normalized);
-        seenLower.add(normalized);
-        // Mark related names as seen to avoid duplication
-        seenLower.add(ship.toLowerCase());
-        if (ship.includes(' ')) {
-          ship.split(' ').forEach(word => seenLower.add(word.toLowerCase()));
-        }
-      }
+
+  for (const mapping of SHIP_NAME_TO_ID) {
+    if (mapping.pattern.test(text) && !found.includes(mapping.id)) {
+      found.push(mapping.id);
     }
   }
-  
-  return found.filter(ship => ship.length > 0).slice(0, 5); // Limit results
+
+  return found;
 }
 
 /**

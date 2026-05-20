@@ -184,6 +184,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const subscribers = (data || []) as SubscriberMember[];
 
+    const subscriberIds = subscribers.map((subscriber) => subscriber.id);
+    const subscriberShipsByCharacter = new Map<string, Set<string>>();
+
+    if (subscriberIds.length > 0) {
+      const { data: subscriberShipRows, error: subscriberShipError } = await supabaseAdmin
+        .from('character_ships')
+        .select('character_id, ship_id')
+        .eq('ownership_type', 'subscriber')
+        .in('character_id', subscriberIds);
+
+      if (subscriberShipError) {
+        throw subscriberShipError;
+      }
+
+      for (const row of (subscriberShipRows || []) as CharacterShipRow[]) {
+        if (!subscriberShipsByCharacter.has(row.character_id)) {
+          subscriberShipsByCharacter.set(row.character_id, new Set());
+        }
+        subscriberShipsByCharacter.get(row.character_id)?.add(row.ship_id);
+      }
+    }
+
     let processed = 0;
     let updated = 0;
     let skipped = 0;
@@ -198,15 +220,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         continue;
       }
 
-      if (subscriber.subscriber_ships_month === currentMonth) {
-        skipped += 1;
-        continue;
-      }
-
       const expectedShips = getSubscriberShips(subscriber.subscriber_tier, currentMonth);
       if (expectedShips.length === 0) {
         skipped += 1;
         continue;
+      }
+
+      if (subscriber.subscriber_ships_month === currentMonth) {
+        const existingShips = subscriberShipsByCharacter.get(subscriber.id) || new Set<string>();
+        const hasMissingExpected = expectedShips.some((shipId) => !existingShips.has(shipId));
+        const hasUnexpectedExisting = Array.from(existingShips).some(
+          (shipId) => !expectedShips.includes(shipId)
+        );
+
+        if (!hasMissingExpected && !hasUnexpectedExisting) {
+          skipped += 1;
+          continue;
+        }
       }
 
       const { error: removeError } = await supabaseAdmin
