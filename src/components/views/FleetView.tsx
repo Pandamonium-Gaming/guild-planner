@@ -213,20 +213,6 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
 
   const playerCharacters = characters.filter(c => c.user_id === userId);
 
-  useEffect(() => {
-    if (!showAddForm || selectedCharacter || playerCharacters.length === 0) return;
-    const mainCharacter = playerCharacters.find(c => c.is_main);
-    if (mainCharacter) {
-      setSelectedCharacter(mainCharacter.id);
-    } else if (playerCharacters.length === 1) {
-      setSelectedCharacter(playerCharacters[0].id);
-    }
-  }, [showAddForm, selectedCharacter, playerCharacters]);
-
-  useEffect(() => {
-    loadCharacterShips();
-  }, [groupId, characters]);
-
   const loadCharacterShips = async () => {
     setLoading(true);
     setError(null);
@@ -262,6 +248,26 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      void loadCharacterShips();
+    }, 0);
+
+    return () => clearTimeout(timerId);
+  }, [groupId, characters]);
+
+  const openAddShipForm = () => {
+    if (!selectedCharacter && playerCharacters.length > 0) {
+      const mainCharacter = playerCharacters.find(c => c.is_main);
+      if (mainCharacter) {
+        setSelectedCharacter(mainCharacter.id);
+      } else if (playerCharacters.length === 1) {
+        setSelectedCharacter(playerCharacters[0].id);
+      }
+    }
+    setShowAddForm(true);
   };
 
   const getShipData = (shipId: string): ShipData | undefined => {
@@ -376,7 +382,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
         </div>
         {canManage && !showAddForm && (
           <button
-            onClick={() => setShowAddForm(true)}
+            onClick={openAddShipForm}
             className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition-colors cursor-pointer"
           >
             <Plus className="w-5 h-5" />
@@ -726,7 +732,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
           <p className="text-slate-400">{t('fleet.noShips')}</p>
           {canManage && (
             <button
-              onClick={() => setShowAddForm(true)}
+              onClick={openAddShipForm}
               className="mt-4 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition-colors cursor-pointer"
             >
               Add the first ship

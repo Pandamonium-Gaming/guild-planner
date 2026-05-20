@@ -52,9 +52,13 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
 
   // Reset state when groupSlug or gameSlug changes (prevent stale data on route transition)
   useEffect(() => {
-    setGroup(null);
-    setCharacters([]);
-    setLoading(true);
+    const timerId = setTimeout(() => {
+      setGroup(null);
+      setCharacters([]);
+      setLoading(true);
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [groupSlug, gameSlug]);
 
   // Fetch clan (no longer auto-creates - that's handled by UI)
@@ -126,7 +130,11 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
 
   // Initial fetch
   useEffect(() => {
-    fetchData();
+    const timerId = setTimeout(() => {
+      void fetchData();
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [fetchData]);
 
   // Add character with full data

@@ -25,7 +25,6 @@ export function RecruitmentSettings({ groupId, groupSlug }: RecruitmentSettingsP
   const [applications, setApplications] = useState<RecruitmentApplication[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [localLoading, setLocalLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const canManageRecruitment = hasPermission('recruitment_manage');
 
@@ -79,16 +78,19 @@ export function RecruitmentSettings({ groupId, groupSlug }: RecruitmentSettingsP
           setError(t('recruitment.loadError') || 'Failed to load recruitment settings');
         }
       } finally {
-        if (isMounted) {
-          setLocalLoading(false);
-        }
+        // no-op
       }
     }
 
     if (groupId) {
-      fetchData();
-    } else {
-      setLocalLoading(false);
+      const timerId = setTimeout(() => {
+        void fetchData();
+      }, 0);
+
+      return () => {
+        isMounted = false;
+        clearTimeout(timerId);
+      };
     }
 
     return () => {

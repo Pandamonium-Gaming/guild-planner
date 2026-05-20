@@ -44,6 +44,19 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
+  // Load group games from database
+  const loadGroupGames = async (gid: string) => {
+    try {
+      const gamesStatus = await getGroupGamesWithStatus(gid);
+      setEnabledGames(gamesStatus.map(g => g.game_slug));
+      setGamesWithStatus(gamesStatus.map(g => ({ slug: g.game_slug, archived: g.archived })));
+    } catch (err) {
+      console.error('Error loading group games:', err);
+      setEnabledGames([]);
+      setGamesWithStatus([]);
+    }
+  };
+
   // Fetch group data
   useEffect(() => {
     async function checkGroup() {
@@ -78,19 +91,6 @@ export default function GroupPage({ params }: { params: Promise<{ group: string 
     }
     checkGroup();
   }, [groupSlug]);
-
-  // Load group games from database
-  const loadGroupGames = async (gid: string) => {
-    try {
-      const gamesStatus = await getGroupGamesWithStatus(gid);
-      setEnabledGames(gamesStatus.map(g => g.game_slug));
-      setGamesWithStatus(gamesStatus.map(g => ({ slug: g.game_slug, archived: g.archived })));
-    } catch (err) {
-      console.error('Error loading group games:', err);
-      setEnabledGames([]);
-      setGamesWithStatus([]);
-    }
-  };
 
   // Add game to group
   const handleAddGame = async (gameSlug: string) => {

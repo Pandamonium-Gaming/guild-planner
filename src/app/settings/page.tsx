@@ -20,10 +20,14 @@ export default function SettingsPage() {
 
   // Initialize from profile
   useEffect(() => {
-    if (profile) {
+    if (!profile) return;
+
+    const timerId = setTimeout(() => {
       setTimezone(profile.timezone || 'UTC');
       setDisplayName(profile.display_name || '');
-    }
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [profile]);
 
   // Auto-detect timezone

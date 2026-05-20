@@ -90,32 +90,36 @@ export function ClanSettings({
 
   // Sync state when props change (when group data loads)
   useEffect(() => {
-    setGameConfig({
-      aoc: {
-        webhookUrl: currentAocWebhookUrl,
-        eventsWebhookUrl: currentAocEventsWebhookUrl,
-        announcementRoleId: aocAnnouncementRoleId,
-        eventsRoleId: aocEventsRoleId,
-      },
-      sc: {
-        webhookUrl: currentScWebhookUrl,
-        eventsWebhookUrl: currentScEventsWebhookUrl,
-        announcementRoleId: scAnnouncementRoleId,
-        eventsRoleId: scEventsRoleId,
-      },
-      ror: {
-        webhookUrl: currentRorWebhookUrl,
-        eventsWebhookUrl: currentRorEventsWebhookUrl,
-        announcementRoleId: rorAnnouncementRoleId,
-        eventsRoleId: rorEventsRoleId,
-      },
-      cc: {
-        webhookUrl: '',
-        eventsWebhookUrl: '',
-        announcementRoleId: '',
-        eventsRoleId: '',
-      },
-    });
+    const timerId = setTimeout(() => {
+      setGameConfig({
+        aoc: {
+          webhookUrl: currentAocWebhookUrl,
+          eventsWebhookUrl: currentAocEventsWebhookUrl,
+          announcementRoleId: aocAnnouncementRoleId,
+          eventsRoleId: aocEventsRoleId,
+        },
+        sc: {
+          webhookUrl: currentScWebhookUrl,
+          eventsWebhookUrl: currentScEventsWebhookUrl,
+          announcementRoleId: scAnnouncementRoleId,
+          eventsRoleId: scEventsRoleId,
+        },
+        ror: {
+          webhookUrl: currentRorWebhookUrl,
+          eventsWebhookUrl: currentRorEventsWebhookUrl,
+          announcementRoleId: rorAnnouncementRoleId,
+          eventsRoleId: rorEventsRoleId,
+        },
+        cc: {
+          webhookUrl: '',
+          eventsWebhookUrl: '',
+          announcementRoleId: '',
+          eventsRoleId: '',
+        },
+      });
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [
     currentAocWebhookUrl,
     currentAocEventsWebhookUrl,

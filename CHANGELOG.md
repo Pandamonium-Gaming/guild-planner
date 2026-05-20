@@ -75,6 +75,10 @@
   * Fixed `SubscriberTier` type import in `/api/sync/subscriber-ships` to import from `src/lib/subscriberShips.ts` (source of the exported type)
   * Resolved CI lint runtime crash (`react/display-name` / `contextOrFilename.getFilename`) by pinning `eslint` to a Next-compatible v9 release
   * Verified with full local install + production build (`npm install` and `npm run build`)
+  * Fixed CI lint error in group landing page by changing `loadGroupGames` to a hoisted function declaration before first use (`react-hooks/immutability`)
+  * Fixed additional declaration-order lint blockers in public and fleet views (`FleetView`, `PublicClanEventsView`, `PublicEventsView`) and removed their `Cannot access variable before it is declared` errors
+  * Fixed a batch of `react-hooks/set-state-in-effect` lint blockers across settings and fleet components by deferring effect-triggered state hydration/fetch calls (`SettingsPage`, `BankTransactionForm`, `GuildIconUploader`, `ClanSettings`, `GameManagement`, `PermissionsSettings`, `RecruitmentSettings`, `ShipsView`)
+  * Fixed remaining `react-hooks/set-state-in-effect` lint blockers across hooks by deferring effect-triggered resets and initial fetches (`useAchievements`, `useActivity`, `useAlliances`, `useBuilds`, `useCaravans`, `useEvents`, `useFreeholds`, `useGroupData`, `useGroupMembership`, `useGuildBank`, `useLootSystem`, `useNodeCitizenships`, `useSiegeEvents`)
 
 * Resolved 11 ESLint/TypeScript warnings across 4 files
   * **permissions/route.ts**: Replaced `(upsertError as any)` casting with proper `PostgrestErrorWithDetails` interface

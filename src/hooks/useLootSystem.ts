@@ -205,7 +205,11 @@ export function useLootSystem(groupId: string | null): UseLootSystemReturn {
 
   // Initial fetch
   useEffect(() => {
-    fetchData();
+    const timerId = setTimeout(() => {
+      void fetchData();
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [fetchData]);
 
   // Create loot system

@@ -98,7 +98,11 @@ export function useCaravans(groupId: string | null): UseCaravansReturn {
   }, [groupId]);
 
   useEffect(() => {
-    fetchData();
+    const timerId = setTimeout(() => {
+      void fetchData();
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [fetchData]);
 
   const now = new Date();

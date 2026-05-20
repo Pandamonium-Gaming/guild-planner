@@ -273,7 +273,11 @@ export function ShipsView({ characters, userId, canManage, groupId, gameSlug = '
 
   // Load character ships
   useEffect(() => {
-    loadCharacterShips();
+    const timerId = setTimeout(() => {
+      void loadCharacterShips();
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [groupId, characters, gameSlug]);
 
   const getShipData = (shipId: string): ShipData | undefined => {

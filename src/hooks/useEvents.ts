@@ -35,9 +35,13 @@ export function useEvents(groupId: string | null, userId: string | null, gameSlu
 
   // Reset state when groupId or gameSlug changes (prevent stale data on route transition)
   useEffect(() => {
-    setEvents([]);
-    setAnnouncements([]);
-    setLoading(true);
+    const timerId = setTimeout(() => {
+      setEvents([]);
+      setAnnouncements([]);
+      setLoading(true);
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [groupId, gameSlug]);
 
   // Fetch all events with RSVPs
@@ -145,7 +149,11 @@ export function useEvents(groupId: string | null, userId: string | null, gameSlu
   // Initial fetch
   useEffect(() => {
     if (groupId) {
-      fetchData();
+      const timerId = setTimeout(() => {
+        void fetchData();
+      }, 0);
+
+      return () => clearTimeout(timerId);
     }
   }, [groupId, fetchData]);
 

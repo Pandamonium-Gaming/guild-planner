@@ -41,13 +41,17 @@ export function BankTransactionForm({
 
   // Reset form when opening
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+
+    const timerId = setTimeout(() => {
       setSearchQuery('');
       setSelectedResource(null);
       setQuantity('');
       setNotes('');
       setError(null);
-    }
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [isOpen]);
 
   // Filter resources

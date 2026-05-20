@@ -24,11 +24,7 @@ export function PublicEventsView() {
   const [events, setEvents] = useState<EventWithClanInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPublicEvents();
-  }, []);
-
-  async function fetchPublicEvents() {
+  const fetchPublicEvents = async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -105,7 +101,15 @@ export function PublicEventsView() {
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      void fetchPublicEvents();
+    }, 0);
+
+    return () => clearTimeout(timerId);
+  }, []);
 
   // Group events by clan
   const eventsByClans = events.reduce((acc, event) => {

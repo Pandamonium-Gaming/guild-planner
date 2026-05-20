@@ -26,7 +26,7 @@ export function PermissionsSettings({ groupId, userRole, onSave }: PermissionsSe
   const { session } = useAuth();
   const [selectedRole, setSelectedRole] = useState<GroupRole>('member');
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => userRole === 'admin' && !!session);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   // Track custom permissions for each role
@@ -44,7 +44,6 @@ export function PermissionsSettings({ groupId, userRole, onSave }: PermissionsSe
   // Load permissions from database on mount (optional - will use defaults if not found)
   useEffect(() => {
     if (!session || userRole !== 'admin') {
-      setIsLoading(false);
       return;
     }
 
@@ -108,7 +107,11 @@ export function PermissionsSettings({ groupId, userRole, onSave }: PermissionsSe
       }
     };
 
-    loadPermissions();
+    const timerId = setTimeout(() => {
+      void loadPermissions();
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [session, groupId, userRole]);
 
   const hierarchy = getRoleHierarchy();

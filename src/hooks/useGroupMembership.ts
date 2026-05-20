@@ -53,10 +53,14 @@ export function useGroupMembership(groupId: string | null, userId: string | null
 
   // Reset state when groupId or userId changes (prevent stale data on route transition)
   useEffect(() => {
-    setMembership(null);
-    setMembers([]);
-    setPendingMembers([]);
-    setLoading(true);
+    const timerId = setTimeout(() => {
+      setMembership(null);
+      setMembers([]);
+      setPendingMembers([]);
+      setLoading(true);
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [groupId, userId]);
 
   const fetchMembership = useCallback(async () => {
@@ -133,7 +137,11 @@ export function useGroupMembership(groupId: string | null, userId: string | null
   }, [fetchMembership, fetchMembers]);
 
   useEffect(() => {
-    refresh();
+    const timerId = setTimeout(() => {
+      void refresh();
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [refresh]);
 
   const apply = async () => {
