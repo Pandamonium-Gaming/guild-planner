@@ -256,9 +256,14 @@ export async function applyToGroup(groupId: string, userId: string) {
   if (groupError) throw groupError;
 
   const approvalRequired = group?.approval_required ?? true;
-  const defaultRole = group?.default_role || 'trial';
-  const insertPayload = approvalRequired
-    ? { group_id: groupId, user_id: userId, role: 'pending' }
+  const defaultRole: string = group?.default_role || 'trial';
+  const insertPayload: {
+    group_id: string;
+    user_id: string;
+    role: string;
+    approved_at: string | null;
+  } = approvalRequired
+    ? { group_id: groupId, user_id: userId, role: 'pending', approved_at: null }
     : { group_id: groupId, user_id: userId, role: defaultRole, approved_at: new Date().toISOString() };
 
   const { error } = await supabase

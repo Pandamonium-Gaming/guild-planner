@@ -3,9 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   getCurrentMonthKey,
   getSubscriberShips,
-  type SubscriberTier,
 } from '@/games/starcitizen/config/subscriber-ships';
-import { syncSubscriberShips } from '@/lib/subscriberShips';
+import { syncSubscriberShips, type SubscriberTier } from '@/lib/subscriberShips';
 import supabaseAdmin from '@/lib/supabaseAdmin';
 
 interface SubscriberMember {
