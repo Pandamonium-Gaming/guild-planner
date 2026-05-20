@@ -44,6 +44,13 @@
   * Provides clear violation messages with fixes for developers
   * Stops repeating broken patterns across conversations by using external validation
 
+### Changed
+
+* **Dependency and tooling package bumps**
+  * Runtime updates: `next` 16.1.6 → 16.2.6, `react`/`react-dom` 19.2.4 → 19.2.6, `@supabase/supabase-js` 2.94.1 → 2.106.1, `@vercel/analytics` 1.6.1 → 2.0.1, `lucide-react` 0.563.0 → 1.16.0
+  * Tooling updates: `typescript` 5.9.3 → 6.0.3, `eslint` 9.39.2 → 10.4.0, `eslint-config-next` 16.1.6 → 16.2.6, `tsx` 4.21.0 → 4.22.3, `supabase` CLI 2.75.3 → 2.100.1
+  * Test and quality tooling updates: `jest` 30.2.0 → 30.4.2, `jest-environment-jsdom` 30.2.0 → 30.4.1, `ts-jest` 29.4.6 → 29.4.10, `cspell` 9.6.4 → 10.0.0, `markdownlint-cli2` 0.20.0 → 0.22.1
+
 ### Fixed
 
 * **Subscriber ships auto-sync reliability**
