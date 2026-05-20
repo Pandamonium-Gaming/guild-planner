@@ -195,7 +195,7 @@ export function useGroupMembership(groupId: string | null, userId: string | null
             inline: false,
           },
         ],
-        footer: { text: 'Guild Planner' },
+        footer: { text: 'Group Planner' },
         timestamp: new Date().toISOString(),
       };
     }

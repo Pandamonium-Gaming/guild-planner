@@ -46,6 +46,9 @@
 
 ### Changed
 
+* **Brand naming consistency**
+  * Updated remaining product name references from "Guild Planner" to "Group Planner" across metadata, Discord webhook text, service worker branding, and project documentation headers
+
 * **Dependency and tooling package bumps**
   * Runtime updates: `next` 16.1.6 → 16.2.6, `react`/`react-dom` 19.2.4 → 19.2.6, `@supabase/supabase-js` 2.94.1 → 2.106.1, `@vercel/analytics` 1.6.1 → 2.0.1, `lucide-react` 0.563.0 → 1.16.0
   * Tooling updates: `typescript` 5.9.3 → 6.0.3, `eslint` 9.39.2 → 10.4.0, `eslint-config-next` 16.1.6 → 16.2.6, `tsx` 4.21.0 → 4.22.3, `supabase` CLI 2.75.3 → 2.100.1

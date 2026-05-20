@@ -1,4 +1,4 @@
-// TypeScript types for the AoC Guild Planner
+// TypeScript types for the AoC Group Planner
 
 // Profession tier types
 export type ProfessionTier = 'gathering' | 'processing' | 'crafting';

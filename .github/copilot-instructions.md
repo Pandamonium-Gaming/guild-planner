@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions for Guild Planner
+# GitHub Copilot Instructions for Group Planner
 
 ## Critical Rules - Always Follow
 

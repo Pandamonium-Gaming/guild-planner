@@ -79,7 +79,7 @@ export async function sendDiscordWebhook(
       body: JSON.stringify({
         webhookUrl,
         payload: {
-          username: payload.username || '⚔️ Guild Planner',
+          username: payload.username || '⚔️ Group Planner',
           avatar_url: payload.avatar_url,
           content: payload.content,
           embeds: payload.embeds,
@@ -114,7 +114,7 @@ export async function testDiscordWebhook(
       description: 'Your Discord webhook is working correctly. You will receive notifications for events and announcements from your guild.',
       color: COLORS.green,
       footer: {
-        text: 'Guild Planner',
+        text: 'Group Planner',
       },
       timestamp: new Date().toISOString(),
     }],

@@ -1,6 +1,6 @@
 # Scripts
 
-This directory contains utility scripts for the Guild Planner project.
+This directory contains utility scripts for the Group Planner project.
 
 ## Available Scripts
 
