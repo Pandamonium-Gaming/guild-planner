@@ -100,11 +100,7 @@ export function useBuilds(groupId: string | null): UseBuildsReturn {
   }, [groupId]);
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      void fetchData();
-    }, 0);
-
-    return () => clearTimeout(timerId);
+    void fetchData();
   }, [fetchData]);
 
   const myBuilds = builds.filter((b) => b.visibility === 'private' || b.creator);

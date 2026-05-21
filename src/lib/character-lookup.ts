@@ -4,7 +4,7 @@
  */
 
 import { supabase } from './supabase';
-import { CharacterWithProfessions } from './types';
+import { CharacterWithProfessions, MemberProfession } from './types';
 
 /**
  * Find a user's character by Discord ID and group ID
@@ -230,7 +230,26 @@ type CharacterLookupRow = CharacterWithProfessions & {
   member_professions?: unknown[];
 };
 
+function isMemberProfession(value: unknown): value is MemberProfession {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const profession = value as Partial<MemberProfession>;
+
+  return (
+    typeof profession.id === 'string' &&
+    typeof profession.member_id === 'string' &&
+    typeof profession.profession === 'string' &&
+    typeof profession.rank === 'number' &&
+    typeof profession.artisan_level === 'number' &&
+    typeof profession.quality_score === 'number'
+  );
+}
+
 function transformCharacter(char: CharacterLookupRow): CharacterWithProfessions {
+  const professions = (char.member_professions || []).filter(isMemberProfession);
+
   return {
     ...char,
     race: char.race || null,
@@ -238,6 +257,6 @@ function transformCharacter(char: CharacterLookupRow): CharacterWithProfessions 
     secondary_archetype: char.secondary_archetype || null,
     level: char.level || 1,
     is_main: char.is_main || false,
-    professions: char.member_professions || [],
+    professions,
   };
 }

@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { useGroupMembership } from './useGroupMembership';
+import { supabase } from '@/lib/supabase';
 import { GroupRole, roleHasPermission, canManageRole, DEFAULT_ROLE_PERMISSIONS } from '@/lib/permissions';
 
 export interface RolePermissions {
@@ -18,13 +19,19 @@ export function usePermissions(groupId ?: string) {
   
   // Fetch custom permission overrides from the server
   useEffect(() => {
-    if (!groupId || !user) return;
+    if (!groupId || !user || !membership?.role) return;
+
+    let isCancelled = false;
 
     const fetchPermissions = async () => {
-      setLoading(true);
       try {
-        const { data: { session } } = await (await import('@/lib/supabase')).supabase.auth.getSession();
+        const sessionResponse = await supabase.auth.getSession();
+        const session = sessionResponse?.data?.session ?? null;
         if (!session) return;
+
+        if (!isCancelled) {
+          setLoading(true);
+        }
 
         // Include group_id as a query parameter
         const response = await fetch(`/api/group/permissions?group_id=${encodeURIComponent(groupId!)}` , {
@@ -44,17 +51,25 @@ export function usePermissions(groupId ?: string) {
                 perms[key] = overrides[key];
               }
             });
-            setCustomPermissions(perms);
+            if (!isCancelled) {
+              setCustomPermissions(perms);
+            }
           }
         }
       } catch (err) {
         console.error('Error fetching permissions:', err);
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchPermissions();
+    void fetchPermissions();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [groupId, user, membership?.role]);
   
   // Check if current user has a specific permission

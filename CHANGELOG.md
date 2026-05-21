@@ -57,6 +57,15 @@
 
 ### Fixed
 
+* **Hook test-suite warning cleanup (no suppression)**
+  * Stabilized async fetch behavior in hooks by removing deferred timer-based initial fetches in `useBuilds`, `useGroupData`, and hardening session/cleanup flow in `usePermissions`
+  * Fixed multiple hook test mock-chain mismatches that produced runtime warnings like `...is not a function` (Supabase fluent query mocks now match actual query shape in targeted tests)
+  * Updated async hook tests to properly await lifecycle updates or wrap hook-mutating calls in `act(...)`, eliminating `not wrapped in act(...)` warnings in affected suites
+
+* **Character lookup profession typing**
+  * Fixed `member_professions` transformation in `character-lookup` by narrowing unknown rows to valid `MemberProfession` objects before assigning to `CharacterWithProfessions.professions`
+  * Resolves `Type 'unknown[]' is not assignable to type 'MemberProfession[]'` at the character transformation step
+
 * **Subscriber ships auto-sync reliability**
   * Fixed Star Citizen subscriber tier change handling to compare against the pre-update tier value, ensuring add/remove sync logic runs correctly
   * Added a scheduled background sync endpoint (`/api/sync/subscriber-ships`) to apply current-month subscriber ships for all subscriber characters automatically

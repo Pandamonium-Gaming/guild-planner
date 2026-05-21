@@ -36,6 +36,11 @@ describe('usePermissions Hook', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    global.fetch = jest.fn();
+
+    jest.mocked(supabase).auth.getSession = jest.fn().mockResolvedValue({
+      data: { session: null },
+    });
 
     // Default mocks
     (useAuth as jest.Mock).mockReturnValue({
@@ -201,7 +206,11 @@ describe('usePermissions Hook', () => {
 
       // Wait for API call and state update
       await waitFor(() => {
-        expect(result.current.loading).toBe(false);
+        expect(global.fetch).toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(result.current.rolePermissions).not.toBeNull();
       });
 
       // After fetch, should use custom override
@@ -224,6 +233,10 @@ describe('usePermissions Hook', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
       const { result } = renderHook(() => usePermissions('group-123'));
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalled();
+      });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -251,7 +264,7 @@ describe('usePermissions Hook', () => {
       const { result } = renderHook(() => usePermissions('group-123'));
 
       await waitFor(() => {
-        expect(result.current.loading).toBe(false);
+        expect(mockGetSession).toHaveBeenCalled();
       });
 
       // Should not call API
