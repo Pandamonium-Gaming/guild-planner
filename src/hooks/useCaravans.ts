@@ -51,7 +51,7 @@ interface UseCaravansReturn {
 
 export function useCaravans(groupId: string | null): UseCaravansReturn {
   const [caravans, setCaravans] = useState<CaravanEventWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => groupId !== null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -98,7 +98,11 @@ export function useCaravans(groupId: string | null): UseCaravansReturn {
   }, [groupId]);
 
   useEffect(() => {
-    void fetchData();
+    const timerId = setTimeout(() => {
+      void fetchData();
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [fetchData]);
 
   const now = new Date();

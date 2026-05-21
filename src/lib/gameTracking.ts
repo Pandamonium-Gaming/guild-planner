@@ -15,6 +15,27 @@ interface UserGroupForGame {
   group_icon_url: string | null;
 }
 
+interface GroupMemberWithGroupRelation {
+  role: string;
+  is_creator: boolean;
+  clans:
+    | {
+        id: string;
+        slug: string;
+        name: string;
+        game: GameId;
+        group_icon_url: string | null;
+      }
+    | {
+        id: string;
+        slug: string;
+        name: string;
+        game: GameId;
+        group_icon_url: string | null;
+      }[]
+    | null;
+}
+
 /**
  * Track which games a user participates in
  */
@@ -83,26 +104,23 @@ export async function getUserGroupsForGame(
     return [];
   }
 
-  return (
-    data?.map((row: {
-      role: string;
-      is_creator: boolean;
-      clans: {
-        id: string;
-        slug: string;
-        name: string;
-        game: GameId;
-        group_icon_url: string | null;
+  const rows = (data || []) as GroupMemberWithGroupRelation[];
+
+  return rows
+    .map((row) => {
+      const clan = Array.isArray(row.clans) ? row.clans[0] : row.clans;
+      if (!clan) return null;
+
+      return {
+        id: clan.id,
+        slug: clan.slug,
+        name: clan.name,
+        game: clan.game,
+        role: row.role,
+        isCreator: row.is_creator,
+        group_icon_url: clan.group_icon_url,
       };
-    }) => ({
-      id: row.clans.id,
-      slug: row.clans.slug,
-      name: row.clans.name,
-      game: row.clans.game,
-      role: row.role,
-      isCreator: row.is_creator,
-      group_icon_url: row.clans.group_icon_url,
-    })) || []
-  );
+    })
+    .filter((group): group is UserGroupForGame => group !== null);
 }
 
