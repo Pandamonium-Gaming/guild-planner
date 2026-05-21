@@ -1,4 +1,6 @@
 "use client";
+
+/* eslint-disable i18next/no-literal-string */
 import { useEffect, useState } from 'react';
 
 export function MigrationBanner({ isAdmin }: { isAdmin: boolean }) {

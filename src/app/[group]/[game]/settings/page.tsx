@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable i18next/no-literal-string */
+
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';

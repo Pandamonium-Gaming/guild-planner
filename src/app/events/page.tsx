@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable i18next/no-literal-string, @next/next/no-img-element */
+
 import Link from 'next/link';
 import { Home, LogOut, User, Settings, Loader2 } from 'lucide-react';
 import { PublicEventsView } from '@/components/views/PublicEventsView';

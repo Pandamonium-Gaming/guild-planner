@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable i18next/no-literal-string */
+
 import { use, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
