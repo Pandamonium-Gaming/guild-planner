@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Sword, Hammer, Pickaxe, LogOut, User, Shield, Users, Settings, Loader2, Globe } from 'lucide-react';
+import { Sword, LogOut, User, Shield, Users, Settings, Loader2, Globe } from 'lucide-react';
 import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { InlineFooter } from '@/components/layout/Footer';
@@ -13,9 +12,7 @@ import { supabase } from '@/lib/supabase';
 import { LandingHero } from '@/components/landing/LandingHero';
 import { LandingClanForm } from '@/components/forms/LandingClanForm';
 import { LandingFeatureHighlights } from '@/components/landing/LandingFeatureHighlights';
-import { GameSelector } from '@/components/common/GameSelector';
 import { GameSwitcher } from '@/components/common/GameSwitcher';
-import { useGame } from '@/contexts/GameContext';
 
 interface UserClan {
   id: string;
@@ -41,10 +38,8 @@ export default function Home() {
   const [clansLoading, setClansLoading] = useState(false);
   const [publicGroups, setPublicGroups] = useState<PublicGroup[]>([]);
   const [publicGroupsLoading, setPublicGroupsLoading] = useState(false);
-  const router = useRouter();
   const { user, profile, loading, signIn, signOut } = useAuthContext();
   const { t, isLoading } = useLanguage();
-  const { selectedGame } = useGame();
 
   // Fetch user's clans when logged in
   useEffect(() => {
@@ -105,18 +100,6 @@ export default function Home() {
       isMounted = false;
     };
   }, []);
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (groupName.trim()) {
-      const slug = groupName
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      router.push(`/${slug}`);
-    }
-  };
 
   const displayName = profile?.display_name || profile?.discord_username || 'User';
 
@@ -310,24 +293,6 @@ export default function Home() {
       <div className="shrink-0">
         <InlineFooter />
       </div>
-    </div>
-  );
-}
-
-function FeatureCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-lg p-6 text-center">
-      <div className="flex justify-center mb-3">{icon}</div>
-      <h3 className="font-semibold text-white mb-2">{title}</h3>
-      <p className="text-slate-400 text-sm">{description}</p>
     </div>
   );
 }

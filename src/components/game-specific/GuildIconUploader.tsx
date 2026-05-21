@@ -28,7 +28,6 @@ export function GuildIconUploader({ groupId, currentUrl, onUploaded }: GuildIcon
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previewUrl]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

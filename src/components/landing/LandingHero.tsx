@@ -1,8 +1,6 @@
 import { Users, Zap, Gamepad2, Sparkles, Globe, Shield } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 export function LandingHero() {
-  const { t } = useLanguage();
   return (
     <div className="relative text-center max-w-5xl mx-auto px-4 py-8">
       {/* Background effects */}

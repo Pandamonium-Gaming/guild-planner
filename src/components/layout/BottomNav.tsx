@@ -1,10 +1,8 @@
 "use client";
 import Link from 'next/link';
-import { usePermissions } from '@/hooks/usePermissions';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { Users, Calendar, Grid3X3, Settings, Warehouse, MoreHorizontal, Sword, Trophy, BookOpen, Handshake, Hammer, TrendingUp, Ship, ChevronUp } from 'lucide-react';
+import { Users, Calendar, Grid3X3, Settings, Sword, Trophy, Handshake, Hammer, TrendingUp, Ship } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 import { Tab, GAME_TAB_EXCLUSIONS } from '@/components/common/tabs';

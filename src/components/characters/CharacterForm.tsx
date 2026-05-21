@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Sword, Star, Ship, Truck, RefreshCw } from 'lucide-react';
+import { X, Sword, Star, RefreshCw } from 'lucide-react';
 import { Race, Archetype } from '@/lib/types';
 import { 
   RACES, 
@@ -16,8 +16,7 @@ import {
 import { ROR_FACTIONS, ROR_CLASSES, ROR_ROLE_CONFIG, getClassesByFaction, RORRole } from '@/games/returnofreckooning/config';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGameConfig } from '@/config';
-import ShipSelector from '@/components/game-specific/ShipSelector';
-import { SUBSCRIBER_TIERS, SUBSCRIBER_COLORS, getCurrentMonthKey, getSubscriberShips } from '@/games/starcitizen/config/subscriber-ships';
+import { SUBSCRIBER_TIERS, SUBSCRIBER_COLORS, getCurrentMonthKey } from '@/games/starcitizen/config/subscriber-ships';
 import { syncSubscriberShips } from '@/lib/subscriberShips';
 import { supabase } from '@/lib/supabase';
 import { CenturionSVG, ImperatorSVG } from '@/components/game-specific/SubscriberIcons';
@@ -84,8 +83,6 @@ export function CharacterForm({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showShipsSection, setShowShipsSection] = useState(false);
-  const [showVehiclesSection, setShowVehiclesSection] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
   const { t } = useLanguage();

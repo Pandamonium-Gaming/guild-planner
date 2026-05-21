@@ -28,7 +28,6 @@ export default function SettingsPage() {
   const [_guildIconUrl, _setGuildIconUrl] = useState(group?.group_icon_url || '');
   const prevIconUrlRef = useRef<string | undefined>(group?.group_icon_url);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const newUrl = group?.group_icon_url || '';
     if (prevIconUrlRef.current !== newUrl) {

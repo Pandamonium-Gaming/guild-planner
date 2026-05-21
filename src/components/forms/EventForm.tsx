@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Calendar } from 'lucide-react';
-import { Event, EventType, EventRole, EVENT_TYPES, EVENT_ROLES, utcToLocal, getEventTypesForGame } from '@/lib/events';
+import { Event, EventType, EventRole, EVENT_ROLES, utcToLocal, getEventTypesForGame } from '@/lib/events';
 
 interface EventFormData {
   title: string;

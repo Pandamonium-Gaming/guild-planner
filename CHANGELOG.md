@@ -79,6 +79,7 @@
   * Fixed additional declaration-order lint blockers in public and fleet views (`FleetView`, `PublicClanEventsView`, `PublicEventsView`) and removed their `Cannot access variable before it is declared` errors
   * Fixed a batch of `react-hooks/set-state-in-effect` lint blockers across settings and fleet components by deferring effect-triggered state hydration/fetch calls (`SettingsPage`, `BankTransactionForm`, `GuildIconUploader`, `ClanSettings`, `GameManagement`, `PermissionsSettings`, `RecruitmentSettings`, `ShipsView`)
   * Fixed remaining `react-hooks/set-state-in-effect` lint blockers across hooks by deferring effect-triggered resets and initial fetches (`useAchievements`, `useActivity`, `useAlliances`, `useBuilds`, `useCaravans`, `useEvents`, `useFreeholds`, `useGroupData`, `useGroupMembership`, `useGuildBank`, `useLootSystem`, `useNodeCitizenships`, `useSiegeEvents`)
+  * Reduced warning noise with a low-risk cleanup pass: removed unused imports/variables, removed stale eslint-disable comments, tightened event typing in forms, and excluded generated `coverage/**` assets from linting
 
 * Resolved 11 ESLint/TypeScript warnings across 4 files
   * **permissions/route.ts**: Replaced `(upsertError as any)` casting with proper `PostgrestErrorWithDetails` interface

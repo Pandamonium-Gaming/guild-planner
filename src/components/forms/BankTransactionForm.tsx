@@ -100,7 +100,6 @@ export function BankTransactionForm({
 
   const isDeposit = transactionType === 'deposit';
   const Icon = isDeposit ? TrendingUp : TrendingDown;
-  const colorClass = isDeposit ? 'text-green-400' : 'text-red-400';
   const bgClass = isDeposit ? 'bg-green-500' : 'bg-red-500';
 
   return (
