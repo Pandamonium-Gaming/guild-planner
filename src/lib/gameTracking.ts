@@ -1,6 +1,20 @@
 import { supabase } from '@/lib/supabase';
 import { GameId } from '@/lib/games';
 
+interface UserGameRow {
+  game: GameId;
+}
+
+interface UserGroupForGame {
+  id: string;
+  slug: string;
+  name: string;
+  game: GameId;
+  role: string;
+  isCreator: boolean;
+  group_icon_url: string | null;
+}
+
 /**
  * Track which games a user participates in
  */
@@ -35,7 +49,7 @@ export async function getUserGames(userId: string): Promise<GameId[]> {
     return [];
   }
 
-  return (data?.map((row: any) => row.game) || []) as GameId[];
+  return (data?.map((row: UserGameRow) => row.game) || []) as GameId[];
 }
 
 /**
@@ -44,7 +58,7 @@ export async function getUserGames(userId: string): Promise<GameId[]> {
 export async function getUserGroupsForGame(
   userId: string,
   gameId: GameId
-): Promise<any[]> {
+): Promise<UserGroupForGame[]> {
   const { data, error } = await supabase
     .from('group_members')
     .select(
@@ -70,7 +84,17 @@ export async function getUserGroupsForGame(
   }
 
   return (
-    data?.map((row: any) => ({
+    data?.map((row: {
+      role: string;
+      is_creator: boolean;
+      clans: {
+        id: string;
+        slug: string;
+        name: string;
+        game: GameId;
+        group_icon_url: string | null;
+      };
+    }) => ({
       id: row.clans.id,
       slug: row.clans.slug,
       name: row.clans.name,

@@ -7,6 +7,11 @@ import { getClassById, ROR_CLASSES, ROR_ROLE_CONFIG } from '@/games/returnofreck
 import { getGameConfig } from '@/config';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+interface GameRoleOption {
+  id: string;
+  name: string;
+}
+
 export interface CharacterFilters {
   search: string;
   race: RaceId | '';
@@ -60,7 +65,7 @@ export function CharacterFiltersBar({
   
   // Get game-specific roles
   const gameConfig = getGameConfig(gameSlug);
-  const gameRoles = (gameConfig as any)?.roles || [];
+  const gameRoles = ((gameConfig as { roles?: GameRoleOption[] }).roles || []);
   
   const hasActiveFilters = 
     filters.search !== '' || 
@@ -223,7 +228,7 @@ export function CharacterFiltersBar({
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
                 <option value="">All Roles</option>
-                {gameRoles.map((role: any) => (
+                {gameRoles.map((role) => (
                   <option key={role.id} value={role.id}>{role.name}</option>
                 ))}
               </select>

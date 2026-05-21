@@ -226,7 +226,11 @@ export async function getCurrentUserMainCharacter(
 /**
  * Transform character data to include professions
  */
-function transformCharacter(char: any): CharacterWithProfessions {
+type CharacterLookupRow = CharacterWithProfessions & {
+  member_professions?: unknown[];
+};
+
+function transformCharacter(char: CharacterLookupRow): CharacterWithProfessions {
   return {
     ...char,
     race: char.race || null,

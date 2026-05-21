@@ -81,6 +81,7 @@
   * Fixed remaining `react-hooks/set-state-in-effect` lint blockers across hooks by deferring effect-triggered resets and initial fetches (`useAchievements`, `useActivity`, `useAlliances`, `useBuilds`, `useCaravans`, `useEvents`, `useFreeholds`, `useGroupData`, `useGroupMembership`, `useGuildBank`, `useLootSystem`, `useNodeCitizenships`, `useSiegeEvents`)
   * Reduced warning noise with a low-risk cleanup pass: removed unused imports/variables, removed stale eslint-disable comments, tightened event typing in forms, and excluded generated `coverage/**` assets from linting
   * Reduced additional warning noise by scoping intentional static-copy exceptions to a handful of text-heavy UI pages/components (`GroupSettingsPage`, game settings, public events page, footer, game selector, migration banner)
+  * Reduced type-warning noise by replacing several local `any` usages with concrete types in character filters, game switching, error handling, game tracking, and character lookup helpers
 
 * Resolved 11 ESLint/TypeScript warnings across 4 files
   * **permissions/route.ts**: Replaced `(upsertError as any)` casting with proper `PostgrestErrorWithDetails` interface
