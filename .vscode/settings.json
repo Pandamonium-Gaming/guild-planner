@@ -50,7 +50,12 @@
         ".\\scripts\\backup-prod-database.ps1": true,
         "gh": true,
         "Get-AzKeyVaultSecret": true,
-        "ConvertFrom-SecureString": true
+        "ConvertFrom-SecureString": true,
+        "Tests:": true,
+        "Snapshots:": true,
+        "Time:": true,
+        "Jest:": true,
+        "PASS": true
     },
     "codeQL.githubDatabase.download": "never"
 }

@@ -1,7 +1,5 @@
 'use client';
 
-/* eslint-disable i18next/no-literal-string */
-
 // Build information for debugging/version tracking
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || '0.0.0';
 const BUILD_TIMESTAMP = process.env.NEXT_PUBLIC_BUILD_TIMESTAMP || new Date().toISOString();

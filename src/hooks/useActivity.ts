@@ -64,11 +64,7 @@ export function useActivity(groupId: string | null): UseActivityReturn {
   }, [groupId]);
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      void fetchData();
-    }, 0);
-
-    return () => clearTimeout(timerId);
+    void fetchData();
   }, [fetchData]);
 
   const inactiveMemberCount = activitySummaries.filter((s) => s.is_inactive).length;

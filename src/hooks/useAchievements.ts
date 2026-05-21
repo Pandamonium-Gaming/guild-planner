@@ -92,11 +92,7 @@ export function useAchievements(groupId: string | null): UseAchievementsReturn {
   }, [groupId]);
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      void fetchData();
-    }, 0);
-
-    return () => clearTimeout(timerId);
+    void fetchData();
   }, [fetchData]);
 
   const unlockedCount = achievements.filter((a) => a.is_unlocked).length;

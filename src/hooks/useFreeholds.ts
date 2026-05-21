@@ -87,11 +87,7 @@ export function useFreeholds(groupId: string | null): UseFreeholdsReturn {
   }, [groupId]);
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      void fetchData();
-    }, 0);
-
-    return () => clearTimeout(timerId);
+    void fetchData();
   }, [fetchData]);
 
   const myFreehold = freeholds.find((f) => {

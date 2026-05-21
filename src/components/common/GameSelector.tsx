@@ -1,5 +1,4 @@
 'use client';
-/* eslint-disable i18next/no-literal-string */
 
 import React, { useState } from 'react';
 import { getAllGames, GameConfig, GameId } from '@/lib/games';

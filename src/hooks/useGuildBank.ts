@@ -172,11 +172,7 @@ export function useGuildBank(groupId: string | null): UseGuildBankReturn {
   }, [groupId]);
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      void fetchData();
-    }, 0);
-
-    return () => clearTimeout(timerId);
+    void fetchData();
   }, [fetchData]);
 
   // Initialize bank for clan
