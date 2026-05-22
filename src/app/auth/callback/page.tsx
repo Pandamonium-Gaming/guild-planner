@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { getClientAuthStack } from '@/lib/authStack';
 import { syncDiscordIdToMembers } from '@/lib/auth';
 import { Loader2 } from 'lucide-react';
 
@@ -11,6 +12,14 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleCallback = async () => {
+      const authStack = getClientAuthStack();
+
+      // PR-01 scaffold: v2 callback flow will be implemented in PR-02.
+      // Keep current behavior unchanged during seam introduction.
+      if (authStack === 'v2') {
+        // TODO(PR-02): handle Auth.js callback flow.
+      }
+
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {

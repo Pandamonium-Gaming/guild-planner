@@ -7,7 +7,7 @@
  * ⚠️  IMPORTANT: After updating this file, the app must be rebuilt/redeployed to reflect changes.
  * The config is cached at build time. Simply pushing changes won't update the running app.
  * 
- * For local development: `npm run dev` (Next.js watch mode auto-rebuilds)
+ * For local development: `yarn dev` (Next.js watch mode auto-rebuilds)
  * For production: Deployment/rebuild required (see CI/CD pipeline)
  * 
  * Tiers:

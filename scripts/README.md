@@ -11,7 +11,7 @@ This directory contains utility scripts for the Group Planner project.
 **Usage:**
 
 ```bash
-npm run check:translations
+yarn check:translations
 ```
 
 **What it checks:**
@@ -24,7 +24,7 @@ npm run check:translations
 
 * Automatically in CI pipeline (GitHub Actions)
 * Automatically on Git commit (via Husky pre-commit hook)
-* Manually via `npm run check:translations`
+* Manually via `yarn check:translations`
 
 **Output:**
 
@@ -40,7 +40,7 @@ npm run check:translations
 **Usage:**
 
 ```bash
-npm run check:changelog
+yarn check:changelog
 ```
 
 **What it checks:**
@@ -54,7 +54,7 @@ npm run check:changelog
 
 * Automatically in CI pipeline (GitHub Actions)
 * Automatically on Git commit (via Husky pre-commit hook)
-* Manually via `npm run check:changelog`
+* Manually via `yarn check:changelog`
 
 **Output:**
 
@@ -78,14 +78,14 @@ npm run check:changelog
 **Usage:**
 
 ```bash
-npm run version:patch  # 0.1.0 → 0.1.1
-npm run version:minor  # 0.1.0 → 0.2.0
-npm run version:major  # 0.1.0 → 1.0.0
+yarn version:patch  # 0.1.0 → 0.1.1
+yarn version:minor  # 0.1.0 → 0.2.0
+yarn version:major  # 0.1.0 → 1.0.0
 
 # With auto-commit and tag:
-npm run version:patch -- --commit
-npm run version:minor -- --commit
-npm run version:major -- --commit
+yarn version:patch -- --commit
+yarn version:minor -- --commit
+yarn version:major -- --commit
 ```
 
 **What it does:**
@@ -98,13 +98,13 @@ npm run version:major -- --commit
 **Workflow (simplified with --commit):**
 
 1. Make changes and update CHANGELOG.md under `[Unreleased]`
-2. When ready to release: `npm run version:patch -- --commit`
+2. When ready to release: `yarn version:patch -- --commit`
 3. Push: `git push && git push --tags`
 
 **Workflow (manual):**
 
 1. Make changes and update CHANGELOG.md under `[Unreleased]`
-2. Run: `npm run version:patch` (or minor/major)
+2. Run: `yarn version:patch` (or minor/major)
 3. Review the changes to package.json and CHANGELOG.md
 4. Commit: `git add package.json CHANGELOG.md`
 5. Commit: `git commit -m "chore: bump version to X.Y.Z"`
@@ -168,8 +168,8 @@ Rules are defined in `.copilot-rules.json` and include:
 This script ensures consistency across different development machines (Windows, macOS, Linux). If you see violations:
 
 1. **Unix command on Windows**: Use PowerShell equivalents (`Select-Object`, `Select-String`, etc.)
-2. **CHANGELOG not updated**: Add entries under `## [Unreleased]` or use `npm run version:patch`
-3. **Translations out of sync**: Run `npm run check:translations` to see mismatches
+2. **CHANGELOG not updated**: Add entries under `## [Unreleased]` or use `yarn version:patch`
+3. **Translations out of sync**: Run `yarn check:translations` to see mismatches
 
 ***
 
@@ -188,7 +188,7 @@ This script ensures consistency across different development machines (Windows, 
 **Usage:**
 
 ```bash
-npm run update-ships
+yarn update-ships
 ```
 
 ### `fetch-loaner-matrix.ts`
@@ -199,10 +199,10 @@ npm run update-ships
 
 ```bash
 # Apply to database
-npm run update-loaners
+yarn update-loaners
 
 # Preview only (no DB writes)
-npm run update-loaners:preview
+yarn update-loaners:preview
 ```
 
 **What it does:**

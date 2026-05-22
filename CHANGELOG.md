@@ -46,6 +46,23 @@
 
 ### Changed
 
+* **Phase 1 PR-01 auth seam scaffolding (non-breaking)**
+  * Added `AUTH_STACK`/`NEXT_PUBLIC_AUTH_STACK` migration flags in `.env.example` (default `v1`)
+  * Added runtime auth-stack selector helpers in `src/lib/authStack.ts`
+  * Added server seam scaffolding modules for upcoming migration slices:
+    * `src/server/auth/session-service.ts`
+    * `src/server/users/user-profile-repository.ts`
+    * `src/server/permissions/group-permissions-service.ts`
+  * Added no-op `v2` feature-flag branches in `useAuth` and auth callback while preserving current `v1` behaviour
+  * Updated migration trackers: marked PR-01 complete in `docs/PHASE1_CHECKLIST.md` and advanced next actions in `docs/SUPABASE_EXIT_PLAN.md`
+
+* **Package manager standardization on Yarn**
+  * Added/confirmed Yarn package manager metadata in `package.json`
+  * Added `.npmrc` with `package-lock=false` to prevent npm lockfile churn
+  * Removed `package-lock.json` and standardized lockfile source on `yarn.lock`
+  * Updated key contributor docs to use Yarn commands in `README.md` and `.github/copilot-instructions.md`
+  * Converted remaining `npx` command examples and operational scripts to Yarn invocations (Supabase CLI, Husky checks, and CI snippets)
+
 * **Brand naming consistency**
   * Updated remaining product name references from "Guild Planner" to "Group Planner" across metadata, Discord webhook text, service worker branding, and project documentation headers
 

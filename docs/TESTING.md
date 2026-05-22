@@ -6,13 +6,13 @@ This project uses **Jest** and **React Testing Library** for unit and component 
 
 ```powershell
 # Run all tests
-npm test
+yarn test
 
 # Run tests in watch mode (auto-reruns on file changes)
-npm run test:watch
+yarn test:watch
 
 # Run tests with coverage report
-npm run test:coverage
+yarn test:coverage
 ```
 
 ## Test Structure
@@ -116,7 +116,7 @@ Current coverage thresholds (set in `jest.config.ts`):
 View coverage report:
 
 ```powershell
-npm run test:coverage
+yarn test:coverage
 ```
 
 This generates a detailed report in `coverage/lcov-report/index.html`.
@@ -210,9 +210,9 @@ As the codebase grows, consider adding:
 Before committing:
 
 ```powershell
-npm run lint       # Check code style
-npm test           # Run all tests
-npm run build      # Ensure build succeeds
+yarn lint       # Check code style
+yarn test           # Run all tests
+yarn build      # Ensure build succeeds
 ```
 
 Consider setting up GitHub Actions to run tests automatically on PRs.

@@ -224,8 +224,8 @@ No component changes needed when adding a new game!
 
 ## Testing the Implementation
 
-1. Run the migration: `npx supabase db push`
-2. Start dev server: `npm run dev`
+1. Run the migration: `yarn supabase db push`
+2. Start dev server: `yarn dev`
 3. Login with Discord
 4. You should see the GameSelector
 5. Choose a game and verify:

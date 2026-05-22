@@ -103,7 +103,7 @@ ALTER TABLE clans ADD CONSTRAINT valid_game
 #### 6. Apply Migration
 
 ```bash
-npx supabase db push
+yarn supabase db push
 ```
 
 ### Using Game-Specific Data

@@ -154,8 +154,9 @@ Status key: `[ ]` not started, `[~]` in progress, `[x]` complete.
 * `[x]` Choose auth/session strategy (Auth.js DB sessions vs JWT) - ADR-001 accepted.
 * `[x]` Choose ORM/migration tool (Prisma vs Drizzle) - ADR-002 accepted.
 * `[x]` Define identity and authorization contract.
-* `[~]` Define first migration slice (recommended: auth + permissions read path).
-* `[ ]` Define rollback strategy and go/no-go criteria.
+* `[x]` Define first migration slice (auth + permissions read path).
+* `[x]` Define rollback strategy and go/no-go criteria.
+* `[x]` Create dated Phase 1 checklist with PR sequence (`docs/PHASE1_CHECKLIST.md`).
 
 ## Phase 0 Decision Matrix
 
@@ -228,8 +229,80 @@ Option B: Drizzle
 
 Reason: this validates identity + authorization early and unlocks downstream domain migration safely.
 
+### First Slice Definition (Locked)
+
+Scope boundaries:
+
+* In scope:
+  * Discord login callback and app-owned session issuance.
+  * Current authenticated user profile read.
+  * Group permission read for current user in active group.
+* Out of scope:
+  * Writes to recruitment/events/builds domains.
+  * Bulk data migration and dual-write.
+  * Storage/bucket migration.
+
+Proposed endpoints and handlers:
+
+* `GET /api/auth/session`
+  * Returns normalized session payload (`user.id`, `user.discordId`, display fields).
+* `GET /api/me/profile`
+  * Returns app profile record for authenticated user.
+* `GET /api/groups/:groupId/permissions`
+  * Returns resolved role + effective permissions for authenticated user in group.
+
+Service/repository modules to introduce:
+
+* `src/server/auth/session-service.ts`
+* `src/server/users/user-profile-repository.ts`
+* `src/server/permissions/group-permissions-service.ts`
+
+Consumer cutover targets (first slice):
+
+* `useAuth` and auth callback flow.
+* Existing permissions read path used by settings/admin gating.
+* Current-user profile reads in app shell and settings surfaces.
+
+Effort sizing (engineering days):
+
+* Auth.js bootstrap + Discord provider wiring: 1.0-1.5 days.
+* Session and profile endpoint implementation: 1.0 day.
+* Group permissions endpoint + role resolution parity tests: 1.0-1.5 days.
+* Hook/client integration and cleanup for slice: 1.0 day.
+* Total estimated first-slice effort: 4.0-5.0 days.
+
+Test plan and parity checks:
+
+* Unit:
+  * Session normalization and identity mapping.
+  * Permission resolution for each role (`admin|officer|member|trial|pending`).
+* Integration:
+  * Authenticated and unauthenticated access for all three endpoints.
+  * Group mismatch and non-member scenarios return expected status.
+* Regression/parity:
+  * Compare outputs against current Supabase-backed path for a fixed fixture dataset.
+
+Go/no-go criteria for slice cutover:
+
+* Go:
+  * All new endpoint tests pass.
+  * Existing `yarn lint` and `yarn test --runInBand` pass.
+  * Role/permission parity matches baseline fixtures in all supported roles.
+  * No increase in auth-related error rate during staged rollout window.
+* No-go:
+  * Any role mismatch causing privilege escalation or unexpected denial.
+  * Session invalidation/revocation does not take effect immediately.
+  * Repeated 401/403 spikes after enabling slice path.
+
+Rollback strategy for first slice:
+
+* Keep a runtime feature flag (example: `AUTH_STACK=v1|v2`) for endpoint/router selection.
+* On failure, switch reads back to Supabase-backed auth/permission path.
+* Preserve new tables/sessions for diagnostics; do not run destructive rollback migrations during incident response.
+* Require post-rollback incident note with failed criteria and remediation tasks before reattempt.
+
 ## Next Actions
 
-1. Confirm defaults (auth/session + ORM).
-2. Create ADR(s) and Phase 1 task list.
-3. Scaffold Compose and auth skeleton in a non-breaking branch.
+1. Execute PR-02 from `docs/PHASE1_CHECKLIST.md` (Auth.js Discord bootstrap).
+2. Implement `GET /api/auth/session` normalized response behind `AUTH_STACK=v2`.
+3. Add fixture-based parity tests for permission resolution before enabling cutover.

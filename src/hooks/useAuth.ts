@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { getClientAuthStack } from '@/lib/authStack';
 import { 
   UserProfile, 
   getUserProfile, 
@@ -47,6 +48,14 @@ export function useAuth(): UseAuthReturn {
   }, []);
 
   useEffect(() => {
+    const authStack = getClientAuthStack();
+
+    // PR-01 scaffold: v2 path is feature-flagged but not implemented yet.
+    // Keep behavior unchanged by continuing to use v1 logic.
+    if (authStack === 'v2') {
+      // TODO(PR-02): replace with app-owned session endpoint.
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);

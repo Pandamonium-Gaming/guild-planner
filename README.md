@@ -33,28 +33,28 @@ A comprehensive group management and planning tool supporting multiple MMOs.
 
 2. Copy `.env.example` to `.env.local` and add your Supabase credentials
 
-3. Run `npm install`
+3. Run `yarn install`
 
 4. Apply database migrations:
 
    ```bash
    # Login to Supabase
-   npx supabase login
+   yarn supabase login
 
    # Link to your Supabase project (migrations are in supabase/migrations/)
-   npx supabase link --project-ref your-project-ref
+   yarn supabase link --project-ref your-project-ref
 
    # Apply all migrations to remote database
-   npx supabase db push
+   yarn supabase db push
    ```
 
    If required at any point you can reset the database with:
 
    ```bash
-   npx supabase db reset --linked`
+   yarn supabase db reset --linked
    ```
 
-5. Run `npm run dev`
+5. Run `yarn dev`
 
 6. Open `http://localhost:3000`
 
@@ -109,13 +109,13 @@ We use **Jest** and **React Testing Library** for comprehensive test coverage.
 
 ```bash
 # Run all tests
-npm test
+yarn test
 
 # Run tests in watch mode (auto-rerun on changes)
-npm run test:watch
+yarn test:watch
 
 # Generate coverage report
-npm run test:coverage
+yarn test:coverage
 ```
 
 **Documentation**:

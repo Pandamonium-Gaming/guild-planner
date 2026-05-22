@@ -30,7 +30,7 @@
    * Latest migration (per-game Discord, role requirements, etc.)
 4. Click **Run** for each migration
 
-**Tip**: Use `npx supabase db push` locally to apply all pending migrations automatically.
+**Tip**: Use `yarn supabase db push` locally to apply all pending migrations automatically.
 
 ### Get API Keys
 

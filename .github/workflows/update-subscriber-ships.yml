@@ -24,16 +24,16 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --immutable
 
       - name: Fetch subscriber ships
         id: fetch
         continue-on-error: true
         run: |
-          npx tsx scripts/fetch-subscriber-ships.ts > /tmp/fetch-output.txt 2>&1
+          yarn tsx scripts/fetch-subscriber-ships.ts > /tmp/fetch-output.txt 2>&1
           RESULT=$?
           cat /tmp/fetch-output.txt
           echo "exitcode=$RESULT" >> $GITHUB_OUTPUT

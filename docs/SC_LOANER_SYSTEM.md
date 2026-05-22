@@ -53,7 +53,7 @@ The loaner matrix changes when RSI updates ships or releases new content.
 
 ### Routine Data Refresh (No Migration)
 
-Run `npm run update-loaners` to:
+Run `yarn update-loaners` to:
 
 1. Scrape latest data from RSI support page
 2. Generate SQL snapshot in `scripts/generated/refresh_sc_loaner_matrix.sql`
@@ -63,7 +63,7 @@ Run `npm run update-loaners` to:
 Preview only (no DB writes):
 
 ```bash
-npm run update-loaners:preview
+yarn update-loaners:preview
 ```
 
 ## Usage Example
