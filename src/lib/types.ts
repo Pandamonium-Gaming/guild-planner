@@ -72,6 +72,12 @@ export interface Clan {
   aoc_public_description?: string | null;
   sc_public_description?: string | null;
   ror_public_description?: string | null;
+  aoc_ranks_enabled?: boolean;
+  sc_ranks_enabled?: boolean;
+  ror_ranks_enabled?: boolean;
+  aoc_custom_ranks?: Array<{ id: string; name: string; hierarchy: number }>;
+  sc_custom_ranks?: Array<{ id: string; name: string; hierarchy: number }>;
+  ror_custom_ranks?: Array<{ id: string; name: string; hierarchy: number }>;
 }
 
 // Race and Archetype types (match database ENUMs)

@@ -1,4 +1,4 @@
-import { CharacterWithProfessions } from '@/lib/types';
+import { CharacterWithProfessions, Clan } from '@/lib/types';
 import { CharacterForm, type CharacterFormData } from '@/components/characters/CharacterForm';
 import React from 'react';
 
@@ -7,9 +7,10 @@ interface CharacterEditModalProps {
   onSubmit: (id: string, data: CharacterFormData) => Promise<void>;
   onCancel: () => void;
   gameSlug?: string;
+  group?: Clan | null;
 }
 
-export function CharacterEditModal({ editingCharacter, onSubmit, onCancel, gameSlug = 'aoc' }: CharacterEditModalProps) {
+export function CharacterEditModal({ editingCharacter, onSubmit, onCancel, gameSlug = 'aoc', group = null }: CharacterEditModalProps) {
   if (!editingCharacter) return null;
   return (
     <CharacterForm
@@ -35,6 +36,7 @@ export function CharacterEditModal({ editingCharacter, onSubmit, onCancel, gameS
       isEditing
       gameSlug={gameSlug}
       characterId={editingCharacter.id}
+      group={group}
     />
   );
 }

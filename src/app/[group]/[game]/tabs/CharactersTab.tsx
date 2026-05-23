@@ -8,11 +8,12 @@ import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useArchiveStatus } from '@/contexts/ArchiveStatusContext';
 import { GroupRole } from '@/lib/permissions';
 import { canEditCharacter, canDeleteCharacter, canOfficerManageUser } from '@/lib/character-permissions';
-import { CharacterWithProfessions, RankLevel } from "@/lib/types";
+import { CharacterWithProfessions, RankLevel, Clan } from "@/lib/types";
 import { CharacterData } from '@/hooks/useGroupData';
 
 interface CharactersTabProps {
   groupId: string;
+  group: Clan;
   characters: CharacterWithProfessions[];
   addCharacter: (data: CharacterData) => Promise<void>;
   updateMember: (id: string, name: string) => Promise<void>;
@@ -26,6 +27,7 @@ interface CharactersTabProps {
 
 export function CharactersTab({
   groupId,
+  group,
   characters,
   addCharacter,
   updateMember,
@@ -99,6 +101,7 @@ export function CharactersTab({
       <AddCharacterButton 
         onAdd={addCharacter} 
         gameSlug={gameSlug}
+        group={group}
         disabled={isGameArchived}
         disabledReason="Cannot add characters to an archived game"
       />
@@ -138,6 +141,7 @@ export function CharactersTab({
               mainCharacterName={mainCharacter?.name}
               altCharacters={alts}
               gameSlug={gameSlug}
+              group={group}
             />
           );
         })

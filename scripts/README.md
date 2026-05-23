@@ -259,6 +259,51 @@ bun run scripts/fetch-subscriber-ships.ts
 * `cheerio` - HTML parsing
 * `node-fetch` - HTTP requests
 
+***
+
+### `preview-rank-normalization.sql`
+
+**Purpose:** Read-only preview for legacy rank value normalization into configured game rank IDs.
+
+**Usage:**
+
+```bash
+psql $env:DATABASE_URL -f scripts/preview-rank-normalization.sql
+```
+
+**What it reports:**
+
+* Potential updates for `members.rank` (game-scoped)
+* Potential updates for `group_members.guild_rank` (group-scoped)
+* Unresolved values requiring manual review
+
+**Deterministic matching rules:**
+
+* Exact rank ID match
+* Case-insensitive rank ID match
+* Case-insensitive rank name match
+* Slugified rank-name match
+
+Only unique best matches are considered resolvable.
+
+***
+
+### `apply-rank-normalization.sql`
+
+**Purpose:** Applies deterministic rank normalization updates after preview verification.
+
+**Usage:**
+
+```bash
+psql $env:DATABASE_URL -f scripts/apply-rank-normalization.sql
+```
+
+**Safety notes:**
+
+* Run `preview-rank-normalization.sql` first
+* Back up the target database before applying
+* Intended for one-time cleanup of legacy rank tokens
+
 For details: See `docs/STAR_CITIZEN_SUBSCRIBER_UPDATES.md`
 
 ***

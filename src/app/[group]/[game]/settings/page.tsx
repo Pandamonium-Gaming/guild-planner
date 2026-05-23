@@ -8,12 +8,14 @@ import { useGroupMembership } from '@/hooks/useGroupMembership';
 import { RankManagement } from '@/components/settings/RankManagement';
 import { ClanSettings } from '@/components/settings/ClanSettings';
 import { GameRecruitmentSettings } from '@/components/settings/GameRecruitmentSettings';
+import { GameRankSettings } from '@/components/settings/GameRankSettings';
 import { getGroupBySlug } from '@/lib/auth';
 import type { GroupRole } from '@/lib/permissions';
 import { ArrowLeft } from 'lucide-react';
+import { getConfiguredGameRanks, isGameRankEnabled } from '@/lib/gameRankSettings';
 
 export default function SettingsPage() {
-  const { group, groupSlug, gameSlug, userId, hasPermission, membership } = useGameLayoutContext();
+  const { group, groupSlug, gameSlug, userId, hasPermission, membership, refreshGroupData } = useGameLayoutContext();
   const { t } = useLanguage();
 
   // Settings page needs full membership management functions
@@ -46,8 +48,8 @@ export default function SettingsPage() {
     return null;
   }
 
-  // Determine if this game has member ranks (Star Citizen only currently)
-  const gameHasRanks = gameSlug === 'sc' || gameSlug === 'starcitizen';
+  const gameHasRanks = isGameRankEnabled(group, gameSlug);
+  const configuredRanks = getConfiguredGameRanks(group, gameSlug);
 
   return (
     <div className="space-y-6">
@@ -73,6 +75,19 @@ export default function SettingsPage() {
           currentUserId={userId}
           currentUserRole={(membership.role || 'member') as GroupRole}
           gameSlug={gameSlug}
+          ranks={configuredRanks}
+        />
+      )}
+
+      {/* Game-Specific Rank Settings */}
+      {canEditSettings && group && (
+        <GameRankSettings
+          groupId={group.id}
+          gameSlug={gameSlug}
+          group={group}
+          onSaved={() => {
+            void refreshGroupData();
+          }}
         />
       )}
 

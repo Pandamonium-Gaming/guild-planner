@@ -20,6 +20,8 @@ import { SUBSCRIBER_TIERS, SUBSCRIBER_COLORS, getCurrentMonthKey } from '@/games
 import { syncSubscriberShips } from '@/lib/subscriberShips';
 import { supabase } from '@/lib/supabase';
 import { CenturionSVG, ImperatorSVG } from '@/components/game-specific/SubscriberIcons';
+import { Clan } from '@/lib/types';
+import { getConfiguredGameRanks, isGameRankEnabled } from '@/lib/gameRankSettings';
 
 export interface CharacterFormData {
   name: string;
@@ -54,6 +56,7 @@ interface CharacterFormProps {
   isEditing?: boolean;
   gameSlug?: string;
   characterId?: string; // Character ID when editing (for re-sync ships)
+  group?: Clan | null;
 }
 
 export function CharacterForm({ 
@@ -62,7 +65,8 @@ export function CharacterForm({
   onCancel,
   isEditing = false,
   gameSlug = 'aoc',
-  characterId
+  characterId,
+  group = null,
 }: CharacterFormProps) {
   const [formData, setFormData] = useState<CharacterFormData>({
     name: initialData?.name || '',
@@ -92,7 +96,8 @@ export function CharacterForm({
   const isRoR = gameSlug === 'ror';
   const gameConfig = getGameConfig(gameSlug);
   const gameRoles = (gameConfig as any)?.roles || [];
-  const gameRanks = (gameConfig as any)?.ranks || [];
+  const gameRanks = getConfiguredGameRanks(group, gameSlug);
+  const ranksEnabled = isGameRankEnabled(group, gameSlug);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -427,7 +432,7 @@ export function CharacterForm({
             </div>
           )}
 
-          {!isAoC && gameRanks.length > 0 && (
+          {!isAoC && ranksEnabled && gameRanks.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">Guild Rank</label>
               <select
@@ -436,7 +441,10 @@ export function CharacterForm({
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="">Select a rank...</option>
-                {gameRanks.map((rank: any) => (
+                {gameRanks
+                  .slice()
+                  .sort((a: any, b: any) => (b.hierarchy || 0) - (a.hierarchy || 0))
+                  .map((rank: any) => (
                   <option key={rank.id} value={rank.id}>
                     {rank.name}
                   </option>

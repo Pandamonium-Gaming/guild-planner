@@ -11,6 +11,8 @@ import { ROR_FACTIONS, ROR_CLASSES, ROR_ROLE_CONFIG, RORRole } from '@/games/ret
 import { ProfessionSelector } from '@/components/game-specific/ProfessionSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGameConfig } from '@/config';
+import { Clan } from '@/lib/types';
+import { getConfiguredGameRanks, resolveConfiguredRankLabel } from '@/lib/gameRankSettings';
 
 interface CharacterCardProps {
   character: CharacterWithProfessions;
@@ -22,6 +24,7 @@ interface CharacterCardProps {
   mainCharacterName?: string; // Name of the main character this alt belongs to
   altCharacters?: Array<{ id: string; name: string }>; // List of alts for this main character
   gameSlug?: string; // Game slug to determine if professions should be shown
+  group?: Clan | null;
 }
 
 export function CharacterCard({ 
@@ -33,7 +36,8 @@ export function CharacterCard({
   readOnly = false,
   mainCharacterName,
   altCharacters = [],
-  gameSlug = 'aoc'
+  gameSlug = 'aoc',
+  group = null,
 }: CharacterCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -63,12 +67,12 @@ export function CharacterCard({
 
   // Get game config for Star Citizen ranks/roles
   const gameConfig = gameSlug ? getGameConfig(gameSlug) : null;
-  const gameRanks = (gameConfig as any)?.ranks || [];
+  const gameRanks = getConfiguredGameRanks(group, gameSlug);
   const gameRoles = (gameConfig as any)?.roles || [];
   
   // Get Star Citizen rank name from ID
-  const scRankName = character.rank && gameSlug === 'starcitizen'
-    ? gameRanks.find((r: any) => r.id === character.rank)?.name || character.rank
+  const scRankName = gameSlug === 'starcitizen'
+    ? resolveConfiguredRankLabel(gameRanks, character.rank)
     : character.rank;
 
   // Get Star Citizen role names from IDs
