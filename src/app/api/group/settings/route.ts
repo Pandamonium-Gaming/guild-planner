@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { auth } from '@/auth';
 import { roleHasPermission, type GroupRole } from '@/lib/permissions';
 
@@ -22,7 +22,7 @@ type RequestUserContext = {
 
 async function resolveRequestUserContext(
   request: NextRequest,
-  supabaseAdmin: ReturnType<typeof createClient>
+  supabaseAdmin: SupabaseClient
 ): Promise<RequestUserContext> {
   const candidateUserIds = new Set<string>();
   const nextAuthSession = await auth();
@@ -39,7 +39,7 @@ async function resolveRequestUserContext(
       .eq('discord_id', discordId);
 
     if (!linkedUsersError) {
-      (linkedUsers || []).forEach((linkedUser) => {
+      ((linkedUsers || []) as Array<{ id: string | null }>).forEach((linkedUser) => {
         if (linkedUser?.id) {
           candidateUserIds.add(linkedUser.id);
         }
@@ -47,7 +47,7 @@ async function resolveRequestUserContext(
     }
 
     return {
-      primaryUserId: nextAuthSession.user.id,
+      primaryUserId: nextAuthSession?.user?.id ?? null,
       discordId,
       candidateUserIds: Array.from(candidateUserIds),
     };
@@ -66,7 +66,11 @@ async function resolveRequestUserContext(
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseAnonKey) {
-    return null;
+    return {
+      primaryUserId: null,
+      discordId: null,
+      candidateUserIds: [],
+    };
   }
 
   const userClient = createClient(supabaseUrl, supabaseAnonKey);
@@ -88,7 +92,7 @@ async function resolveRequestUserContext(
 }
 
 async function requireGroupMembership(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: SupabaseClient,
   groupId: string,
   userIds: string[]
 ): Promise<{ role: GroupRole } | null> {
@@ -109,7 +113,7 @@ async function requireGroupMembership(
     throw new Error(`Failed to verify membership: ${error.message}`);
   }
 
-  if (!data || data.role === 'pending') {
+  if (!data) {
     return null;
   }
 

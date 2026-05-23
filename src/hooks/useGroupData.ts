@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Clan, CharacterWithProfessions, RankLevel, Race, Archetype } from '@/lib/types';
+import { Clan, CharacterWithProfessions, MemberProfession, RankLevel, Race, Archetype } from '@/lib/types';
 import { canEditCharacter, canDeleteCharacter, canOfficerManageUser } from '@/lib/character-permissions';
 import { GroupRole } from '@/lib/permissions';
 import { syncSubscriberShips, updateSubscriberTier } from '@/lib/subscriberShips';
@@ -184,13 +184,16 @@ export function useGroupData(groupSlug: string, gameSlug?: string): UseGroupData
 
       const charactersWithProfessions: CharacterWithProfessions[] = (charactersData || []).map((char) => ({
         ...char,
+        professions:
+          ('professions' in char
+            ? char.professions
+            : (char as { member_professions?: MemberProfession[] }).member_professions) || [],
         // Ensure defaults for new fields
         race: char.race || null,
         primary_archetype: char.primary_archetype || null,
         secondary_archetype: char.secondary_archetype || null,
         level: char.level || 1,
         is_main: char.is_main || false,
-        professions: char.member_professions || [],
       }));
 
       setCharacters(charactersWithProfessions);

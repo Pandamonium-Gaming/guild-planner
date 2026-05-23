@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+
+echo "🏗️ Running local build gate before push..."
+yarn build || { echo "❌ Build failed. Fix errors before pushing."; exit 1; }
+
+echo "✅ Build gate passed."

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { auth } from '@/auth';
 import { roleHasPermission, type GroupRole } from '@/lib/permissions';
 
@@ -15,7 +15,7 @@ function getSupabaseAdmin() {
 }
 
 async function requireGroupMembership(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: SupabaseClient,
   groupId: string,
   userId: string
 ): Promise<{ role: GroupRole } | null> {
@@ -24,13 +24,14 @@ async function requireGroupMembership(
     .select('role')
     .eq('group_id', groupId)
     .eq('user_id', userId)
+    .neq('role', 'pending')
     .maybeSingle();
 
   if (membershipError) {
     throw new Error(`Failed to verify membership: ${membershipError.message}`);
   }
 
-  if (!membership || membership.role === 'pending') {
+  if (!membership) {
     return null;
   }
 
@@ -58,18 +59,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Server missing Supabase service credentials' }, { status: 500 });
   }
 
-  const { data: membership, error: membershipError } = await supabaseAdmin
-    .from('group_members')
-    .select('role')
-    .eq('group_id', groupId)
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  if (membershipError) {
-    return NextResponse.json({ error: 'Failed to verify membership', details: membershipError.message }, { status: 500 });
+  let membership: { role: GroupRole } | null = null;
+  try {
+    membership = await requireGroupMembership(supabaseAdmin, groupId, userId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to verify membership';
+    return NextResponse.json({ error: 'Failed to verify membership', details: message }, { status: 500 });
   }
 
-  if (!membership || membership.role === 'pending') {
+  if (!membership) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       if (linkedUsersError) {
         console.error('Error resolving linked users by discord_id:', linkedUsersError);
       } else {
-        (linkedUsers || []).forEach((linkedUser) => {
+        ((linkedUsers || []) as Array<{ id: string | null }>).forEach((linkedUser) => {
           if (linkedUser?.id) {
             resolvedUserIds.add(linkedUser.id);
           }

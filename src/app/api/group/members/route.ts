@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { auth } from '@/auth';
 import type { GroupRole } from '@/lib/permissions';
 
@@ -37,7 +37,7 @@ type MemberMutationPayload = {
 
 async function resolveRequestUserContext(
   request: NextRequest,
-  supabaseAdmin: ReturnType<typeof createClient>
+  supabaseAdmin: SupabaseClient
 ): Promise<RequestUserContext> {
   const candidateUserIds = new Set<string>();
   const session = await auth();
@@ -55,7 +55,7 @@ async function resolveRequestUserContext(
       .eq('discord_id', discordId);
 
     if (!linkedUsersError) {
-      (linkedUsers || []).forEach((linkedUser) => {
+      ((linkedUsers || []) as Array<{ id: string | null }>).forEach((linkedUser) => {
         if (linkedUser?.id) {
           candidateUserIds.add(linkedUser.id);
         }
@@ -83,7 +83,7 @@ async function resolveRequestUserContext(
 }
 
 async function requireGroupMembership(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: SupabaseClient,
   groupId: string,
   userIds: string[]
 ): Promise<{ role: GroupRole; user_id: string } | null> {

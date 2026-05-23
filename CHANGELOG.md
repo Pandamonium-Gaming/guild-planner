@@ -138,6 +138,15 @@
 
 ### Fixed
 
+* **Build-time TypeScript guardrails for group events route**
+  * Fixed strict typing mismatches that could fail `next build` in:
+    * `src/app/api/group/events/route.ts`
+    * `src/app/api/group/members/route.ts`
+    * `src/app/api/group/settings/route.ts`
+    * `src/app/api/group/ships-overview/route.ts`
+    * `src/hooks/useGroupData.ts`
+  * Added a local Husky pre-push gate (`.husky/pre-push`) to run `yarn build` before push, preventing source-level build regressions from slipping past test/lint-only local checks
+
 * **v2 write-path bridge for events and announcements**
   * Extended `POST /api/group/events` with action-based mutations for events, RSVPs, and announcements
   * Added membership + permission enforcement on server-side event/announcement mutation paths
