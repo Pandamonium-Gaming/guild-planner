@@ -45,6 +45,10 @@
   * Added root `docker-compose.yml` for general local/prod-like container runs
   * Added build/run documentation to `README.md`
 
+* **Production compose override profile**
+  * Added `docker-compose.prod.yml` to layer production env-file, healthcheck, and resource metadata
+  * Added production compose command examples to `README.md`
+
 * **Comprehensive Test Coverage for Discord ID Functions**
   * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
   * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user\_id fallback

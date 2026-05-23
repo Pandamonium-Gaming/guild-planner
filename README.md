@@ -88,7 +88,22 @@ docker compose down
 Notes:
 
 * The app container expects runtime environment values from `.env.local` by default in compose.
-* If you want a production-specific env file, update `env_file` in `docker-compose.yml` to point to that file.
+* A production override is available in `docker-compose.prod.yml` and expects `.env.production`.
+
+### Production-like Compose profile
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
+docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f app
+docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+```
+
+This profile adds:
+
+* container healthcheck
+* production env-file (`.env.production`)
+* resource limits/reservations metadata for orchestrated deployments
 
 ## PR-02 Auth.js Local Validation
 
