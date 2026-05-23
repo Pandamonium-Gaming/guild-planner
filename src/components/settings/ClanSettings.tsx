@@ -8,6 +8,7 @@ import { Webhook, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { testDiscordWebhook } from '@/lib/discord';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getClientAuthStack } from '@/lib/authStack';
 
 interface ClanSettingsProps {
   groupId: string;
@@ -169,13 +170,33 @@ export function ClanSettings({
       updateData[columns.announcementRoleId] = currentConfig.announcementRoleId.trim() || null;
       updateData[columns.eventsRoleId] = currentConfig.eventsRoleId.trim() || null;
 
-      const { error: updateError } = await supabase
-        .from('groups')
-        .update(updateData)
-        .eq('id', groupId)
-        .select();
+      if (getClientAuthStack() === 'v2') {
+        const response = await fetch('/api/group/settings', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'update_group_fields',
+            group_id: groupId,
+            changes: updateData,
+          }),
+        });
 
-      if (updateError) throw updateError;
+        if (!response.ok) {
+          const payload = (await response.json().catch(() => ({}))) as { error?: string; details?: string };
+          throw new Error(payload.details || payload.error || `Failed to save settings (${response.status})`);
+        }
+      } else {
+        const { error: updateError } = await supabase
+          .from('groups')
+          .update(updateData)
+          .eq('id', groupId)
+          .select();
+
+        if (updateError) throw updateError;
+      }
 
       setSaved(true);
       onUpdate?.();

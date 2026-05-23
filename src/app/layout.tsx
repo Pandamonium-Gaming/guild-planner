@@ -47,6 +47,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const enableServiceWorker = process.env.NODE_ENV === 'production';
   return (
     <html lang="en" className="dark">
       <head>
@@ -81,12 +82,28 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                  navigator.serviceWorker.register('/sw.js')
-                    .catch(err => console.error('SW registration failed:', err));
-                });
-              }
+              (async () => {
+                if (!('serviceWorker' in navigator)) return;
+
+                if (${enableServiceWorker ? 'true' : 'false'}) {
+                  window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                      .catch(err => console.error('SW registration failed:', err));
+                  });
+                  return;
+                }
+
+                try {
+                  const registrations = await navigator.serviceWorker.getRegistrations();
+                  await Promise.all(registrations.map((registration) => registration.unregister()));
+                  if ('caches' in window) {
+                    const cacheKeys = await caches.keys();
+                    await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+                  }
+                } catch (err) {
+                  console.error('SW cleanup failed:', err);
+                }
+              })();
             `,
           }}
         />

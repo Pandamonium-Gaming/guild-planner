@@ -122,7 +122,7 @@ export function CharacterFiltersBar({
           }`}
         >
           <Filter size={16} />
-          <span className="hidden sm:inline">Filters</span>
+          <span className="hidden sm:inline">{t('filters.title')}</span>
           {hasActiveFilters && (
             <span className="text-xs bg-orange-500 text-white px-1.5 rounded-full">!</span>
           )}
@@ -220,14 +220,14 @@ export function CharacterFiltersBar({
           {/* Star Citizen role filter */}
           {gameSlug === 'starcitizen' && (
             <div>
-              <label htmlFor="filter-sc-role" className="text-xs text-slate-400 mb-1 block">Role</label>
+              <label htmlFor="filter-sc-role" className="text-xs text-slate-400 mb-1 block">{t('filters.role')}</label>
               <select
                 id="filter-sc-role"
                 value={filters.scRole}
                 onChange={(e) => onChange({ ...filters, scRole: e.target.value })}
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
-                <option value="">All Roles</option>
+                <option value="">{t('filters.allRoles')}</option>
                 {gameRoles.map((role) => (
                   <option key={role.id} value={role.id}>{role.name}</option>
                 ))}
@@ -238,16 +238,16 @@ export function CharacterFiltersBar({
           {/* Return of Reckoning faction filter */}
           {gameSlug === 'ror' && (
             <div>
-              <label htmlFor="filter-ror-faction" className="text-xs text-slate-400 mb-1 block">Faction</label>
+              <label htmlFor="filter-ror-faction" className="text-xs text-slate-400 mb-1 block">{t('filters.faction')}</label>
               <select
                 id="filter-ror-faction"
                 value={filters.rorFaction}
                 onChange={(e) => onChange({ ...filters, rorFaction: e.target.value })}
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
-                <option value="">All Factions</option>
-                <option value="destruction">Destruction</option>
-                <option value="order">Order</option>
+                <option value="">{t('filters.allFactions')}</option>
+                <option value="destruction">{t('filters.destruction')}</option>
+                <option value="order">{t('filters.order')}</option>
               </select>
             </div>
           )}
@@ -255,14 +255,14 @@ export function CharacterFiltersBar({
           {/* Return of Reckoning class filter */}
           {gameSlug === 'ror' && (
             <div>
-              <label htmlFor="filter-ror-class" className="text-xs text-slate-400 mb-1 block">Class</label>
+              <label htmlFor="filter-ror-class" className="text-xs text-slate-400 mb-1 block">{t('filters.class')}</label>
               <select
                 id="filter-ror-class"
                 value={filters.rorClass}
                 onChange={(e) => onChange({ ...filters, rorClass: e.target.value })}
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
-                <option value="">All Classes</option>
+                <option value="">{t('filters.allClasses')}</option>
                 {ROR_CLASSES.map((rorClass) => (
                   <option key={rorClass.id} value={rorClass.id}>{rorClass.name}</option>
                 ))}
@@ -273,14 +273,14 @@ export function CharacterFiltersBar({
           {/* Return of Reckoning role filter */}
           {gameSlug === 'ror' && (
             <div>
-              <label htmlFor="filter-ror-role" className="text-xs text-slate-400 mb-1 block">Role</label>
+              <label htmlFor="filter-ror-role" className="text-xs text-slate-400 mb-1 block">{t('filters.role')}</label>
               <select
                 id="filter-ror-role"
                 value={filters.rorRole}
                 onChange={(e) => onChange({ ...filters, rorRole: e.target.value })}
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
-                <option value="">All Roles</option>
+                <option value="">{t('filters.allRoles')}</option>
                 {Object.entries(ROR_ROLE_CONFIG).map(([roleKey, roleConfig]) => (
                   <option key={roleKey} value={roleKey}>{roleConfig.label}</option>
                 ))}
@@ -291,7 +291,7 @@ export function CharacterFiltersBar({
           {/* Star Citizen subscriber status filter */}
           {gameSlug === 'starcitizen' && (
             <div>
-              <label htmlFor="filter-subscriber" className="text-xs text-slate-400 mb-1 block">Subscriber Status</label>
+              <label htmlFor="filter-subscriber" className="text-xs text-slate-400 mb-1 block">{t('filters.subscriberStatus')}</label>
               <select
                 id="filter-subscriber"
                 value={filters.subscriberTier}
@@ -299,24 +299,24 @@ export function CharacterFiltersBar({
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
                 <option value="">All</option>
-                <option value="centurion">Centurion</option>
-                <option value="imperator">Imperator</option>
+                <option value="centurion">{t('filters.centurion')}</option>
+                <option value="imperator">{t('filters.imperator')}</option>
               </select>
             </div>
           )}
 
           {/* Main / Alt filter - all games */}
           <div>
-            <label htmlFor="filter-char-type" className="text-xs text-slate-400 mb-1 block">Character Type</label>
+            <label htmlFor="filter-char-type" className="text-xs text-slate-400 mb-1 block">{t('filters.characterType')}</label>
             <select
               id="filter-char-type"
               value={filters.characterType}
               onChange={(e) => onChange({ ...filters, characterType: e.target.value as 'all' | 'main' | 'alt' })}
               className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
             >
-              <option value="all">All</option>
-              <option value="main">Main Characters</option>
-              <option value="alt">Alts</option>
+              <option value="all">{t('filters.allCharacterTypes')}</option>
+              <option value="main">{t('filters.mainCharacters')}</option>
+              <option value="alt">{t('filters.alts')}</option>
             </select>
           </div>
         </div>

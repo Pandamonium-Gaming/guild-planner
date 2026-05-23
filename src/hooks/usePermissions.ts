@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { useGroupMembership } from './useGroupMembership';
 import { supabase } from '@/lib/supabase';
+import { getClientAuthStack } from '@/lib/authStack';
 import { GroupRole, roleHasPermission, canManageRole, DEFAULT_ROLE_PERMISSIONS } from '@/lib/permissions';
 
 export interface RolePermissions {
@@ -25,19 +26,26 @@ export function usePermissions(groupId ?: string) {
 
     const fetchPermissions = async () => {
       try {
-        const sessionResponse = await supabase.auth.getSession();
-        const session = sessionResponse?.data?.session ?? null;
-        if (!session) return;
-
         if (!isCancelled) {
           setLoading(true);
         }
 
+        const authStack = getClientAuthStack();
+        let headers: HeadersInit | undefined;
+
+        if (authStack !== 'v2') {
+          const sessionResponse = await supabase.auth.getSession();
+          const session = sessionResponse?.data?.session ?? null;
+          if (!session) return;
+          headers = {
+            'Authorization': `Bearer ${session.access_token}`,
+          };
+        }
+
         // Include group_id as a query parameter
         const response = await fetch(`/api/group/permissions?group_id=${encodeURIComponent(groupId!)}` , {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-          },
+          headers,
+          credentials: 'include',
         });
 
         if (response.ok) {

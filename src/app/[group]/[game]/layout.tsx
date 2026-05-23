@@ -114,8 +114,17 @@ export default function GameLayout({
           };
         })
         .filter(game => gameStatuses.some(gs => gs.game_slug === game.slug));
-      
-      setEnabledGames(gamesWithStatus);
+
+      setEnabledGames(gamesWithStatus.length > 0
+        ? gamesWithStatus
+        : allGames.map((game) => ({
+            slug: game.id,
+            name: game.name,
+            icon: game.icon,
+            iconUrl: game.iconUrl,
+            archived: false,
+          }))
+      );
     }
     
     fetchGames();

@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { UserPlus, Save, Loader2, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getClientAuthStack } from '@/lib/authStack';
 
 interface GameRecruitmentSettingsProps {
   groupId: string;
@@ -98,12 +99,32 @@ export function GameRecruitmentSettings({ groupId, gameSlug }: GameRecruitmentSe
         [columns.publicDescription]: publicDescription.trim() || null,
       };
 
-      const { error: updateError } = await supabase
-        .from('groups')
-        .update(updateData)
-        .eq('id', groupId);
+      if (getClientAuthStack() === 'v2') {
+        const response = await fetch('/api/group/settings', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'update_group_fields',
+            group_id: groupId,
+            changes: updateData,
+          }),
+        });
 
-      if (updateError) throw updateError;
+        if (!response.ok) {
+          const payload = (await response.json().catch(() => ({}))) as { error?: string; details?: string };
+          throw new Error(payload.details || payload.error || `Failed to save settings (${response.status})`);
+        }
+      } else {
+        const { error: updateError } = await supabase
+          .from('groups')
+          .update(updateData)
+          .eq('id', groupId);
+
+        if (updateError) throw updateError;
+      }
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

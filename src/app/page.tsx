@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Sword, LogOut, User, Shield, Users, Settings, Loader2, Globe } from 'lucide-react';
 import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -121,10 +122,10 @@ export default function Home() {
           <Link
             href="/events"
             className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-            title="Public Events"
+            title={t('home.publicEventsLink')}
           >
             <Sword size={18} className="group-hover:text-indigo-400 transition-colors" />
-            <span className="text-sm font-medium hidden sm:inline">Public Events</span>
+            <span className="text-sm font-medium hidden sm:inline">{t('home.publicEventsLink')}</span>
           </Link>
           <div className="flex items-center justify-end">
           {loading ? (
@@ -136,9 +137,12 @@ export default function Home() {
               <GameSwitcher />
               <div className="flex items-center gap-2 text-slate-300">
                 {profile?.discord_avatar ? (
-                  <img
+                  <Image
                     src={profile.discord_avatar}
                     alt={displayName}
+                    width={32}
+                    height={32}
+                    unoptimized
                     className="w-8 h-8 rounded-full ring-2 ring-slate-700"
                   />
                 ) : (
@@ -149,7 +153,7 @@ export default function Home() {
               <Link
                 href="/settings"
                 className="p-2 text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-lg transition-all cursor-pointer"
-                title="Settings"
+                title={t('common.settings')}
               >
                 <Settings size={18} />
               </Link>
@@ -185,7 +189,7 @@ export default function Home() {
       <div className="mt-12 w-full max-w-2xl mx-auto">
         <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2 justify-center">
           <Globe className="w-5 h-5 text-cyan-400" />
-          Public Groups
+          {t('home.publicGroupsTitle')}
         </h2>
         {publicGroupsLoading ? (
           <div className="flex items-center justify-center py-4">
@@ -201,9 +205,12 @@ export default function Home() {
               >
                 <div className="flex items-center gap-3">
                   {group.group_icon_url ? (
-                    <img
+                    <Image
                       src={group.group_icon_url}
-                      alt="Group Icon"
+                      alt={group.name}
+                      width={32}
+                      height={32}
+                      unoptimized
                       className="w-8 h-8 rounded-full border border-slate-700 bg-slate-800"
                     />
                   ) : (
@@ -221,14 +228,14 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="text-sm text-slate-400">
-                  {group.recruitment_open ? 'Open Recruitment' : 'View Group'}
+                  {group.recruitment_open ? t('home.openRecruitmentStatus') : t('home.viewGroupStatus')}
                 </div>
               </Link>
             ))}
           </div>
         ) : (
           <p className="text-center text-slate-500 py-4">
-            No public groups yet.
+            {t('home.noPublicGroups')}
           </p>
         )}
       </div>
@@ -254,9 +261,12 @@ export default function Home() {
                 >
                   <div className="flex items-center gap-3">
                     {group.group_icon_url ? (
-                      <img
+                      <Image
                         src={group.group_icon_url}
-                        alt="Guild Icon"
+                        alt={group.name}
+                        width={40}
+                        height={40}
+                        unoptimized
                         className="w-10 h-10 rounded-xl border border-slate-700 bg-slate-800 group-hover:border-indigo-500/50 transition-colors"
                       />
                     ) : (

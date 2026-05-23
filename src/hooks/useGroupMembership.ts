@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { UserRole, applyToGroup, getGroupMembership } from '@/lib/auth';
 import { GroupRole } from '@/lib/permissions';
+import { getClientAuthStack } from '@/lib/authStack';
 
 interface ClanMember {
   id: string;
@@ -319,13 +320,39 @@ export function useGroupMembership(groupId: string | null, userId: string | null
   };
 
   const updateRank = async (membershipId: string, rank: string | null) => {
-    const { error } = await supabase
-      .from('group_members')
-      .update({ guild_rank: rank })
-      .eq('id', membershipId)
-      .select();
+    if (!groupId) {
+      throw new Error('Group not found');
+    }
 
-    if (error) throw error;
+    if (getClientAuthStack() === 'v2') {
+      const response = await fetch('/api/group/members', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'update_rank',
+          group_id: groupId,
+          membership_id: membershipId,
+          rank,
+        }),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => ({}))) as { error?: string; details?: string };
+        throw new Error(payload.details || payload.error || `Failed to update rank (${response.status})`);
+      }
+    } else {
+      const { error } = await supabase
+        .from('group_members')
+        .update({ guild_rank: rank })
+        .eq('id', membershipId)
+        .select();
+
+      if (error) throw error;
+    }
+
     await refresh();
   };
 

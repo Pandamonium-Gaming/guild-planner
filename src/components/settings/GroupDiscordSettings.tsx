@@ -5,6 +5,7 @@ import { Webhook, Bell, BellOff, Check, AlertCircle, Loader2 } from 'lucide-reac
 import { supabase } from '@/lib/supabase';
 import { testDiscordWebhook } from '@/lib/discord';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getClientAuthStack } from '@/lib/authStack';
 
 interface GroupDiscordSettingsProps {
   groupId: string;
@@ -47,17 +48,39 @@ export function GroupDiscordSettings({
     setTestResult(null);
 
     try {
-      const { error: updateError } = await supabase
-        .from('groups')
-        .update({
-          group_webhook_url: webhookUrl.trim() || null,
-          group_welcome_webhook_url: welcomeWebhookUrl.trim() || null,
-          notify_on_events: eventsEnabled,
-          notify_on_announcements: announcementsEnabled,
-        })
-        .eq('id', groupId);
+      const updateData = {
+        group_webhook_url: webhookUrl.trim() || null,
+        group_welcome_webhook_url: welcomeWebhookUrl.trim() || null,
+        notify_on_events: eventsEnabled,
+        notify_on_announcements: announcementsEnabled,
+      };
 
-      if (updateError) throw updateError;
+      if (getClientAuthStack() === 'v2') {
+        const response = await fetch('/api/group/settings', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'update_group_fields',
+            group_id: groupId,
+            changes: updateData,
+          }),
+        });
+
+        if (!response.ok) {
+          const payload = (await response.json().catch(() => ({}))) as { error?: string; details?: string };
+          throw new Error(payload.details || payload.error || `Failed to save settings (${response.status})`);
+        }
+      } else {
+        const { error: updateError } = await supabase
+          .from('groups')
+          .update(updateData)
+          .eq('id', groupId);
+
+        if (updateError) throw updateError;
+      }
 
       setSaved(true);
       onUpdate?.();

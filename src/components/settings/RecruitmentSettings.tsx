@@ -7,6 +7,7 @@ import { Globe, UserPlus, Save, Loader2, Check, ExternalLink, CheckCircle, XCirc
 import { supabase } from '@/lib/supabase';
 import { RecruitmentApplication } from '@/lib/types';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getClientAuthStack } from '@/lib/authStack';
 
 interface RecruitmentSettingsProps {
   groupId: string;
@@ -117,17 +118,41 @@ export function RecruitmentSettings({ groupId, groupSlug }: RecruitmentSettingsP
         public_description: publicDescription.trim() || null,
       };
 
-      const { error: updateError } = await supabase
-        .from('groups')
-        .update(updateData)
-        .eq('id', groupId)
-        .select();
+      if (getClientAuthStack() === 'v2') {
+        const response = await fetch('/api/group/settings', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'update_group_fields',
+            group_id: groupId,
+            changes: updateData,
+          }),
+        });
 
-      if (updateError) {
-        console.error('[RecruitmentSettings] Save error:', updateError);
-        setError(updateError.message);
-        return;
+        if (!response.ok) {
+          const payload = (await response.json().catch(() => ({}))) as { error?: string; details?: string };
+          const message = payload.details || payload.error || `Failed to save settings (${response.status})`;
+          console.error('[RecruitmentSettings] Save error:', message);
+          setError(message);
+          return;
+        }
+      } else {
+        const { error: updateError } = await supabase
+          .from('groups')
+          .update(updateData)
+          .eq('id', groupId)
+          .select();
+
+        if (updateError) {
+          console.error('[RecruitmentSettings] Save error:', updateError);
+          setError(updateError.message);
+          return;
+        }
       }
+
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
@@ -143,16 +168,37 @@ export function RecruitmentSettings({ groupId, groupSlug }: RecruitmentSettingsP
       return;
     }
     try {
-      const { error } = await supabase
-        .from('recruitment_applications')
-        .update({
-          status: action,
-          reviewed_at: new Date().toISOString(),
-        })
-        .eq('id', appId)
-        .select();
+      if (getClientAuthStack() === 'v2') {
+        const response = await fetch('/api/group/settings', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'update_recruitment_application',
+            group_id: groupId,
+            application_id: appId,
+            status: action,
+          }),
+        });
 
-      if (error) throw error;
+        if (!response.ok) {
+          const payload = (await response.json().catch(() => ({}))) as { error?: string; details?: string };
+          throw new Error(payload.details || payload.error || `Failed to update application (${response.status})`);
+        }
+      } else {
+        const { error } = await supabase
+          .from('recruitment_applications')
+          .update({
+            status: action,
+            reviewed_at: new Date().toISOString(),
+          })
+          .eq('id', appId)
+          .select();
+
+        if (error) throw error;
+      }
 
       setApplications(prev => 
         prev.map(app => 
