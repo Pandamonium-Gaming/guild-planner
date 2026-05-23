@@ -49,6 +49,10 @@
   * Added `docker-compose.prod.yml` to layer production env-file, healthcheck, and resource metadata
   * Added production compose command examples to `README.md`
 
+* **Production env template for containers**
+  * Added `.env.production.example` with required app, Supabase, and Auth.js variables for containerized production runs
+  * Clarified in `README.md` that current compose profiles include the app container only and expect an external/managed database
+
 * **Comprehensive Test Coverage for Discord ID Functions**
   * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
   * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user\_id fallback

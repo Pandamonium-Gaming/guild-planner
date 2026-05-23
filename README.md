@@ -89,6 +89,8 @@ Notes:
 
 * The app container expects runtime environment values from `.env.local` by default in compose.
 * A production override is available in `docker-compose.prod.yml` and expects `.env.production`.
+* Start from `.env.production.example` when creating `.env.production`.
+* The provided compose files run the **app container only**. Database services are expected to be external/managed and configured via `AUTH_DATABASE_URL` / `DATABASE_URL`.
 
 ### Production-like Compose profile
 
