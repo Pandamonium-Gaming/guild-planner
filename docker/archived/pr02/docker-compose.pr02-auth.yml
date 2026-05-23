@@ -13,7 +13,7 @@ services:
       - "5433:5432"
     volumes:
       - pr02_authdb_data:/var/lib/postgresql/data
-      - ./docker/auth-db-init.sql:/docker-entrypoint-initdb.d/001-auth-db-init.sql:ro
+      - ./auth-db-init.sql:/docker-entrypoint-initdb.d/001-auth-db-init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d guild_planner_auth"]
       interval: 5s

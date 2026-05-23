@@ -70,7 +70,7 @@ For the in-progress Auth.js migration slice (`AUTH_STACK=v2`), use:
 
 This includes both:
 
-* Docker-first setup (`docker-compose.pr02-auth.yml`)
+* Docker-first setup (`docker/archived/pr02/docker-compose.pr02-auth.yml`)
 * Local-only setup (host app + local Postgres)
 
 Important:

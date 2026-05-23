@@ -41,13 +41,13 @@ Use one of these:
 * Start Docker profile:
 
 ```powershell
-docker compose -f docker-compose.pr02-auth.yml up -d
+docker compose -f docker/archived/pr02/docker-compose.pr02-auth.yml up -d
 ```
 
 * Confirm services are healthy:
 
 ```powershell
-docker compose -f docker-compose.pr02-auth.yml ps
+docker compose -f docker/archived/pr02/docker-compose.pr02-auth.yml ps
 ```
 
 * Open app at `http://localhost:3000`.
@@ -55,19 +55,19 @@ docker compose -f docker-compose.pr02-auth.yml ps
 * Stop when done:
 
 ```powershell
-docker compose -f docker-compose.pr02-auth.yml down
+docker compose -f docker/archived/pr02/docker-compose.pr02-auth.yml down
 ```
 
 * If you need a clean DB reset:
 
 ```powershell
-docker compose -f docker-compose.pr02-auth.yml down -v
+docker compose -f docker/archived/pr02/docker-compose.pr02-auth.yml down -v
 ```
 
 Notes:
 
 * Compose file forces `AUTH_STACK=v2` and wires Auth.js DB to the `authdb` container.
-* Auth adapter tables are auto-created from `docker/auth-db-init.sql` on first start.
+* Auth adapter tables are auto-created from `docker/archived/pr02/auth-db-init.sql` on first start.
 
 ## Option B: Local-only Setup
 
@@ -77,7 +77,7 @@ Notes:
 CREATE DATABASE guild_planner_auth;
 ```
 
-* Initialize Auth.js tables with `docker/auth-db-init.sql` (run once).
+* Initialize Auth.js tables with `docker/archived/pr02/auth-db-init.sql` (run once).
 * Set `.env.local`:
   * `AUTH_STACK=v2`
   * `NEXT_PUBLIC_AUTH_STACK=v2`
@@ -165,7 +165,7 @@ docker exec -it guild-planner-authdb psql -U postgres -d guild_planner_auth
 
 ## Validation Log (2026-05-23)
 
-Automated checks completed in local Docker profile (`docker-compose.pr02-auth.yml`):
+Automated checks completed in local Docker profile (`docker/archived/pr02/docker-compose.pr02-auth.yml`):
 
 * Service health check:
   * `guild-planner-app-pr02` running on `http://localhost:3000`

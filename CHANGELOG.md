@@ -101,6 +101,11 @@
   * Added Docker-first validation stack (`docker-compose.pr02-auth.yml`) with Postgres bootstrap schema (`docker/auth-db-init.sql`)
   * Added step-by-step local and Docker setup guidance in `docs/PR02_AUTHJS_VALIDATION.md`
 
+* **Archived PR-02 Docker validation assets**
+  * Moved PR-02 compose profile to `docker/archived/pr02/docker-compose.pr02-auth.yml`
+  * Moved Auth.js DB bootstrap script to `docker/archived/pr02/auth-db-init.sql`
+  * Updated runbook and README references to use archived paths
+
 * **Package manager standardization on Yarn**
   * Added/confirmed Yarn package manager metadata in `package.json`
   * Added `.npmrc` with `package-lock=false` to prevent npm lockfile churn
