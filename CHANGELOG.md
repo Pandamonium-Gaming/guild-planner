@@ -138,6 +138,11 @@
 
 ### Fixed
 
+* **Auth.js session-mode env hardening for Vercel deployments**
+  * Updated `src/auth.ts` to normalize `AUTH_SESSION_STRATEGY` values (trim + lowercase), so values like `JWT` or `jwt` with trailing whitespace no longer silently fall back to database mode
+  * Removed implicit fallback from `AUTH_DATABASE_URL` to `DATABASE_URL`, preventing unrelated platform-level `DATABASE_URL` values from unexpectedly enabling the Postgres adapter
+  * Helps avoid callback failures where runtime attempted DB adapter queries despite intended JWT-only mode
+
 * **Build-time TypeScript guardrails for group events route**
   * Fixed strict typing mismatches that could fail `next build` in:
     * `src/app/api/group/events/route.ts`

@@ -6,15 +6,17 @@ import { createClient } from '@supabase/supabase-js';
 
 const discordClientId = process.env.AUTH_DISCORD_ID || process.env.DISCORD_CLIENT_ID;
 const discordClientSecret = process.env.AUTH_DISCORD_SECRET || process.env.DISCORD_CLIENT_SECRET;
-const authDatabaseUrl = process.env.AUTH_DATABASE_URL || process.env.DATABASE_URL;
+const authDatabaseUrl = process.env.AUTH_DATABASE_URL;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const requestedSessionStrategy = process.env.AUTH_SESSION_STRATEGY === 'jwt' ? 'jwt' : 'database';
+const requestedSessionStrategy = (process.env.AUTH_SESSION_STRATEGY || '').trim().toLowerCase() === 'jwt'
+  ? 'jwt'
+  : 'database';
 const useDatabaseSessions = requestedSessionStrategy === 'database' && !!authDatabaseUrl;
 
 if (requestedSessionStrategy === 'database' && !authDatabaseUrl) {
-  console.warn('AUTH_SESSION_STRATEGY=database but no AUTH_DATABASE_URL/DATABASE_URL set; falling back to jwt sessions.');
+  console.warn('AUTH_SESSION_STRATEGY=database but no AUTH_DATABASE_URL set; falling back to jwt sessions.');
 }
 
 if (!discordClientId || !discordClientSecret) {
