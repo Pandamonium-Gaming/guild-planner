@@ -116,8 +116,9 @@ After deployment, add your Vercel URL to Discord OAuth:
 
 After initial setup:
 
-* Every push to `main` → Production deploy
+* Every push to `develop` → Dev deployment (team workflow)
 * Every pull request → Preview deploy
+* Production deployment remains controlled separately (for example `main` or manual promotion, based on Vercel project settings)
 
 ***
 

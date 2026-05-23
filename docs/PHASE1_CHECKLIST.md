@@ -132,3 +132,58 @@ Status key: `[ ]` not started, `[~]` in progress, `[x]` complete.
     * `src/hooks/__tests__/usePermissions.test.ts`
 * Rollout note:
   * Enable `AUTH_STACK=v2` with staged monitoring for 401/403 error patterns and session revocation behavior.
+
+## Staged Rollout Plan (Develop -> Vercel Dev)
+
+This repository deploys dev builds from `develop` to Vercel automatically. Use that pipeline as the rollout vehicle for `AUTH_STACK=v2`.
+
+### Stage A: Baseline Deploy (control)
+
+* Goal: capture a short baseline window before flipping the flag.
+* Steps:
+  * Confirm Vercel dev environment has `AUTH_STACK=v1`.
+  * Push a no-risk `develop` commit (docs/chore is fine) to trigger a fresh dev deployment.
+  * Validate baseline auth paths:
+    * `GET /api/auth/session`
+    * `GET /api/me/profile`
+    * `GET /api/groups/:groupId/permissions`
+* Exit criteria:
+  * No unusual 401/403 pattern.
+  * No session-loop behavior after Discord login.
+
+### Stage B: Enable v2 in Vercel Dev
+
+* Goal: run the first real staged rollout in the automatically deployed dev build.
+* Steps:
+  * Set Vercel dev env var `AUTH_STACK=v2`.
+  * Redeploy `develop` (or trigger redeploy from Vercel).
+  * Execute smoke tests for:
+    * login/logout
+    * profile load and hydration
+    * role-gated pages (admin/officer/member)
+    * non-member and group-mismatch paths
+* Exit criteria:
+  * Permission outcomes match expected role matrix.
+  * No privilege escalation or unexpected denials.
+
+### Stage C: Observe + Decide
+
+* Goal: confirm stability before wider promotion.
+* Monitoring window:
+  * At least one normal dev usage cycle after deploy.
+* Watch for:
+  * Repeated 401/403 spikes
+  * Session invalidation lag/failure
+  * Endpoint regressions on first-slice routes
+* Decision:
+  * If stable, mark v2 as the default for next promotion path.
+  * If unstable, execute rollback immediately.
+
+### Rollback Trigger and Action
+
+* Trigger:
+  * Any observed privilege escalation, persistent 401/403 spikes, or session breakage.
+* Action:
+  * Set Vercel dev env var `AUTH_STACK=v1`.
+  * Redeploy `develop`.
+  * Capture traces and parity diffs, then open remediation issue(s).
