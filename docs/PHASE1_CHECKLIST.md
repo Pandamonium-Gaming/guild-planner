@@ -118,4 +118,18 @@ Status key: `[ ]` not started, `[~]` in progress, `[x]` complete.
 * `[x]` PR-03 Profile read path (repository seam + `GET /api/me/profile` completed; live parity sign-off validated on 2026-05-23 with authenticated v2 session and profile contract response)
 * `[x]` PR-04 Group permissions read path (service seam + `GET /api/groups/:groupId/permissions` completed with role parity and non-member status coverage on 2026-05-23)
 * `[x]` PR-05 Client hook integration (updated `useAuth` and permissions/profile consumers for v2 endpoint reads with v1 fallback on 2026-05-23)
-* `[ ]` Go/no-go gate review completed
+* `[x]` Go/no-go gate review completed (2026-05-23)
+
+## Go/No-Go Review (2026-05-23)
+
+* Decision: **No-Go** (hold `AUTH_STACK=v2` as default)
+* Evidence:
+  * ✅ First-slice endpoint and regression tests pass: `yarn test --runInBand --silent` → `24/24` suites, `395/395` tests, `TEST_EXIT=0`
+  * ✅ Role/permission parity checks pass via automated coverage:
+    * `src/server/permissions/__tests__/group-permissions-service.test.ts`
+    * `src/app/api/groups/__tests__/permissions-route.test.ts`
+    * `src/hooks/__tests__/usePermissions.test.ts`
+  * ❌ Lint gate currently fails: `yarn lint` → `LINT_EXIT=1` (existing warning policy violations, primarily i18n literal-string and `no-explicit-any` warnings)
+* Exit criteria to switch to **Go**:
+  * Resolve lint warnings that are currently treated as failing gate conditions.
+  * Re-run `yarn lint` and `yarn test --runInBand --silent` and confirm both return exit code `0`.
