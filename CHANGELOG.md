@@ -39,6 +39,12 @@
   * Updated `usePermissions` and `FleetView` effect scheduling to avoid `react-hooks/set-state-in-effect` lint errors while preserving behavior
   * Restored `yarn lint` pass status required by the phase go/no-go gate
 
+* **General Docker container scaffolding**
+  * Added multi-stage production `Dockerfile` for Next.js build and runtime
+  * Added `.dockerignore` to reduce build context and exclude local artifacts
+  * Added root `docker-compose.yml` for general local/prod-like container runs
+  * Added build/run documentation to `README.md`
+
 * **Comprehensive Test Coverage for Discord ID Functions**
   * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
   * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user\_id fallback

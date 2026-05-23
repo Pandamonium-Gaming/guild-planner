@@ -62,6 +62,34 @@ A comprehensive group management and planning tool supporting multiple MMOs.
 
 See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for full instructions.
 
+## Container Deployment
+
+This repo now includes a general container path for running the app outside Vercel:
+
+* [Dockerfile](./Dockerfile)
+* [docker-compose.yml](./docker-compose.yml)
+
+### Build and run with Docker
+
+```powershell
+docker build -t guild-planner:latest .
+docker run --rm -p 3000:3000 --env-file .env.local guild-planner:latest
+```
+
+### Run with Docker Compose
+
+```powershell
+docker compose up --build -d
+docker compose ps
+docker compose logs -f app
+docker compose down
+```
+
+Notes:
+
+* The app container expects runtime environment values from `.env.local` by default in compose.
+* If you want a production-specific env file, update `env_file` in `docker-compose.yml` to point to that file.
+
 ## PR-02 Auth.js Local Validation
 
 For the in-progress Auth.js migration slice (`AUTH_STACK=v2`), use:
