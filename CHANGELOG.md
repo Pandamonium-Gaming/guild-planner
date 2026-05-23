@@ -53,6 +53,15 @@
   * Added `.env.production.example` with required app, Supabase, and Auth.js variables for containerized production runs
   * Clarified in `README.md` that current compose profiles include the app container only and expect an external/managed database
 
+* **PR-06 containerized migration baseline (app + db)**
+  * Added `docker-compose.stack.yml` to run the app with a co-located Postgres container for Supabase-exit migration rehearsal
+  * Added `.env.stack.example` for stack bootstrap variables
+  * Updated `docs/SUPABASE_EXIT_PLAN.md` and `docs/PHASE1_CHECKLIST.md` with a mandatory containerized migration rule and a file-based Supabase -> containerized Postgres runbook
+  * Updated `README.md` with stack start/stop commands for the new app + db profile
+
+* **Dockerfile Yarn 4 compatibility for container builds**
+  * Updated `Dockerfile` to force `node-modules` linker during container install/build so compose images can build reliably under Yarn 4
+
 * **Comprehensive Test Coverage for Discord ID Functions**
   * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
   * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user\_id fallback

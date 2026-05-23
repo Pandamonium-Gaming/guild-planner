@@ -4,7 +4,7 @@ FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 
 COPY package.json yarn.lock ./
-RUN corepack enable && yarn install --immutable
+RUN corepack enable && yarn config set nodeLinker node-modules && yarn install --immutable
 
 FROM node:22-bookworm-slim AS builder
 WORKDIR /app
@@ -14,7 +14,7 @@ ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN corepack enable && yarn build
+RUN corepack enable && yarn config set nodeLinker node-modules && yarn build
 
 FROM node:22-bookworm-slim AS runner
 WORKDIR /app

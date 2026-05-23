@@ -92,6 +92,32 @@ Notes:
 * Start from `.env.production.example` when creating `.env.production`.
 * The provided compose files run the **app container only**. Database services are expected to be external/managed and configured via `AUTH_DATABASE_URL` / `DATABASE_URL`.
 
+### Containerized app + db stack (PR-06 migration target)
+
+For Supabase-exit migration rehearsal, use the stack profile that runs both app and Postgres together:
+
+* [docker-compose.stack.yml](./docker-compose.stack.yml)
+* [.env.stack.example](./.env.stack.example)
+
+```powershell
+Copy-Item .env.stack.example .env.stack
+docker compose -f docker-compose.stack.yml up --build -d
+docker compose -f docker-compose.stack.yml ps
+docker compose -f docker-compose.stack.yml logs -f app
+```
+
+Stop stack:
+
+```powershell
+docker compose -f docker-compose.stack.yml down
+```
+
+Remove stack including database volume:
+
+```powershell
+docker compose -f docker-compose.stack.yml down -v
+```
+
 ### Production-like Compose profile
 
 ```powershell

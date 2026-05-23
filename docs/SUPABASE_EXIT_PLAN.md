@@ -13,6 +13,11 @@ In scope:
 * Migrate operational tooling and local/dev environments to Docker Compose.
 * Preserve existing behaviour for permissions, group membership, character ownership, and auditability.
 
+Critical execution rule:
+
+* The migration target must support a fully containerized runtime where `app` and `db` are started together via Docker Compose.
+* Supabase exit work must include a reproducible data-migration path from Supabase Postgres into the containerized Postgres target.
+
 Out of scope for initial migration:
 
 * Feature redesign.
@@ -301,8 +306,131 @@ Rollback strategy for first slice:
 * Preserve new tables/sessions for diagnostics; do not run destructive rollback migrations during incident response.
 * Require post-rollback incident note with failed criteria and remediation tasks before reattempt.
 
+## PR-06: Runtime Decoupling Sprint (Next)
+
+Goal:
+
+* Remove remaining high-impact direct Supabase runtime usage from client hooks/components and route all reads and writes through app-owned API services.
+
+Scope:
+
+* In scope:
+  * Replace direct client-side Supabase auth/session reads in hooks and UI entry points.
+  * Replace direct client-side Supabase data mutations in high-impact domains.
+  * Define API parity checks for each migrated surface.
+* Out of scope:
+  * Full data-store replacement in one PR.
+  * Bulk schema migration cutover.
+
+Acceptance criteria:
+
+* No direct `@/lib/supabase` imports remain in priority PR-06 target surfaces.
+* Equivalent API endpoints exist for each replaced read/write path.
+* A runnable Compose profile exists for app + Postgres (`docker-compose.stack.yml`) with documented env bootstrap.
+* A documented migration runbook exists for Supabase -> containerized Postgres (file-based export/import).
+* `yarn build`, `yarn lint`, and `yarn test --runInBand --silent` pass.
+* Feature-flag fallback behavior remains available where required.
+
+### Supabase Coupling Inventory (Current)
+
+Observed runtime coupling areas (non-test sources):
+
+* Client/runtime imports of `@/lib/supabase` remain widespread across hooks, components, app pages, and library actions.
+* Server/API routes still initialize Supabase clients for service-role and anon token bridge operations.
+
+Priority extraction buckets for PR-06:
+
+1. Auth/session client coupling
+   * Examples:
+     * `src/hooks/useAuth.ts`
+     * `src/app/auth/callback/page.tsx`
+     * `src/app/page.tsx`
+2. High-impact data hooks (read/write)
+   * Examples:
+     * `src/hooks/useGroupData.ts`
+     * `src/hooks/useEvents.ts`
+     * `src/hooks/useGroupMembership.ts`
+     * `src/hooks/useBuilds.ts`
+3. Settings and admin UI mutations
+   * Examples:
+     * `src/components/settings/RecruitmentSettings.tsx`
+     * `src/components/settings/GroupDiscordSettings.tsx`
+     * `src/components/settings/ClanSettings.tsx`
+4. Game operations and logistics domains
+   * Examples:
+     * `src/hooks/useGuildBank.ts`
+     * `src/hooks/useLootSystem.ts`
+     * `src/hooks/useCaravans.ts`
+     * `src/hooks/useFreeholds.ts`
+
+### PR-06 Implementation Sequence
+
+1. Create API-first contract list for each priority bucket.
+2. Migrate auth/session calls to API session endpoints only.
+3. Migrate group/member/event/settings mutation paths to API-only calls.
+4. Add a containerized `app + db` runtime profile and baseline env template.
+5. Add Supabase -> containerized Postgres migration runbook steps (dump to file, restore from file).
+6. Add or extend integration tests for migrated endpoints.
+7. Remove obsolete direct Supabase imports in touched surfaces.
+8. Re-run gate checks and record parity outcomes.
+
+### PR-06 Exit Checklist
+
+* \[ ] Priority auth/session surfaces no longer call `supabase.auth.*` on client.
+* \[ ] Priority mutation surfaces use API routes only under v2 path.
+* \[ ] Endpoint parity tests updated and passing.
+* \[ ] Containerized stack profile (`app + db`) runs end-to-end.
+* \[ ] Supabase -> containerized Postgres migration runbook is documented and validated on sample data.
+* \[ ] Build, lint, translations, and changelog checks pass.
+* \[ ] Rollout notes updated in `docs/PHASE1_CHECKLIST.md` (or follow-on phase tracker).
+
+### Containerized Migration Runbook (PR-06)
+
+Use file-based export/import to move data from Supabase Postgres to the containerized Postgres stack.
+
+Safety rules:
+
+* Do not perform direct source->target streaming writes.
+* Always export to a local file first, then restore from file.
+
+Example flow (PowerShell):
+
+1. Start stack.
+
+```powershell
+Copy-Item .env.stack.example .env.stack
+docker compose -f docker-compose.stack.yml up --build -d
+```
+
+1. Export from Supabase Postgres to file.
+
+```powershell
+pg_dump "<SUPABASE_POSTGRES_URL>" --data-only --no-owner --no-privileges --file supabase-data.sql
+```
+
+1. Restore into containerized Postgres.
+
+```powershell
+Get-Content supabase-data.sql | docker exec -i guild-planner-db psql -U postgres -d guild_planner
+```
+
+1. Validate target data.
+
+```powershell
+docker exec -it guild-planner-db psql -U postgres -d guild_planner -c "SELECT COUNT(*) FROM groups;"
+docker exec -it guild-planner-db psql -U postgres -d guild_planner -c "SELECT COUNT(*) FROM members;"
+```
+
+1. Run app gates against stack.
+
+```powershell
+yarn build
+yarn lint
+yarn test --runInBand --silent
+```
+
 ## Next Actions
 
-1. Execute PR-02 from `docs/PHASE1_CHECKLIST.md` (Auth.js Discord bootstrap).
-2. Implement `GET /api/auth/session` normalized response behind `AUTH_STACK=v2`.
-3. Add fixture-based parity tests for permission resolution before enabling cutover.
+1. Execute PR-06 Sequence step 1 by publishing API-first contract list per priority bucket.
+2. Implement PR-06 step 2 (auth/session client decoupling) as the first commit slice.
+3. Run parity tests and staged rollout checks after each bucket migration.

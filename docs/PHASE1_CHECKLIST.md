@@ -119,6 +119,7 @@ Status key: `[ ]` not started, `[~]` in progress, `[x]` complete.
 * `[x]` PR-04 Group permissions read path (service seam + `GET /api/groups/:groupId/permissions` completed with role parity and non-member status coverage on 2026-05-23)
 * `[x]` PR-05 Client hook integration (updated `useAuth` and permissions/profile consumers for v2 endpoint reads with v1 fallback on 2026-05-23)
 * `[x]` Go/no-go gate review completed (2026-05-23)
+* `[ ]` PR-06 Runtime decoupling sprint (remove priority direct Supabase client coupling and route through app-owned API services)
 
 ## Go/No-Go Review (2026-05-23)
 
@@ -187,3 +188,30 @@ This repository deploys dev builds from `develop` to Vercel automatically. Use t
   * Set Vercel dev env var `AUTH_STACK=v1`.
   * Redeploy `develop`.
   * Capture traces and parity diffs, then open remediation issue(s).
+
+## PR-06 Focus Checklist (Next)
+
+* Scope owner: `@api-owner` with support from `@auth-owner` and `@qa-owner`.
+* Goal: remove high-impact direct Supabase runtime coupling in client surfaces.
+
+Execution items:
+
+1. Replace client auth/session reads with API session paths in priority surfaces.
+2. Replace direct client data writes in settings/events/membership slices with API-only calls.
+3. Add a Docker Compose stack profile that starts `app` and containerized `db` together for migration validation.
+4. Document and run Supabase -> containerized Postgres file-based migration steps (dump to file, restore from file).
+5. Remove obsolete direct Supabase imports in touched files.
+6. Add or update integration tests for migrated endpoints and fallback behavior.
+7. Verify rollout gates:
+
+* `yarn build`
+* `yarn lint`
+* `yarn test --runInBand --silent`
+
+PR-06 completion criteria:
+
+* No direct `@/lib/supabase` usage remains in priority PR-06 buckets.
+* App + DB can run together in Compose for local migration/cutover rehearsal.
+* Supabase data migration runbook to containerized Postgres is documented and repeatable.
+* No auth callback/session regressions in staged dev rollout.
+* Endpoint parity behavior documented for migrated surfaces.
