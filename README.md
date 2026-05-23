@@ -62,6 +62,23 @@ A comprehensive group management and planning tool supporting multiple MMOs.
 
 See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for full instructions.
 
+## PR-02 Auth.js Local Validation
+
+For the in-progress Auth.js migration slice (`AUTH_STACK=v2`), use:
+
+* [docs/PR02\_AUTHJS\_VALIDATION.md](./docs/PR02_AUTHJS_VALIDATION.md)
+
+This includes both:
+
+* Docker-first setup (`docker-compose.pr02-auth.yml`)
+* Local-only setup (host app + local Postgres)
+
+Important:
+
+* PR-02 is an incremental migration stage, not full Supabase removal yet.
+* Auth/session in `AUTH_STACK=v2` uses Auth.js + Postgres (adapter sessions).
+* The app still reads domain data (groups, characters, settings, etc.) from Supabase until later phases.
+
 ## Cron Jobs and Manual Triggering
 
 The app has two Vercel cron jobs configured in [vercel.json](./vercel.json):

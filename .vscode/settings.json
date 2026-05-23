@@ -55,7 +55,8 @@
         "Snapshots:": true,
         "Time:": true,
         "Jest:": true,
-        "PASS": true
+        "PASS": true,
+        "docker compose": true
     },
     "codeQL.githubDatabase.download": "never"
 }
