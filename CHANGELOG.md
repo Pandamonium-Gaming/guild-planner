@@ -29,6 +29,12 @@
   * Added route coverage for unauthorized/non-member/member responses in `src/app/api/groups/__tests__/permissions-route.test.ts`
   * Added service parity coverage for `admin|officer|member|trial|pending` and override application in `src/server/permissions/__tests__/group-permissions-service.test.ts`
 
+* **PR-05 first-slice client hook integration**
+  * Updated `usePermissions` to call `GET /api/groups/:groupId/permissions` under `AUTH_STACK=v2` and consume authoritative `role + permissions` snapshots
+  * Preserved `v1` fallback behavior in `usePermissions` by continuing to read `GET /api/group/permissions` overrides with bearer-token auth
+  * Updated `useAuth` v2 profile hydration to call `GET /api/me/profile` with safe fallback to session-derived profile fields
+  * Added v2 client-hook coverage in `src/hooks/__tests__/usePermissions.test.ts`
+
 * **Comprehensive Test Coverage for Discord ID Functions**
   * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
   * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user\_id fallback

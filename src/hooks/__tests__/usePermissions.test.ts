@@ -37,6 +37,7 @@ describe('usePermissions Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = jest.fn();
+    process.env.NEXT_PUBLIC_AUTH_STACK = 'v1';
 
     jest.mocked(supabase).auth.getSession = jest.fn().mockResolvedValue({
       data: { session: null },
@@ -322,6 +323,72 @@ describe('usePermissions Hook', () => {
           },
         })
       );
+    });
+  });
+
+  describe('v2 Permission Snapshot', () => {
+    it('should call v2 group permissions endpoint and apply effective permissions', async () => {
+      process.env.NEXT_PUBLIC_AUTH_STACK = 'v2';
+
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: jest.fn().mockResolvedValue({
+            role: 'officer',
+            permissions: ['settings_edit_roles', 'events_create'],
+          }),
+        });
+
+      const { result } = renderHook(() => usePermissions('group-123'));
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith(
+          '/api/groups/group-123/permissions',
+          expect.objectContaining({
+            credentials: 'include',
+          })
+        );
+      });
+
+      await waitFor(() => {
+        expect(result.current.userRole).toBe('officer');
+      });
+
+      expect(result.current.hasPermission('settings_edit_roles')).toBe(true);
+      expect(result.current.hasPermission('characters_delete_any')).toBe(false);
+      expect(jest.mocked(supabase).auth.getSession).not.toHaveBeenCalled();
+    });
+
+    it('should still request v2 snapshot even when membership role is missing', async () => {
+      process.env.NEXT_PUBLIC_AUTH_STACK = 'v2';
+
+      (useGroupMembership as jest.Mock).mockReturnValue({
+        membership: null,
+        loading: false,
+      });
+
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: jest.fn().mockResolvedValue({
+            role: 'member',
+            permissions: ['characters_create'],
+          }),
+        });
+
+      const { result } = renderHook(() => usePermissions('group-123'));
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(result.current.userRole).toBe('member');
+      });
+
+      expect(result.current.hasPermission('characters_create')).toBe(true);
     });
   });
 

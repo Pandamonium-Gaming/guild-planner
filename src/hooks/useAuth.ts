@@ -30,6 +30,40 @@ export function useAuth(): UseAuthReturn {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const buildFallbackV2Profile = useCallback((payloadUser: {
+    id: string;
+    discordId: string | null;
+    displayName: string | null;
+  }): UserProfile => ({
+    id: payloadUser.id,
+    discord_id: payloadUser.discordId,
+    discord_username: null,
+    discord_avatar: null,
+    display_name: payloadUser.displayName,
+    timezone: 'UTC',
+  }), []);
+
+  const fetchV2Profile = useCallback(async (fallbackProfile: UserProfile) => {
+    try {
+      const response = await fetch('/api/me/profile', {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        setProfile(fallbackProfile);
+        return;
+      }
+
+      const payload = await response.json() as { profile?: UserProfile | null };
+      setProfile(payload.profile ?? fallbackProfile);
+    } catch (error) {
+      console.error('Error fetching v2 profile:', error);
+      setProfile(fallbackProfile);
+    }
+  }, []);
+
   const fetchV2Session = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/session', { cache: 'no-store' });
@@ -52,21 +86,16 @@ export function useAuth(): UseAuthReturn {
       // Keep current hook contract for consumers while v2 rollout is gated.
       setUser({ id: payload.user.id } as User);
       setSession(null);
-      setProfile({
-        id: payload.user.id,
-        discord_id: payload.user.discordId,
-        discord_username: null,
-        discord_avatar: null,
-        display_name: payload.user.displayName,
-        timezone: 'UTC',
-      });
+
+      const fallbackProfile = buildFallbackV2Profile(payload.user);
+      await fetchV2Profile(fallbackProfile);
     } catch (error) {
       console.error('Error fetching v2 session:', error);
       setUser(null);
       setSession(null);
       setProfile(null);
     }
-  }, []);
+  }, [buildFallbackV2Profile, fetchV2Profile]);
 
   const fetchProfile = useCallback(async (userId: string) => {
     try {

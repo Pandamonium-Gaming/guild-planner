@@ -117,5 +117,5 @@ Status key: `[ ]` not started, `[~]` in progress, `[x]` complete.
 * `[x]` PR-02 Auth.js Discord bootstrap (automated runbook checks, DB session revocation, and manual Discord login/logout verification completed on 2026-05-23)
 * `[x]` PR-03 Profile read path (repository seam + `GET /api/me/profile` completed; live parity sign-off validated on 2026-05-23 with authenticated v2 session and profile contract response)
 * `[x]` PR-04 Group permissions read path (service seam + `GET /api/groups/:groupId/permissions` completed with role parity and non-member status coverage on 2026-05-23)
-* `[ ]` PR-05 Client hook integration
+* `[x]` PR-05 Client hook integration (updated `useAuth` and permissions/profile consumers for v2 endpoint reads with v1 fallback on 2026-05-23)
 * `[ ]` Go/no-go gate review completed

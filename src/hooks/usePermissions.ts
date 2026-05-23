@@ -16,20 +16,25 @@ export function usePermissions(groupId ?: string) {
   const { user } = useAuth();
   const { membership } = useGroupMembership(groupId || null, user?.id || null);
   const [customPermissions, setCustomPermissions] = useState<Record<string, boolean> | null>(null);
+  const [effectivePermissions, setEffectivePermissions] = useState<Set<string> | null>(null);
+  const [resolvedRole, setResolvedRole] = useState<GroupRole | null>(null);
   const [loading, setLoading] = useState(false);
   
   // Fetch custom permission overrides from the server
   useEffect(() => {
-    if (!groupId || !user || !membership?.role) return;
+    if (!groupId || !user) {
+      setCustomPermissions(null);
+      setEffectivePermissions(null);
+      setResolvedRole(null);
+      return;
+    }
 
     let isCancelled = false;
 
     const fetchPermissions = async () => {
-      try {
-        if (!isCancelled) {
-          setLoading(true);
-        }
+      let didStartLoading = false;
 
+      try {
         const authStack = getClientAuthStack();
         let headers: HeadersInit | undefined;
 
@@ -42,7 +47,47 @@ export function usePermissions(groupId ?: string) {
           };
         }
 
-        // Include group_id as a query parameter
+        if (authStack === 'v2') {
+          if (!isCancelled) {
+            setLoading(true);
+            didStartLoading = true;
+          }
+
+          const response = await fetch(`/api/groups/${encodeURIComponent(groupId!)}/permissions`, {
+            credentials: 'include',
+            cache: 'no-store',
+          });
+
+          if (response.ok) {
+            const payload = await response.json() as {
+              role?: GroupRole;
+              permissions?: string[];
+            };
+
+            if (!isCancelled) {
+              setResolvedRole(payload.role ?? null);
+              setEffectivePermissions(new Set(payload.permissions ?? []));
+              setCustomPermissions(null);
+            }
+          }
+          return;
+        }
+
+        if (!membership?.role) {
+          if (!isCancelled) {
+            setCustomPermissions(null);
+            setEffectivePermissions(null);
+            setResolvedRole(null);
+          }
+          return;
+        }
+
+        // v1 path: include group_id as query parameter and apply role overrides client-side.
+        if (!isCancelled) {
+          setLoading(true);
+          didStartLoading = true;
+        }
+
         const response = await fetch(`/api/group/permissions?group_id=${encodeURIComponent(groupId!)}` , {
           headers,
           credentials: 'include',
@@ -52,7 +97,6 @@ export function usePermissions(groupId ?: string) {
           const { permissions } = await response.json();
           const overrides = permissions?.find((o: any) => o.role === membership?.role);
           if (overrides) {
-            // Extract just the permission columns (all the boolean fields)
             const perms: Record<string, boolean> = {};
             Object.keys(overrides).forEach(key => {
               if (key !== 'id' && key !== 'clan_id' && key !== 'role' && key !== 'created_at' && key !== 'updated_at') {
@@ -61,13 +105,14 @@ export function usePermissions(groupId ?: string) {
             });
             if (!isCancelled) {
               setCustomPermissions(perms);
+              setEffectivePermissions(null);
             }
           }
         }
       } catch (err) {
         console.error('Error fetching permissions:', err);
       } finally {
-        if (!isCancelled) {
+        if (!isCancelled && didStartLoading) {
           setLoading(false);
         }
       }
@@ -83,9 +128,16 @@ export function usePermissions(groupId ?: string) {
   // Check if current user has a specific permission
   // First checks custom overrides, then falls back to default role permissions
   const hasPermission = useCallback((permission: string): boolean => {
-    if (!user || !membership) return false;
+    if (!user) return false;
 
-    // If we have custom permissions loaded, check those first
+    // v2 path: use authoritative effective permission snapshot from server.
+    if (effectivePermissions !== null) {
+      return effectivePermissions.has(permission);
+    }
+
+    if (!membership) return false;
+
+    // v1 path: if custom role overrides are loaded, check those first.
     if (customPermissions !== null) {
       // Convert permission ID to database column name (convert underscores to match DB format)
       const dbColumnName = permission; // Already in correct format from PERMISSIONS object
@@ -97,12 +149,12 @@ export function usePermissions(groupId ?: string) {
     // Fall back to default role permissions
     const userRole = membership.role as GroupRole;
     return roleHasPermission(userRole, permission);
-  }, [user, membership, customPermissions]);
+  }, [user, membership, customPermissions, effectivePermissions]);
 
   // Get current user's role
   const getUserRole = useCallback((): GroupRole => {
-    return (membership?.role as GroupRole) ?? 'pending';
-  }, [membership]);
+    return resolvedRole ?? (membership?.role as GroupRole) ?? 'pending';
+  }, [membership, resolvedRole]);
 
   // Check if user can manage another role
   const canManage = useCallback((targetRole: GroupRole): boolean => {
