@@ -298,7 +298,7 @@ export function CharacterFiltersBar({
                 onChange={(e) => onChange({ ...filters, subscriberTier: e.target.value })}
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
-                <option value="">All</option>
+                <option value="">{t('common.all')}</option>
                 <option value="centurion">{t('filters.centurion')}</option>
                 <option value="imperator">{t('filters.imperator')}</option>
               </select>

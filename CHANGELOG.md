@@ -147,6 +147,10 @@
 
 ### Fixed
 
+* **Literal-string and image lint issues in filters and header pages**
+  * Replaced remaining hardcoded filter option text in `src/components/characters/CharacterFilters.tsx` with translated text
+  * Resolved `no-img-element` and literal-string lint findings in `src/app/page.tsx` and `src/app/events/page.tsx` by using localized labels and `next/image`
+
 * **Auth.js session-mode env hardening for Vercel deployments**
   * Updated `src/auth.ts` to normalize `AUTH_SESSION_STRATEGY` values (trim + lowercase), so values like `JWT` or `jwt` with trailing whitespace no longer silently fall back to database mode
   * Removed implicit fallback from `AUTH_DATABASE_URL` to `DATABASE_URL`, preventing unrelated platform-level `DATABASE_URL` values from unexpectedly enabling the Postgres adapter
