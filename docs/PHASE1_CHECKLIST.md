@@ -38,7 +38,7 @@ Execute Phase 1 (abstraction seam) in a non-breaking way, with a clear PR sequen
   * Add `GET /api/auth/session` normalized response shape.
 * Acceptance criteria:
   * Successful login/logout in dev with Auth.js path when flag is `v2`.
-  * Session revocation test path documented and validated.
+  * Session revocation test path documented and validated (`docs/PR02_AUTHJS_VALIDATION.md`).
   * Lint and tests pass.
 
 ### PR-03: Profile Read Path
@@ -114,8 +114,8 @@ Execute Phase 1 (abstraction seam) in a non-breaking way, with a clear PR sequen
 Status key: `[ ]` not started, `[~]` in progress, `[x]` complete.
 
 * `[x]` PR-01 Feature flag and scaffolding
-* `[ ]` PR-02 Auth.js Discord bootstrap
-* `[ ]` PR-03 Profile read path
-* `[ ]` PR-04 Group permissions read path
+* `[x]` PR-02 Auth.js Discord bootstrap (automated runbook checks, DB session revocation, and manual Discord login/logout verification completed on 2026-05-23)
+* `[x]` PR-03 Profile read path (repository seam + `GET /api/me/profile` completed; live parity sign-off validated on 2026-05-23 with authenticated v2 session and profile contract response)
+* `[x]` PR-04 Group permissions read path (service seam + `GET /api/groups/:groupId/permissions` completed with role parity and non-member status coverage on 2026-05-23)
 * `[ ]` PR-05 Client hook integration
 * `[ ]` Go/no-go gate review completed

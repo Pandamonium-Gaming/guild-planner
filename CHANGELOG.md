@@ -4,6 +4,31 @@
 
 ### Added
 
+* **Customizable game rank settings per group**
+  * Added group-level rank settings storage columns and migration: `supabase/migrations/007_game_rank_settings.sql`
+  * Added `GameRankSettings` to game settings pages for:
+    * Enabling/disabling rank usage per game
+    * Defining custom rank names and order (highest to lowest)
+  * Updated game rank management to use group-configured rank definitions instead of only static game config
+  * Updated character create/edit rank dropdowns to use group-configured game rank definitions and respect per-game rank enabled toggles
+  * Added shared helpers in `src/lib/gameRankSettings.ts` for rank column mapping, normalization, and effective rank resolution
+
+* **PR-03 profile read endpoint and repository seam**
+  * Added app-owned profile endpoint `GET /api/me/profile` in `src/app/api/me/profile/route.ts`
+  * Added v2 session-cookie auth path and v1 bearer-token fallback for authenticated profile reads
+  * Implemented profile repository seam in `src/server/users/user-profile-repository.ts` with create-on-miss support for legacy users
+  * Added route tests for authenticated/unauthenticated behavior across v1/v2 auth modes in `src/app/api/me/profile/__tests__/route.test.ts`
+
+* **Discord profile fields now refresh on login**
+  * Updated Auth.js Discord sign-in flow to sync `users.discord_username` and `users.discord_avatar` for existing linked users on each login
+  * Keeps existing custom `display_name` intact unless it was previously empty
+
+* **PR-04 group permissions read path**
+  * Added app-owned endpoint `GET /api/groups/:groupId/permissions` in `src/app/api/groups/[groupId]/permissions/route.ts`
+  * Implemented authoritative permissions service seam in `src/server/permissions/group-permissions-service.ts` to resolve membership role from `group_members` and compute effective permissions from role defaults plus `group_permission_overrides`
+  * Added route coverage for unauthorized/non-member/member responses in `src/app/api/groups/__tests__/permissions-route.test.ts`
+  * Added service parity coverage for `admin|officer|member|trial|pending` and override application in `src/server/permissions/__tests__/group-permissions-service.test.ts`
+
 * **Comprehensive Test Coverage for Discord ID Functions**
   * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
   * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user\_id fallback
@@ -56,6 +81,16 @@
   * Added no-op `v2` feature-flag branches in `useAuth` and auth callback while preserving current `v1` behaviour
   * Updated migration trackers: marked PR-01 complete in `docs/PHASE1_CHECKLIST.md` and advanced next actions in `docs/SUPABASE_EXIT_PLAN.md`
 
+* **Phase 1 PR-02 Auth.js Discord bootstrap (in progress)**
+  * Added Auth.js configuration and Discord provider bootstrap in `src/auth.ts`
+  * Added Auth.js route handlers in `src/app/api/auth/[...nextauth]/route.ts`
+  * Added normalized session endpoint `GET /api/auth/session` in `src/app/api/auth/session/route.ts`
+  * Implemented v2 session resolution in `src/server/auth/session-service.ts`
+  * Added v2-gated sign-in/sign-out/session wiring in `src/hooks/useAuth.ts` while preserving default `v1` behavior
+  * Added Auth.js environment variables to `.env.example`
+  * Added Docker-first validation stack (`docker-compose.pr02-auth.yml`) with Postgres bootstrap schema (`docker/auth-db-init.sql`)
+  * Added step-by-step local and Docker setup guidance in `docs/PR02_AUTHJS_VALIDATION.md`
+
 * **Package manager standardization on Yarn**
   * Added/confirmed Yarn package manager metadata in `package.json`
   * Added `.npmrc` with `package-lock=false` to prevent npm lockfile churn
@@ -73,6 +108,149 @@
   * CI workflow updates: bumped GitHub Actions to latest major versions (`actions/checkout@v6`, `actions/setup-node@v6`, `codecov/codecov-action@v6`, `actions/github-script@v9`, `peter-evans/create-pull-request@v8`) and moved workflow Node runtime to 22
 
 ### Fixed
+
+* **v2 write-path bridge for events and announcements**
+  * Extended `POST /api/group/events` with action-based mutations for events, RSVPs, and announcements
+  * Added membership + permission enforcement on server-side event/announcement mutation paths
+  * Updated `useEvents` to route all mutation operations through the API under `AUTH_STACK=v2` while preserving existing v1 Supabase flows
+
+* **v2 write-path bridge for ship mutations**
+  * Added `POST/DELETE /api/group/ships` for ship add/remove operations with session-based authorization and group ownership checks
+  * Updated `FleetView` and `ShipsView` to use the ship mutation API under `AUTH_STACK=v2` while preserving v1 direct Supabase behavior
+
+* **v2 write-path bridge for settings mutations**
+  * Added `POST /api/group/settings` for controlled settings writes (`groups` fields + recruitment application review actions)
+  * Enforced group membership and relevant permission checks (`recruitment_manage`, `settings_edit`, `settings_edit_roles`) on server-side settings mutations
+  * Migrated recruitment and Discord settings save paths to use the settings API under `AUTH_STACK=v2`:
+    * `RecruitmentSettings` (group recruitment config + application accept/reject)
+    * `GameRecruitmentSettings` (game-scoped recruitment fields)
+    * `GroupDiscordSettings` (guild-wide webhook and notification fields)
+    * `ClanSettings` (game-scoped Discord webhook/role fields)
+
+* **Restored direct reads for group games and members**
+  * Rolled back the v2 API read bridge for `group_games` and `members` to restore the live game shell after 404s in `/api/group/games` and `/api/group/members`
+  * Keeps the new v2 write bridges intact while returning these core reads to the known-working direct Supabase path
+
+* **Disabled service worker caching in development**
+  * Updated root layout to unregister existing service workers and clear caches when not running in production
+  * Prevents stale client bundles from keeping old API calls alive after container restarts in local development
+
+* **Restored v2 member read bridge with fallback**
+  * Re-enabled `useGroupData` to load members through `GET /api/group/members` under `AUTH_STACK=v2`
+  * Falls back to the direct Supabase query if the API path fails, so character data can recover instead of staying blank
+
+* **Archive status no longer throws on missing game rows**
+  * Switched `isGameArchived()` to `maybeSingle()` so groups without an explicit `group_games` row no longer emit 0-row errors during layout load
+
+* **PR-02 Auth.js runtime compatibility with `next-auth` v4**
+  * Replaced v5-style `handlers/auth` export usage with v4-compatible `authOptions` + `getServerSession` in `src/auth.ts`
+  * Updated App Router auth route wiring in `src/app/api/auth/[...nextauth]/route.ts` to use `NextAuth(authOptions)` handler exports
+  * Fixes local/Docker runtime `500` errors on `GET /api/auth/session` caused by incompatible Auth.js API shape
+
+* **Discord auth loop in database-session mode**
+  * Fixed a null-safety bug in `src/auth.ts` where the NextAuth `session` callback accessed `token.discordId` even when `token` is undefined for database sessions
+  * Resolves recurring `[next-auth][error][SESSION_ERROR] Cannot read properties of undefined (reading 'discordId')` and subsequent re-auth loops after Discord login
+
+* **Auth.js to legacy user reconciliation for role/membership checks**
+  * Added Discord account resolution from Auth.js `accounts` table and legacy `users.id` lookup by `discord_id` in `src/auth.ts`
+  * Session now exposes the reconciled legacy user id so existing group membership/admin authorization logic continues to recognize existing accounts
+  * Configured NextAuth sign-in page override to use `/login` instead of the default provider page
+  * Added auto-provisioning of legacy `users` rows for first-time Discord logins without an existing legacy user id (keyed by `discord_id`)
+
+* **Group game visibility fallback for unconfigured groups**
+  * Updated group and game layouts to show all available games when a group has no `group_games` rows yet
+  * Prevents empty game lists in local/dev environments before explicit game configuration is added
+
+* **v2 auth bridge for group game management**
+  * Added `GET/POST/DELETE /api/group/games` backed by NextAuth session + service-role Supabase access for group membership authorization
+  * Updated `src/lib/group-games.ts` to use the new API under `AUTH_STACK=v2`, avoiding client-side Supabase RLS failures during game add/remove/list operations
+
+* **v2 auth bridge for character visibility**
+  * Added `GET /api/group/members` backed by NextAuth session + service-role Supabase access with group membership checks
+  * Updated `src/hooks/useGroupData.ts` to load characters via the API when `AUTH_STACK=v2`, resolving empty character lists caused by client-side Supabase RLS
+
+* **v2 auth bridge expansion for ships, events, and permissions settings**
+  * Updated `GET /api/group/ships-overview` and `GET/POST /api/group/permissions` to accept NextAuth session cookies (with bearer-token fallback for v1 compatibility)
+  * Added `GET /api/group/events` for v2-safe event/announcement reads
+  * Updated `usePermissions`, `PermissionsSettings`, `ShipsView`, and `useEvents` to use cookie-auth API paths under `AUTH_STACK=v2`
+
+* **Ships overview now loads group-wide data in v2 bridge**
+  * Updated `GET /api/group/ships-overview` to fetch members by `group_id` without restricting by current `game_slug`
+  * Prevents empty ship views when the active game tab has no character rows but the group does have ships in other game-scoped member records
+
+* **Hangar view now uses v2-safe ships bridge**
+  * Updated `FleetView` (`/[group]/[game]/hangar`) to load ship data from `GET /api/group/ships-overview` under `AUTH_STACK=v2`
+  * Preserves v1 bearer-token and direct-query fallback paths
+  * Fixes empty hangar state caused by client-side Supabase reads under v2 auth
+
+* **Hangar ownership matching hardened for v2 identity reconciliation**
+  * Updated `FleetView` player-character filtering to support both legacy `members.user_id` matching and Discord ID fallback (`members.discord_id` vs session `discordId`)
+  * Uses API-returned character list as fallback when layout-provided character context is empty/stale
+
+* **Hangar ship mapping now uses API character source first**
+  * Updated `FleetView` to prefer `characters` returned by `GET /api/group/ships-overview` when building per-character ship maps
+  * Prevents false "No ships added yet" states when route/context character lists are narrower than ship overview scope
+
+* **Hangar ownership now uses server-resolved character IDs**
+  * Updated `GET /api/group/ships-overview` to include `discord_id` in character payload and return `ownCharacterIds`
+  * Updated `FleetView` to prioritize `ownCharacterIds` when deciding which characters belong to the current user
+  * Fixes cases where client-side ownership matching failed under v2 identity reconciliation
+
+* **Hangar ownership reconciliation across linked legacy user IDs**
+  * Enhanced `GET /api/group/ships-overview` to resolve all `users.id` values linked to the active session Discord account (`users.discord_id`)
+  * `ownCharacterIds` now matches by both character `user_id` in the resolved linked-ID set and `members.discord_id` fallback
+  * Addresses restored/legacy UUID mismatch scenarios where membership exists but character ownership used a sibling linked user ID
+
+* **Hangar non-blank fallback for unresolved ownership sessions**
+  * Updated `FleetView` to render ship-owning characters when personal ownership matching resolves no characters but ship data is present
+
+* **Game settings writes now persist with linked v2 identities**
+  * Updated `POST /api/group/settings` membership resolution to authorize against all legacy `users.id` records linked by `discord_id`, not only a single resolved user id
+  * Prevents false `403 Forbidden` saves when Auth.js v2 sessions reconcile to a sibling legacy user id in restored/migrated environments
+
+* **Game rank dropdown updates now persist under v2 auth**
+  * Added `POST /api/group/members` action `update_rank` with server-side authorization and linked-identity membership resolution
+  * Updated `useGroupMembership.updateRank` to use `/api/group/members` under `AUTH_STACK=v2` (cookie auth), keeping direct Supabase writes for v1
+  * Fixed `RankManagement` self-edit guard to compare against `member.user_id` (not membership row id)
+
+* **Admins can now edit their own game rank**
+  * Updated `RankManagement` to allow self-rank changes when the current user role is `admin`
+  * Updated `POST /api/group/members` rank mutation guard to permit self-rank updates for admins while continuing to block self-edits for non-admin roles
+  * Updated `src/app/[group]/[game]/tabs/ManageTab.tsx` so rank editing follows the same admin self-edit rule and no longer depends on role-edit visibility
+
+* **Game member lists now sort by rank hierarchy then name**
+  * Updated game rank management and game manage-tab member sorting to use game rank hierarchy descending, with display name as the tie-breaker
+  * Rank order now follows configured game ranks (for Star Citizen: Admiral > Vice Admiral > Captain > Enforcer > Pirate > Lowlife > No Rank)
+
+* **Rank dropdown option order now matches rank weighting**
+  * Updated character and rank-management dropdowns to render rank options highest-to-lowest by hierarchy (instead of lowest-to-highest)
+
+* **v2 character edit/delete no longer fail with false login guard**
+  * Updated `useGroupData` to resolve current user id from `GET /api/auth/session` when Supabase client auth is unavailable under Auth.js v2 cookie sessions
+  * Fixes "You must be logged in to update a character" / delete guard errors in v2 mode while preserving v1 Supabase auth behavior
+
+* **Character edit modal rank changes now persist across rank-management views**
+  * Added members API action `update_user_rank` to update `group_members.guild_rank` by target user id with the same server-side permission enforcement
+  * Updated `useGroupData.updateCharacter` to sync rank changes from character edit modal into `group_members.guild_rank` for admin/officer edits, keeping modal rank edits and rank-management ordering in sync
+  * Fixed `update_user_rank` API update filter to use resolved target membership id instead of `payload.membership_id` (which is not present for that action), preventing `invalid input syntax for type uuid: "undefined"`
+  * Added members API action `update_character_rank` and switched v2 character modal rank updates to this server path so rank changes persist even when client-side Supabase updates are restricted by RLS
+  * Updated character card rank display to resolve rank labels from group-configured custom ranks (instead of static game config), preventing raw rank IDs from showing in the UI
+  * Fixed game-rank fallback behavior for RoR so it no longer inherits AoC default ranks when no custom RoR ranks are configured
+  * Hardened rank label fallback so unknown token-like rank values (e.g. legacy ids) render as empty (`—`) instead of raw values, while preserving readable legacy labels
+  * Adds a visible warning banner so ownership reconciliation issues are explicit instead of showing a misleading empty state
+
+* **Hangar data-load effect stabilized**
+  * Updated `FleetView` to trigger ship loading from a stable character-ID dependency key instead of a zero-timeout effect tied to unstable array references
+  * Prevents canceled/deferred loads that could leave hangar stuck on "No ships added yet" despite available ship data
+
+* **Group page add-game CTA UX refinement**
+  * Hid the top header Add Game button when no games are enabled to avoid duplicate CTAs with the empty-state button
+  * Increased spacing between available-games copy and header-level Add Game action for clearer visual separation
+
+* **CI lint blockers in filters and landing headers**
+  * Replaced remaining hardcoded filter/header literals with i18n keys in `CharacterFilters`, home, and public events surfaces
+  * Replaced flagged `<img>` usages with `next/image` in `src/app/page.tsx` and `src/app/events/page.tsx`
+  * Added matching locale keys in `public/locales/en-GB.json`, `public/locales/es.json`, and `public/locales/nl.json`
 
 * **Hook test-suite warning cleanup (no suppression)**
   * Stabilized async fetch behaviour in hooks by removing deferred timer-based initial fetches in `useBuilds`, `useGroupData`, and hardening session/cleanup flow in `usePermissions`
