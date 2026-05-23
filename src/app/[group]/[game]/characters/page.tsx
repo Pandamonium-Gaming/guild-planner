@@ -30,6 +30,7 @@ export default function CharactersPage() {
     <>
       <CharactersTab
         groupId={group.id}
+        group={group}
         characters={characters}
         addCharacter={addCharacter}
         updateMember={updateMember}
@@ -49,6 +50,7 @@ export default function CharactersPage() {
         }}
         onCancel={() => setEditingCharacter(null)}
         gameSlug={gameSlug}
+        group={group}
       />
     </>
   );
