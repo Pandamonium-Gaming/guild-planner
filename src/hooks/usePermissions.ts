@@ -23,9 +23,11 @@ export function usePermissions(groupId ?: string) {
   // Fetch custom permission overrides from the server
   useEffect(() => {
     if (!groupId || !user) {
-      setCustomPermissions(null);
-      setEffectivePermissions(null);
-      setResolvedRole(null);
+      queueMicrotask(() => {
+        setCustomPermissions(null);
+        setEffectivePermissions(null);
+        setResolvedRole(null);
+      });
       return;
     }
 

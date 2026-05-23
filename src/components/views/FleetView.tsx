@@ -204,7 +204,6 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
   const [characterShips, setCharacterShips] = useState<Record<string, CharacterShip[]>>({});
   const [fleetCharacters, setFleetCharacters] = useState<CharacterWithProfessions[]>(characters);
   const [ownCharacterIds, setOwnCharacterIds] = useState<string[]>([]);
-  const [sessionDiscordId, setSessionDiscordId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
@@ -218,9 +217,7 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
 
   const playerCharacters = ownCharacterIds.length > 0
     ? fleetCharacters.filter((c) => ownCharacterIds.includes(c.id))
-    : fleetCharacters.filter(
-      (c) => c.user_id === userId || (sessionDiscordId ? c.discord_id === sessionDiscordId : false)
-    );
+    : fleetCharacters.filter((c) => c.user_id === userId);
   const hasAnyShipsInDataset = Object.values(characterShips).some((ships) => ships.length > 0);
   const visibleCharacters = playerCharacters.length > 0
     ? playerCharacters
@@ -316,47 +313,12 @@ export function FleetView({ characters, userId, canManage, groupId }: FleetViewP
   };
 
   useEffect(() => {
-    void loadCharacterShips();
+    const timerId = setTimeout(() => {
+      void loadCharacterShips();
+    }, 0);
+
+    return () => clearTimeout(timerId);
   }, [groupId, characterIdsKey]);
-
-  useEffect(() => {
-    if (getClientAuthStack() !== 'v2') {
-      setSessionDiscordId(null);
-      return;
-    }
-
-    let active = true;
-    const loadSessionIdentity = async () => {
-      try {
-        const response = await fetch('/api/auth/session', {
-          credentials: 'include',
-          cache: 'no-store',
-        });
-
-        if (!response.ok) {
-          return;
-        }
-
-        const payload = (await response.json()) as {
-          user?: {
-            discordId?: string | null;
-          };
-        };
-
-        if (active) {
-          setSessionDiscordId(payload.user?.discordId || null);
-        }
-      } catch {
-        // Non-blocking: user_id matching remains the primary ownership filter.
-      }
-    };
-
-    void loadSessionIdentity();
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const openAddShipForm = () => {
     if (!selectedCharacter && playerCharacters.length > 0) {

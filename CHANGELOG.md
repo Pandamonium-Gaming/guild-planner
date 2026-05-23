@@ -35,6 +35,10 @@
   * Updated `useAuth` v2 profile hydration to call `GET /api/me/profile` with safe fallback to session-derived profile fields
   * Added v2 client-hook coverage in `src/hooks/__tests__/usePermissions.test.ts`
 
+* **Lint gate compatibility fixes for PR-05 rollout**
+  * Updated `usePermissions` and `FleetView` effect scheduling to avoid `react-hooks/set-state-in-effect` lint errors while preserving behavior
+  * Restored `yarn lint` pass status required by the phase go/no-go gate
+
 * **Comprehensive Test Coverage for Discord ID Functions**
   * New test file: `src/lib/__tests__/character-lookup.test.ts` (38 tests)
   * Test coverage for `getCharacterByDiscordId()` - Discord ID lookup with user\_id fallback
