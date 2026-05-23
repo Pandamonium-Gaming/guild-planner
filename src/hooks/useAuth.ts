@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { getClientAuthStack } from '@/lib/authStack';
+import { signIn as nextAuthSignIn, signOut as nextAuthSignOut } from 'next-auth/react';
 import { 
   UserProfile, 
   getUserProfile, 
@@ -29,6 +30,44 @@ export function useAuth(): UseAuthReturn {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchV2Session = useCallback(async () => {
+    try {
+      const response = await fetch('/api/auth/session', { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch v2 session: ${response.status}`);
+      }
+
+      const payload = await response.json() as {
+        authenticated: boolean;
+        user: { id: string; discordId: string | null; displayName: string | null } | null;
+      };
+
+      if (!payload.authenticated || !payload.user) {
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        return;
+      }
+
+      // Keep current hook contract for consumers while v2 rollout is gated.
+      setUser({ id: payload.user.id } as User);
+      setSession(null);
+      setProfile({
+        id: payload.user.id,
+        discord_id: payload.user.discordId,
+        discord_username: null,
+        discord_avatar: null,
+        display_name: payload.user.displayName,
+        timezone: 'UTC',
+      });
+    } catch (error) {
+      console.error('Error fetching v2 session:', error);
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+    }
+  }, []);
+
   const fetchProfile = useCallback(async (userId: string) => {
     try {
       const timeoutPromise = new Promise<UserProfile | null>((_, reject) => {
@@ -50,10 +89,20 @@ export function useAuth(): UseAuthReturn {
   useEffect(() => {
     const authStack = getClientAuthStack();
 
-    // PR-01 scaffold: v2 path is feature-flagged but not implemented yet.
-    // Keep behavior unchanged by continuing to use v1 logic.
     if (authStack === 'v2') {
-      // TODO(PR-02): replace with app-owned session endpoint.
+      let isCancelled = false;
+      const timerId = setTimeout(() => {
+        fetchV2Session().finally(() => {
+          if (!isCancelled) {
+            setLoading(false);
+          }
+        });
+      }, 0);
+
+      return () => {
+        isCancelled = true;
+        clearTimeout(timerId);
+      };
     }
 
     // Get initial session
@@ -85,13 +134,26 @@ export function useAuth(): UseAuthReturn {
     return () => {
       subscription.unsubscribe();
     };
-  }, [fetchProfile]);
+  }, [fetchProfile, fetchV2Session]);
 
   const signIn = async (redirectTo?: string) => {
+    if (getClientAuthStack() === 'v2') {
+      await nextAuthSignIn('discord', { callbackUrl: redirectTo || '/' });
+      return;
+    }
+
     await signInWithDiscord(redirectTo);
   };
 
   const signOut = async () => {
+    if (getClientAuthStack() === 'v2') {
+      await nextAuthSignOut({ callbackUrl: '/' });
+      setUser(null);
+      setProfile(null);
+      setSession(null);
+      return;
+    }
+
     await authSignOut();
     setUser(null);
     setProfile(null);
@@ -105,6 +167,11 @@ export function useAuth(): UseAuthReturn {
   };
 
   const refresh = async () => {
+    if (getClientAuthStack() === 'v2') {
+      await fetchV2Session();
+      return;
+    }
+
     if (user) {
       await fetchProfile(user.id);
     }

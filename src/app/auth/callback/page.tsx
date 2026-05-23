@@ -14,10 +14,9 @@ export default function AuthCallbackPage() {
     const handleCallback = async () => {
       const authStack = getClientAuthStack();
 
-      // PR-01 scaffold: v2 callback flow will be implemented in PR-02.
-      // Keep current behavior unchanged during seam introduction.
       if (authStack === 'v2') {
-        // TODO(PR-02): handle Auth.js callback flow.
+        router.push('/');
+        return;
       }
 
       const { data: { session }, error } = await supabase.auth.getSession();

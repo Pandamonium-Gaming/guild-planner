@@ -1,4 +1,5 @@
 import { getServerAuthStack } from '@/lib/authStack';
+import { auth } from '@/auth';
 
 export interface SessionSnapshot {
   stack: 'v1' | 'v2';
@@ -7,17 +8,24 @@ export interface SessionSnapshot {
   displayName: string | null;
 }
 
-/**
- * PR-01 scaffold: server auth seam.
- *
- * This intentionally returns an empty snapshot while the app still runs on v1.
- * Phase 1 PR-02 will implement Auth.js-backed session resolution for v2.
- */
 export async function getSessionSnapshot(): Promise<SessionSnapshot> {
+  const stack = getServerAuthStack();
+
+  if (stack === 'v1') {
+    return {
+      stack,
+      userId: null,
+      discordId: null,
+      displayName: null,
+    };
+  }
+
+  const session = await auth();
+
   return {
-    stack: getServerAuthStack(),
-    userId: null,
-    discordId: null,
-    displayName: null,
+    stack,
+    userId: session?.user?.id ?? null,
+    discordId: session?.user?.discordId ?? null,
+    displayName: session?.user?.name ?? null,
   };
 }
