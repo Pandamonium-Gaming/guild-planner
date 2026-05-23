@@ -2,6 +2,8 @@
 set -e
 
 echo "🏗️ Running local build gate before push..."
-yarn build || { echo "❌ Build failed. Fix errors before pushing."; exit 1; }
+node -e "const fs=require('fs'); try{fs.rmSync('.next',{recursive:true,force:true,maxRetries:5,retryDelay:200});}catch(_e){}"
+node scripts/generate-migration-list.js
+node ./node_modules/next/dist/bin/next build --webpack || { echo "❌ Build failed. Fix errors before pushing."; exit 1; }
 
 echo "✅ Build gate passed."
