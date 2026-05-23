@@ -117,7 +117,6 @@ export function useCaravans(groupId: string | null): UseCaravansReturn {
     const { data: { user } } = await supabase.auth.getUser();
     
     // Destructure escortRequirements (not a DB column) from data to prevent insert error
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { escortRequirements, ...caravanData } = data as CaravanData & { escortRequirements?: unknown };
 
     const { data: newCaravan, error: insertError } = await supabase
